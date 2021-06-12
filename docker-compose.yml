@@ -44,7 +44,6 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
-      PGADMIN_LISTEN_PORT: 5454
     volumes:
        - pgadmin:/root/.pgadmin
     ports:
