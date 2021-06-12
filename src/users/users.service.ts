@@ -17,6 +17,7 @@ export class UsersService {
     newUser.wins = 0;
     newUser.looses = 0;
     newUser.current_status = "none";
+    newUser.friends = userData.friends;
     await this.manager.save(newUser);
     return newUser;
   }

@@ -1,8 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, BaseEntity } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
 @Entity()
-export class MatchHistory {
+export class MatchHistory extends BaseEntity {
 
   @PrimaryGeneratedColumn()
   id: number;
