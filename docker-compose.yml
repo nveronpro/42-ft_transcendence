@@ -5,13 +5,13 @@ services:
     build:
       context: .
     volumes:
-      - .:/usr/src/app
+      - ./Back-end/.:/usr/src/app
       - /usr/src/app/node_modules
     ports:
       - 3000:3000
     command: npm run start:dev
     env_file:
-      - .env
+      - ./Back-end/.env
     networks:
       - webnet
     depends_on:
