@@ -1,0 +1,1 @@
+export declare const OAUTH2_SERVER_OPTIONS = "OAUTH2_SERVER_OPTIONS";
