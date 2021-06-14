@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { MatchHistoriesService } from './match-histories.service';
 import { CreateMatchHistoryDto } from './dto/create-match-history.dto';
-//import { UpdateMatchHistoryDto } from './dto/update-match-history.dto';
+import { UpdateMatchHistoryDto } from './dto/update-match-history.dto';
 
 @Controller('match-histories')
 export class MatchHistoriesController {
@@ -22,10 +22,10 @@ export class MatchHistoriesController {
     return this.matchHistoriesService.findOne(+id);
   }
 
-  //@Patch(':id')
-  //update(@Param('id') id: string, @Body() updateMatchHistoryDto: UpdateMatchHistoryDto) {
-  //  return this.matchHistoriesService.update(+id, updateMatchHistoryDto);
-  //}
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateMatchHistoryDto: UpdateMatchHistoryDto) {
+    return this.matchHistoriesService.update(+id, updateMatchHistoryDto);
+  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

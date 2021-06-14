@@ -29,4 +29,7 @@ export class User extends BaseEntity {
   @ManyToMany(() => MatchHistory)
   @JoinTable()
   match_histories: MatchHistory[];
+
+  @Column()
+  is_admin?: boolean;
 }
