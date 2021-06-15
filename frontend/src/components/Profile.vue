@@ -18,7 +18,7 @@
 			</div>
 			<hr>
 			<div>
-				<button>2 factor authentification </button>
+				<button onclick='alert("you have reached the button");'>2 factor authentification </button>
 			</div>
 			<hr>
 		</div>

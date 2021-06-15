@@ -3,8 +3,8 @@ import App from './App.vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 import HomeComponent from '@/views/Home.vue';
-import EditComponent from '@/components/customers/Edit.vue';
-import CreateComponent from '@/components/customers/Create.vue';
+//import EditComponent from '@/components/customers/Edit.vue';
+//import CreateComponent from '@/components/customers/Create.vue';
 
 import FriendsComponent from '@/components/Friends.vue';
 import StatsComponent from '@/components/Stats.vue';
@@ -20,8 +20,8 @@ const router = createRouter({
   routes: [
     { path: '/', redirect: { name: 'home' } },
     { path: '/home', name: 'home', component: HomeComponent },
-    { path: '/create', name: 'Create', component: CreateComponent },
-    { path: '/edit/:id', name: 'Edit', component: EditComponent },
+    //{ path: '/create', name: 'Create', component: CreateComponent },
+    //{ path: '/edit/:id', name: 'Edit', component: EditComponent },
 
 	{ path: '/friends', name: 'Friends', component: FriendsComponent },
 	{ path: '/stats', name: 'Stats', component: StatsComponent },

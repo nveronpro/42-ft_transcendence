@@ -79,6 +79,8 @@
 #chat-container > * {
 	display: inline;
 	float: right;
+
+	z-index:-100;
 }
 
 #chat-tabs {
@@ -94,10 +96,6 @@
 	flex-direction: row;
 	
 	overflow-x: scroll;
-
-
-	z-index: -1;
-
 }
 
 .chat-tab {
@@ -116,9 +114,7 @@
 	transform: translateY(-100%);
 	display: block;
 
-	pointer-events: auto;
-
-	z-index: 1;
+	z-index: 100;
 }
 
 .header {

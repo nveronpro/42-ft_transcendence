@@ -3,6 +3,7 @@
       <div class="text-center">
         <h1>Nest Customer List App Tutorial</h1>
        <p> Built with Nest.js and Vue.js</p>
+       <button v-on:click="pingContainer()">PingTheServer !</button>
        <div v-if="customers.length === 0">
             <h2> No customer found at the moment </h2>
         </div>
@@ -53,7 +54,8 @@ export default {
     };
   },
   created() {
-    this.fetchCustomers();
+    //this.fetchCustomers();
+	this.pingContainer();
   },
   methods: {
     fetchCustomers() {
@@ -65,6 +67,7 @@ export default {
           console.log(data);
         });
     },
+	/*
     deleteCustomer(id) {
       axios
         .delete(`${server.baseURL}/customer/delete?customerID=${id}`)
@@ -72,7 +75,15 @@ export default {
           console.log(data);
           window.location.reload();
         });
-    }
+    },
+	*/
+	pingContainer() {
+		axios
+			.get(`${server.baseURL}/users`)
+			.then((data) => {
+				console.log("the container has been reached !");
+			});
+	}
   }
 };
 </script>
