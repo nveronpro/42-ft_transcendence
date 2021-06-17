@@ -59,15 +59,14 @@ services:
             dockerfile: ./dockerfile_frontend
         restart: always
         ports:
-            - 80:8080
-        command: npm run build
+            - 8080:8080
+        #command: npm run serve
         env_file:
             - .env
         networks:
             - webnet
         depends_on:
-            - redis
-            - postgres
+            - main
 
 networks:
     webnet:

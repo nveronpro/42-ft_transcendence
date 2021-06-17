@@ -1,3 +1,3 @@
 export const server = {
-	baseURL: 'http://postgres:3000'
+	baseURL: `http://main:3000`
 }
