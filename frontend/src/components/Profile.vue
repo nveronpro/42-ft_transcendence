@@ -19,6 +19,7 @@
 			<hr>
 			<div>
 				<button onclick='alert("you have reached the button");'>2 factor authentification </button>
+				<a href="http://google.com/">This is a link to go to google</a>
 			</div>
 			<hr>
 		</div>

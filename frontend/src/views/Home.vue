@@ -3,6 +3,7 @@
       <div class="text-center">
         <h1>Nest Customer List App Tutorial</h1>
        <p> Built with Nest.js and Vue.js</p>
+       <input id="server_address" value="/api/users/"/>
        <button v-on:click="pingContainer()">PingTheServer !</button>
        <div v-if="customers.length === 0">
             <h2> No customer found at the moment </h2>
@@ -79,9 +80,13 @@ export default {
 	*/
 	pingContainer() {
 		axios
-			.get(`${server.baseURL}/users`)
+			.get(document.getElementById('server_address').value)
 			.then((data) => {
 				console.log("the container has been reached !");
+				console.log(data);
+			})
+			.catch((data) => {
+				console.log("An error has occured...");
 			});
 	}
   }
