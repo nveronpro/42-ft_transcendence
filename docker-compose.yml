@@ -60,7 +60,6 @@ services:
         restart: always
         ports:
             - 8080:8080
-        #command: npm run serve
         env_file:
             - .env
         networks:
