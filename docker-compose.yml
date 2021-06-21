@@ -6,13 +6,13 @@ services:
             context: .
             dockerfile: ./dockerfile_backend
         volumes:
-            - ./Back-end/.:/usr/src/app
+            - ./backend/.:/usr/src/app
             - /usr/src/app/node_modules
         ports:
             - 3000:3000
         command: npm run start:dev
         env_file:
-            - ./Back-end/.env
+            - ./backend/.env
         networks:
             - webnet
         depends_on:
