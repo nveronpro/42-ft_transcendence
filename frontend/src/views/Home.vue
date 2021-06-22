@@ -56,7 +56,7 @@ export default {
   },
   created() {
     //this.fetchCustomers();
-	this.pingContainer();
+	//this.pingContainer();
   },
   methods: {
     fetchCustomers() {
