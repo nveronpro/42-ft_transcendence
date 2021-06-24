@@ -76,19 +76,21 @@
 
 <style>
 
+#footer {
+	pointer-events: none;
+}
+
 #chat-container > * {
 	display: inline;
 	float: right;
-
+	pointer-events: none;
 	z-index:-100;
 }
 
 #chat-tabs {
-	border: solid 3px magenta;
+	pointer-events: none;
 
-	background-color: rgba(200, 0, 200, 0.2);
-
-	height: 50vh;
+	height: 60vh;
 
 	max-width: 100%;
 
@@ -107,7 +109,7 @@
 	min-width: 220px;
 	max-height: 410px;
 	bottom: 0;
-
+	pointer-events: all;
 	position: relative;
 	display: inline-block;
 	top: 100%;

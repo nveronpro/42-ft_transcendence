@@ -7,6 +7,7 @@
        <button v-on:click="login()">LOGIN</button>
        <input id="server_address" value="/api/users/"/>
        <button v-on:click="pingContainer()">PingTheServer !</button>
+       <button v-on:click="ft_login()">LOGIN !</button>
        <div v-if="customers.length === 0">
             <h2> No customer found at the moment </h2>
         </div>
@@ -70,7 +71,10 @@ export default {
           console.log(data);
         });
     },
-    /*
+    async ft_login() {
+      window.location.href = "http://localhost:3000/auth/login";
+    },
+	/*
     deleteCustomer(id) {
       axios
         .delete(`${server.baseURL}/customer/delete?customerID=${id}`)
