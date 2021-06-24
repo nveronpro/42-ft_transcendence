@@ -5,6 +5,7 @@
        <p> Built with Nest.js and Vue.js</p>
        <input id="server_address" value="/api/users/"/>
        <button v-on:click="pingContainer()">PingTheServer !</button>
+       <button v-on:click="ft_login()">LOGIN !</button>
        <div v-if="customers.length === 0">
             <h2> No customer found at the moment </h2>
         </div>
@@ -67,6 +68,9 @@ export default {
           console.log("all user received:");
           console.log(data);
         });
+    },
+    async ft_login() {
+      window.location.href = "http://localhost:3000/auth/login";
     },
 	/*
     deleteCustomer(id) {

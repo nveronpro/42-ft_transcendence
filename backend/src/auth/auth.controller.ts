@@ -11,6 +11,7 @@ export class AuthController {
   @Get('/login')
   @Redirect('/', 302) // CHANGE THE CODE
   login(@Res() res: Response){
+    console.log("test login");
     const url_login = this.authService.login();
     return { url: url_login };
 
@@ -31,7 +32,7 @@ export class AuthController {
   }
 
   @Get('/saveToken')
-  @Redirect('/', 302) // CHANGE THE CODE
+  @Redirect('http://localhost:8080', 302) // CHANGE THE CODE
   saveToken(@Query('token') token, @Res() res: Response){
     res.cookie('auth-cookie', token, { httpOnly: true });
   }
