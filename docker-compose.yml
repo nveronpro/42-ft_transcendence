@@ -59,7 +59,7 @@ services:
             dockerfile: ./dockerfile_frontend
         restart: always
         ports:
-            - 8080:8080
+            - 8080:80
         #command: npm run serve
         env_file:
             - .env
