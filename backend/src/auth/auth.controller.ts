@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Query, Redirect, UseGuards, Req, Res } from '@nestjs/common';
+import { Controller, Post, Get, Query, Redirect, UseGuards, Req, Res, Logger } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { User } from './decorators/user.decorator';
@@ -7,13 +7,15 @@ import {Response, Request} from 'express';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+  private readonly logger = new Logger(AuthController.name);
 
   @Get('/login')
-  @Redirect('/', 302) // TODO CHANGE THE CODE
-  login(@Res() res: Response){
+  //@Redirect('/', 302) // TODO CHANGE THE CODE
+  login(/*@Res() res: Response*/){
+	this.logger.log("@GET(/login)");
     const url_login = this.authService.login();
-    return { url: url_login };
-
+	this.logger.log("url:"+url_login);
+    return {url: url_login};
   }
 
   @Get('/logout')

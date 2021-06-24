@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Logger } 
 import { MatchHistoriesService } from './match-histories.service';
 import { CreateMatchHistoryDto } from './dto/create-match-history.dto';
 import { UpdateMatchHistoryDto } from './dto/update-match-history.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from '../auth/decorators/user.decorator';
 
 @Controller('match-histories')
