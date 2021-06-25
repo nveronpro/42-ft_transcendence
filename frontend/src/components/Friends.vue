@@ -75,24 +75,19 @@
 	flex-flow: column;
 	background-color: darkgrey;
 }
-
 #search {
 	float: left;
 	width: 20%;
 	margin-left: 2%;
-
 	border-right: 5px solid green;
-
 	background-color: yellowgreen;
 }
-
 #result-list {
 	margin: 5px;
 	list-style-type:none;
 	padding: 10px;
 	border: solid black 2px;
 }
-
 .search-result {
 	margin-top: 5px;
 	height: 52px;
@@ -100,61 +95,46 @@
 	line-height: 52px;
 	background-color: lightgreen;
 }
-
 .search-result .nickname {
 	display: inline;
 	vertical-align: middle;
 }
-
 .search-result img {
 	display: inline;
 	vertical-align: middle;	
 }
-
 .search-result .avatar {
 	width: 50px;
 	height: 50px;
 	border: 1px solid greenyellow;
 	float: left;
 }
-
 .search-result .status {
 	width: 15px;
 	height: 15px;
 	border: 1px solid white;
 	float: right;
 }
-
-
-
-
 #friends {
 	float: right;
 	width: 76%;
 	margin-right: 2%;
-
 	border-left: 5px solid red;
-
 	background-color: pink;
 }
-
 #friends-list {
 	margin: 5px;
 	list-style-type:none;
 	padding: 10px;
 	border: solid black 2px;
-
 	display: flex;
 	flex-wrap: wrap;
 }
-
 #friends-list li {
 	list-style: none;
 	flex: 0 0 30%;
 	margin: 1%;
 }
-
-
 </style>
 
 
