@@ -11,7 +11,8 @@ async function bootstrap() {
 			'warn',
 			'log',
 			'debug',
-			'verbose'],
+			// 'verbose'
+		],
 	});
 	app.enableCors({
 		"origin": "*",

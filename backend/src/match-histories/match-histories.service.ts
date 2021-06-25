@@ -14,8 +14,17 @@ export class MatchHistoriesService {
 
 	private readonly logger = new Logger(MatchHistoriesService.name);
 
-	create(createMatchHistoryDto: CreateMatchHistoryDto) {
-		return 'This action adds a new matchHistory';
+	async create(createMatchHistoryDto: CreateMatchHistoryDto) {
+		const res = await this.manager
+		.createQueryBuilder()
+		.insert()
+		.into(MatchHistory)
+		.values(createMatchHistoryDto)
+		.execute();
+
+		this.logger.verbose("result:" + res);
+
+		// return (res);
 	}
 
 	async findAll() {
@@ -44,12 +53,24 @@ export class MatchHistoriesService {
 		.orWhere("match_history.looserId = :looser", {looser: user.id})
 		.getRawMany();
 
+		this.logger.verbose("result:" + res);
+
 		return (res);
 
 	}
 
-	findOne(id: number) {
-		return `This action returns a #${id} matchHistory`;
+	async findOne(id: number) {
+
+		const res = await this.manager
+		.createQueryBuilder()
+		.select("match_history")
+		.from(MatchHistory, "match_history")
+		.where("match_history.id = :id", {id: id})
+		.getRawOne();
+
+		this.logger.verbose("result:" + res);
+
+		return (res);
 	}
 
 	update(id: number, updateMatchHistoryDto: UpdateMatchHistoryDto) {
