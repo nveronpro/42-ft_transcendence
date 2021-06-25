@@ -16,16 +16,16 @@ export class MatchHistoriesController {
 		return this.matchHistoriesService.create(createMatchHistoryDto);
 	}
 
-	// @Get()
-	// findAll() {
-	// 	return this.matchHistoriesService.findAll();
-	// }
+	@Get("/all")
+	findAll() {
+		return this.matchHistoriesService.findAll();
+	}
 	
 	@Get()
 	@UseGuards(JwtAuthGuard)
 	async findUserHistory(@User() user) {
 		this.logger.log("@GET("+user+")");
-		return this.matchHistoriesService.findAll();
+		return this.matchHistoriesService.findUserHistory(user);
 	}
 
 	@Get(':id')

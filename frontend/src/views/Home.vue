@@ -4,7 +4,6 @@
         <h1>Nest Customer List App Tutorial</h1>
        <p> Built with Nest.js and Vue.js</p>
        <button> UPDATE </button>
-       <button v-on:click="login()">LOGIN</button>
        <input id="server_address" value="/api/users/"/>
        <button v-on:click="pingContainer()">PingTheServer !</button>
        <button v-on:click="ft_login()">LOGIN !</button>
@@ -90,25 +89,6 @@ export default {
             .then((data) => {
                 console.log("the container has been reached !");
                 console.log(data);
-        console.log(data.url);
-        window.location.href = data.url;
-            })
-            .catch((data) => {
-                console.log("An error has occured...");
-                console.log(data);
-            });
-    }, 
-    login() {
-        axios
-            .get("/api/auth/login")
-            .then((data) => {
-                console.log("the container has been reached !");
-                console.log("data: " + data);
-                console.log("data.url: " + data.url);
-                console.log("data.data: " + data.data);
-                console.log("data.data.url: " + data.data.url);
-				console.log("data.data.url: " + "\"" + data.data.url + "\"");
-                window.location.href = "\"" + data.data.url + "\"";
             })
             .catch((data) => {
                 console.log("An error has occured...");

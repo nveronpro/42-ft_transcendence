@@ -19,7 +19,7 @@ async function bootstrap() {
 		"preflightContinue": false,
 		"optionsSuccessStatus": 204
 	});
-	//seed();
+	seed();
 	app.use(cookieParser());
 	await app.listen(3000);
 }
