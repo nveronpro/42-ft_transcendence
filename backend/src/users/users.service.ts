@@ -27,12 +27,7 @@ export class UsersService {
     console.log(allUsers);
     return allUsers;
   }
-
-  async findOne(id: number) {
-    const user = await this.manager.findOne(User, id);
-    return user;
-  }
-
+  
   async findOneWhithLogin(login: string) {
     const user = await this.manager.findOne(User, { login: login });
     return user;

@@ -1,6 +1,6 @@
 <template>
 	<div id="container">
-		<p> this will be the Profile component </p>
+		<p> this will be the Profile component test</p>
 		<div id="profile">
 			<div>
 				<form v-on:submit.prevent="onSubmit">
@@ -28,12 +28,6 @@
 </template>
 
 <style>
-#container {
-	height: 100%;
-	display: flex;
-	flex-flow: column;
-	background-color: darkgrey;
-}
 
 #ppUpdate {
 	border: solid 2px black ;
@@ -46,22 +40,3 @@
 }
 
 </style>
-
-
-
-
-<script>
-
-// import axios from "axios";
-// import { server } from "../../helper";
-// import router from "../../router";
-export default {
-	data() {
-		return {
-			friends: []
-		};
-	},
-	methods: {
-	},
-};
-</script>

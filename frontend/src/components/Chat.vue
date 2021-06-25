@@ -1,31 +1,6 @@
 <template>
 	<div id="chat-container">
-		<!-- <p> this will be the Chat component </p> -->
 		<div id="chat-tabs">
-			<div class="chat-tab retracted">
-				<p class="header" onclick='this.parentNode.children[1].classList.toggle("hidden");this.parentNode.classList.toggle("retracted");'>Epsilon</p>
-				<div class="under-chat hidden">
-					<ul class="chat">
-					</ul>
-					<input class="chat-input"/>
-				</div>
-			</div>
-			<div class="chat-tab retracted">
-				<p class="header" onclick='this.parentNode.children[1].classList.toggle("hidden");this.parentNode.classList.toggle("retracted");'>Delta</p>
-				<div class="under-chat hidden">
-					<ul class="chat">
-					</ul>
-					<input class="chat-input"/>
-				</div>
-			</div>
-			<div class="chat-tab retracted">
-				<p class="header" onclick='this.parentNode.children[1].classList.toggle("hidden");this.parentNode.classList.toggle("retracted");'>Omega</p>
-				<div class="under-chat hidden">
-					<ul class="chat">
-					</ul>
-					<input class="chat-input"/>
-				</div>
-			</div>
 			<div class="chat-tab retracted">
 				<p class="header" onclick='this.parentNode.children[1].classList.toggle("hidden");this.parentNode.classList.toggle("retracted");'>Pi</p>
 				<div class="under-chat hidden">
@@ -76,37 +51,27 @@
 
 <style>
 
-#footer {
+#chat-container {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	z-index: 100;
 	pointer-events: none;
-}
-
-#chat-container > * {
-	display: inline;
-	float: right;
-	pointer-events: none;
-	z-index:-100;
 }
 
 #chat-tabs {
-	pointer-events: none;
-
 	height: 60vh;
-
 	max-width: 100%;
-
 	display: flex;
 	flex-direction: row;
-	
-	overflow-x: scroll;
+	pointer-events: none;
 }
 
 .chat-tab {
 	background-color:rgba(100, 100, 100, 0.3);
 	margin-left: 5px;
 	margin-right: 5px;
-	margin-bottom: 5px;
-	border: 1px solid black;
-	min-width: 220px;
+	min-width: 200px;
 	max-height: 410px;
 	bottom: 0;
 	pointer-events: all;
@@ -193,29 +158,7 @@
 }
 
 .retracted {
-	height: 50px;
+	height: 5vh;
 }
 
 </style>
-
-
-
-
-
-
-
-
-<script>
-// import axios from "axios";
-// import { server } from "../../helper";
-// import router from "../../router";
-export default {
-	data() {
-		return {
-			friends: []
-		};
-	},
-	methods: {
-	},
-};
-</script>

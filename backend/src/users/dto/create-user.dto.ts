@@ -1,5 +1,6 @@
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { User } from '../entities/user.entity'
+import { MatchHistory } from "../../match-histories/entities/match-history.entity"
 
 export class CreateUserDto {
     login: string;
@@ -13,4 +14,6 @@ export class CreateUserDto {
     friends: User[];
 
     current_status: string;
+
+    match_histories: MatchHistory[];
 }
