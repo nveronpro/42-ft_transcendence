@@ -6,6 +6,7 @@ import { configService } from './config/config.service';
 import { UsersModule } from './users/users.module';
 import { MatchHistoriesModule } from './match-histories/match-histories.module';
 import { AuthModule } from './auth/auth.module';
+import { Connection } from 'typeorm';
 
 @Module({
   imports: [
@@ -17,4 +18,4 @@ import { AuthModule } from './auth/auth.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
