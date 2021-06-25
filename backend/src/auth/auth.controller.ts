@@ -19,7 +19,7 @@ export class AuthController {
   }
 
   @Get('/logout')
-  @Redirect('/', 302) // TODO CHANGE THE CODE
+  @Redirect('http://localhost:8080', 302) // CHANGE THE CODE
   logout(@Res() res: Response){
     res.clearCookie('auth-cookie', { httpOnly: true });
   }
@@ -38,9 +38,19 @@ export class AuthController {
     res.cookie('auth-cookie', token, { httpOnly: true });
   }
 
+  @Get('/cookie')
+  cookie(@Req() request: Request){
+    console.log(request?.cookies["auth-cookie"]);
+    if (request.cookies["auth-cookie"])
+      return true;
+    else
+      return false;
+  }
+
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   async profile(@User() user){
     console.log(user);
+    return user;
   }
 }

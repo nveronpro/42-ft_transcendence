@@ -42,87 +42,6 @@
 						<p class="nickname">Beta</p>
 						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
 					</li>
-					<li class="match-result tie">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Alpha</p>
-						<b> 5 </b>
-						<h4> // </h4>
-						<b> 5 </b>
-						<p class="nickname">Gamma</p>
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-					</li>
-					<li class="match-result win">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Alpha</p>
-						<b> 4 </b>
-						<h4> // </h4>
-						<b> 3 </b>
-						<p class="nickname">Delta</p>
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-					</li>
-					<li class="match-result loose">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Alpha</p>
-						<b> 0 </b>
-						<h4> // </h4>
-						<b> 9 </b>
-						<p class="nickname">Omega</p>
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-					</li>
-					<li class="match-result win">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Alpha</p>
-						<b> 6 </b>
-						<h4> // </h4>
-						<b> 5 </b>
-						<p class="nickname">Pi</p>
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-					</li>
-					<li class="match-result win">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Alpha</p>
-						<b> 5 </b>
-						<h4> // </h4>
-						<b> 1 </b>
-						<p class="nickname">Epsilon</p>
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-					</li>
-					<li class="match-result tie">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Alpha</p>
-						<b> 1 </b>
-						<h4> // </h4>
-						<b> 1 </b>
-						<p class="nickname">Teta</p>
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-					</li>
-					<li class="match-result loose">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Alpha</p>
-						<b> 6 </b>
-						<h4> // </h4>
-						<b> 8 </b>
-						<p class="nickname">Omicron</p>
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-					</li>
-					<li class="match-result win">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Alpha</p>
-						<b> 2 </b>
-						<h4> // </h4>
-						<b> 1 </b>
-						<p class="nickname">Ro</p>
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-					</li>
-					<li class="match-result win">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Alpha</p>
-						<b> 6 </b>
-						<h4> // </h4>
-						<b> 2 </b>
-						<p class="nickname">Zeta</p>
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-					</li>
 				</ul>
 			</div>
 		</div>
@@ -228,27 +147,21 @@ li * {
 	margin-left: 3%;
 	margin-right: 3%;
 }
-
-
-
 </style>
 
-
-
-
-
 <script>
+	import axios from "axios";
 
-// import axios from "axios";
-// import { server } from "../../helper";
-// import router from "../../router";
-export default {
-	data() {
-		return {
-			friends: []
-		};
-	},
-	methods: {
-	},
-};
+	export default {
+		data(){
+			return {
+				user: null,
+			}
+		},
+		mounted () {
+			axios
+			.get('/api/auth/me')
+			.then(response => (this.user = response.data))
+		}
+	}
 </script>
