@@ -35,8 +35,13 @@ export class UsersService {
 	}
 
 	async findOne(id: number) {
-		const user = await this.manager.findOne(User, id);
-		return user;
+		const res = await this.manager
+		.createQueryBuilder()
+		.select("user")
+		.from(User, "user")
+		.where("user.id = :id", {id: id})
+		.getRawMany();
+		return res;
 	}
 
 	async findOneWhithLogin(login: string) {
@@ -44,11 +49,35 @@ export class UsersService {
 		return user;
 	}
 
-	update(id: number, updateUserDto: UpdateUserDto) {
-		return `This action updates a #${id} user`;
+
+	/*
+    login: string;
+
+    nickname: string;
+
+    wins: number;
+
+    looses: number;
+
+    friends: User[];
+
+    current_status: string;
+	*/
+	async update(user: User, updateUserDto: UpdateUserDto) {
+		const res = await this.manager
+		.createQueryBuilder()
+		.update("user")
+		.set(updateUserDto)
+		.where("user.id = :id", {id: user.id})
+		.execute();
 	}
 
-	remove(id: number) {
-		return `This action removes a #${id} user`;
+	async remove(user: User) {
+		const res = await this.manager
+		.createQueryBuilder()
+		.delete()
+		.from(User)
+		.where("user.id = :id", {id: user.id})
+		.execute();
 	}
 }

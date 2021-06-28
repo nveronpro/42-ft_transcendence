@@ -7,13 +7,15 @@ import { UsersModule } from './users/users.module';
 import { MatchHistoriesModule } from './match-histories/match-histories.module';
 import { AuthModule } from './auth/auth.module';
 import { Connection } from 'typeorm';
+import { FriendsModule } from './friends/friends.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
     UsersModule,
     MatchHistoriesModule,
-    AuthModule
+    AuthModule,
+    FriendsModule
   ],
   controllers: [AppController],
   providers: [AppService],

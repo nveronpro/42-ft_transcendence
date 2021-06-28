@@ -13,20 +13,14 @@ export async function seed() {
 
     await reset_db();
 
+	//-------------USERS-------------
+
     const usrDto1 = new CreateUserDto();
     usrDto1.login = "User1Login";
     usrDto1.nickname = "User1Nickname";
     usrDto1.wins = 0;
     usrDto1.looses = 0;
     usrDto1.current_status = "none";
-    let u1 = await User.create(usrDto1).save();
-
-    //await reset_db();
-    const matchHisoryDto1 = new CreateMatchHistoryDto();
-    matchHisoryDto1.score = "3-2";
-    matchHisoryDto1.winner = u1;
-    matchHisoryDto1.looser = u1;
-    let matchHistory1 = await MatchHistory.create(matchHisoryDto1).save();
 
     const usrDto2 = new CreateUserDto();
     usrDto2.login = "User2Login";
@@ -34,7 +28,6 @@ export async function seed() {
     usrDto2.wins = 0;
     usrDto2.looses = 0;
     usrDto2.current_status = "none";
-    usrDto2.match_histories = [matchHistory1];
 
     const usrDto3 = new CreateUserDto();
     usrDto3.login = "User3Login";
@@ -113,6 +106,35 @@ export async function seed() {
 	// console.log(u7.friends + " login: " + u7.login);
 	// console.log(u8.friends + " login: " + u8.login);
 	// console.log(u9.friends + " login: " + u9.login);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//-------------MATCHES-------------
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     //await User.update(u1, { friends: [{id: u1.id}] });
@@ -290,6 +312,65 @@ export async function seed() {
 	// uOwen.match_histories = [matchHistoryO1];
 	// uOwen.match_histories = [matchHistoryO2];
 	// uOwen.match_histories = [matchHistoryO3];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//-------------FRIENDS-------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	u1.friends = [uOwen];
+	u2.friends = [];
+	u3.friends = [u6, uOwen];
+	u4.friends = [u6, u9];
+	u5.friends = [];
+	u6.friends = [u3, u4, u9];
+	u7.friends = [u9, uOwen];
+	u8.friends = [u9, uOwen]
+	u9.friends = [u4, u6, u7, u8, uOwen];
+	uOwen.friends = [u1, u3, u7, u8, u9];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	await User.save(u1);
 	await User.save(u2);
