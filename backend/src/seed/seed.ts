@@ -78,12 +78,20 @@ export async function seed() {
     usrDto9.looses = 0;
     usrDto9.current_status = "none";
 
-    const usrDtoOwen = new CreateUserDto();
-    usrDtoOwen.login = "oroberts";
-    usrDtoOwen.nickname = "Nickname_oroberts";
-    usrDtoOwen.wins = 0;
-    usrDtoOwen.looses = 0;
-    usrDtoOwen.current_status = "none";
+    const usrDtoOroberts = new CreateUserDto();
+    usrDtoOroberts.login = "oroberts";
+    usrDtoOroberts.nickname = "Nickname_oroberts";
+    usrDtoOroberts.wins = 0;
+    usrDtoOroberts.looses = 0;
+    usrDtoOroberts.current_status = "none";
+
+    const usrDtoNveron = new CreateUserDto();
+    usrDtoNveron.login = "nveron";
+    usrDtoNveron.nickname = "Nickname_nveron";
+    usrDtoNveron.wins = 0;
+    usrDtoNveron.looses = 0;
+    usrDtoNveron.current_status = "none";
+
 
     let u1 = await User.create(usrDto1).save();
     let u2 = await User.create(usrDto2).save();
@@ -94,7 +102,8 @@ export async function seed() {
 	let u7 = await User.create(usrDto7).save();
 	let u8 = await User.create(usrDto8).save();
 	let u9 = await User.create(usrDto9).save();
-	let uOwen = await User.create(usrDtoOwen).save();
+	let uOroberts = await User.create(usrDtoOroberts).save();
+	let uNveron = await User.create(usrDtoNveron).save();
 
 
     console.log(u1.friends + " login: " + u1.login);
@@ -109,33 +118,7 @@ export async function seed() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 	//-------------MATCHES-------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     //await User.update(u1, { friends: [{id: u1.id}] });
     console.log("AFTER");
@@ -149,13 +132,22 @@ export async function seed() {
 	u7 = await User.findOne({ id: u7.id });
 	u8 = await User.findOne({ id: u8.id });
 	u9 = await User.findOne({ id: u9.id });
-	uOwen = await User.findOne({ id: uOwen.id });
+	uOroberts = await User.findOne({ id: uOroberts.id });
+	uNveron = await User.findOne({ id: uNveron.id });
 
-    u1.friends = [u2];
-    await User.save(u1);
 
-    console.log(u1.friends[0].login + " login: " + u1.login);
-    console.log(u2.friends + " login: " + u2.login);
+	u1.match_histories = [];
+	u2.match_histories = [];
+	u3.match_histories = [];
+	u4.match_histories = [];
+	u5.match_histories = [];
+	u6.match_histories = [];
+	u7.match_histories = [];
+	u8.match_histories = [];
+	u9.match_histories = [];
+	uOroberts.match_histories = [];
+	uNveron.match_histories = [];
+
 
     const matchHisoryDto1 = new CreateMatchHistoryDto();
     matchHisoryDto1.score = "5-2";
@@ -164,6 +156,8 @@ export async function seed() {
     matchHisoryDto1.looser = u2;
 	u2.looses++;
     let matchHistory1 = await MatchHistory.create(matchHisoryDto1).save();
+	u1.match_histories.push(matchHistory1);
+	u2.match_histories.push(matchHistory1);
 
 
     const matchHisoryDto2 = new CreateMatchHistoryDto();
@@ -173,6 +167,8 @@ export async function seed() {
     matchHisoryDto2.looser = u2;
 	u2.looses++;
     let matchHistory2 = await MatchHistory.create(matchHisoryDto2).save();
+	u3.match_histories.push(matchHistory2);
+	u2.match_histories.push(matchHistory2);
 
 
     const matchHisoryDto3 = new CreateMatchHistoryDto();
@@ -182,7 +178,8 @@ export async function seed() {
     matchHisoryDto3.looser = u4;
 	u4.looses++;
     let matchHistory3 = await MatchHistory.create(matchHisoryDto3).save();
-
+	u2.match_histories.push(matchHistory3);
+	u4.match_histories.push(matchHistory3);
 
     const matchHisoryDto4 = new CreateMatchHistoryDto();
     matchHisoryDto4.score = "5-0";
@@ -191,7 +188,8 @@ export async function seed() {
     matchHisoryDto4.looser = u8;
 	u8.looses++;
     let matchHistory4 = await MatchHistory.create(matchHisoryDto4).save();
-
+	u6.match_histories.push(matchHistory4);
+	u8.match_histories.push(matchHistory4);
 
 
     const matchHisoryDto5 = new CreateMatchHistoryDto();
@@ -201,7 +199,8 @@ export async function seed() {
     matchHisoryDto5.looser = u6;
 	u6.looses++;
     let matchHistory5 = await MatchHistory.create(matchHisoryDto5).save();
-
+	u3.match_histories.push(matchHistory5);
+	u6.match_histories.push(matchHistory5);
 
 
     const matchHisoryDto6 = new CreateMatchHistoryDto();
@@ -211,7 +210,8 @@ export async function seed() {
     matchHisoryDto6.looser = u9;
 	u9.looses++;
     let matchHistory6 = await MatchHistory.create(matchHisoryDto6).save();
-
+	u1.match_histories.push(matchHistory6);
+	u9.match_histories.push(matchHistory6);
 
 
     const matchHisoryDto7 = new CreateMatchHistoryDto();
@@ -221,7 +221,8 @@ export async function seed() {
     matchHisoryDto7.looser = u8;
 	u8.looses++;
     let matchHistory7 = await MatchHistory.create(matchHisoryDto7).save();
-
+	u1.match_histories.push(matchHistory7);
+	u8.match_histories.push(matchHistory7);
 
 
     const matchHisoryDto8 = new CreateMatchHistoryDto();
@@ -231,7 +232,8 @@ export async function seed() {
     matchHisoryDto8.looser = u4;
 	u4.looses++;
     let matchHistory8 = await MatchHistory.create(matchHisoryDto8).save();
-
+	u3.match_histories.push(matchHistory8);
+	u4.match_histories.push(matchHistory8);
 
 
     const matchHisoryDto9 = new CreateMatchHistoryDto();
@@ -241,36 +243,78 @@ export async function seed() {
     matchHisoryDto9.looser = u7;
 	u7.looses++;
     let matchHistory9 = await MatchHistory.create(matchHisoryDto9).save();
-
+	u3.match_histories.push(matchHistory9);
+	u7.match_histories.push(matchHistory9);
 
 
     const matchHisoryDtoO1 = new CreateMatchHistoryDto();
     matchHisoryDtoO1.score = "5-4";
-    matchHisoryDtoO1.winner = uOwen;
-	uOwen.wins++;
+    matchHisoryDtoO1.winner = uOroberts;
+	uOroberts.wins++;
     matchHisoryDtoO1.looser = u4;
 	u4.looses++;
     let matchHistoryO1 = await MatchHistory.create(matchHisoryDtoO1).save();
-
+	uOroberts.match_histories.push(matchHistoryO1);
+	u4.match_histories.push(matchHistoryO1);
 
     const matchHisoryDtoO2 = new CreateMatchHistoryDto();
     matchHisoryDtoO2.score = "5-0";
     matchHisoryDtoO2.winner = u3;
 	u3.wins++;
-    matchHisoryDtoO2.looser = uOwen;
-	uOwen.looses++;
+    matchHisoryDtoO2.looser = uOroberts;
+	uOroberts.looses++;
     let matchHistoryO2 = await MatchHistory.create(matchHisoryDtoO2).save();
-
+	u3.match_histories.push(matchHistoryO2);
+	uOroberts.match_histories.push(matchHistoryO2);
+	
 
     const matchHisoryDtoO3 = new CreateMatchHistoryDto();
     matchHisoryDtoO3.score = "5-4";
     matchHisoryDtoO3.winner = u1;
 	u1.wins++;
-    matchHisoryDtoO3.looser = uOwen;
-	uOwen.looses++;
+    matchHisoryDtoO3.looser = uOroberts;
+	uOroberts.looses++;
     let matchHistoryO3 = await MatchHistory.create(matchHisoryDtoO3).save();
+	u1.match_histories.push(matchHistoryO3);
+	uOroberts.match_histories.push(matchHistoryO3);
 
 
+
+    const matchHisoryDtoO4 = new CreateMatchHistoryDto();
+    matchHisoryDtoO4.score = "5-4";
+    matchHisoryDtoO4.winner = uNveron;
+	uNveron.wins++;
+    matchHisoryDtoO4.looser = uOroberts;
+	uOroberts.looses++;
+    let matchHistoryO4 = await MatchHistory.create(matchHisoryDtoO4).save();
+	uNveron.match_histories.push(matchHistoryO4);
+	uOroberts.match_histories.push(matchHistoryO4);
+
+
+    const matchHisoryDtoO5 = new CreateMatchHistoryDto();
+    matchHisoryDtoO5.score = "5-2";
+    matchHisoryDtoO5.winner = uOroberts;
+	uOroberts.wins++;
+    matchHisoryDtoO5.looser = uNveron;
+	uNveron.looses++;
+    let matchHistoryO5 = await MatchHistory.create(matchHisoryDtoO5).save();
+	uOroberts.match_histories.push(matchHistoryO5);
+	uNveron.match_histories.push(matchHistoryO5);
+	
+
+
+    const matchHisoryDtoO6 = new CreateMatchHistoryDto();
+    matchHisoryDtoO6.score = "5-0";
+    matchHisoryDtoO6.winner = u1;
+	u1.wins++;
+    matchHisoryDtoO6.looser = uNveron;
+	uNveron.looses++;
+    let matchHistoryO6 = await MatchHistory.create(matchHisoryDtoO6).save();
+	u1.match_histories.push(matchHistoryO6);
+	uNveron.match_histories.push(matchHistoryO6);
+
+
+/*
 	u1.match_histories = [matchHistory1, matchHistory6, matchHistory7, matchHistoryO3];
 	// u1.match_histories.push(matchHistory1);
 	// u1.match_histories.push(matchHistory6);
@@ -308,65 +352,27 @@ export async function seed() {
 	u9.match_histories = [matchHistory6];
 	// u9.match_histories.push(matchHistory6);
 
-	uOwen.match_histories = [matchHistoryO1, matchHistoryO2, matchHistoryO3];
-	// uOwen.match_histories = [matchHistoryO1];
-	// uOwen.match_histories = [matchHistoryO2];
-	// uOwen.match_histories = [matchHistoryO3];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	uOroberts.match_histories = [matchHistoryO1, matchHistoryO2, matchHistoryO3];
+	// uOroberts.match_histories = [matchHistoryO1];
+	// uOroberts.match_histories = [matchHistoryO2];
+	// uOroberts.match_histories = [matchHistoryO3];
+*/
 
 	//-------------FRIENDS-------------
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-	u1.friends = [uOwen];
-	u2.friends = [];
-	u3.friends = [u6, uOwen];
-	u4.friends = [u6, u9];
+	u1.friends = [uOroberts];
+	u2.friends = [uNveron];
+	u3.friends = [u6, uOroberts];
+	u4.friends = [u6, u9, uNveron];
 	u5.friends = [];
-	u6.friends = [u3, u4, u9];
-	u7.friends = [u9, uOwen];
-	u8.friends = [u9, uOwen]
-	u9.friends = [u4, u6, u7, u8, uOwen];
-	uOwen.friends = [u1, u3, u7, u8, u9];
-
-
-
-
-
-
-
-
-
-
-
-
-
+	u6.friends = [u3, u4, u9, uNveron];
+	u7.friends = [u9, uNveron, uOroberts];
+	u8.friends = [u9, uOroberts]
+	u9.friends = [u4, u6, u7, u8, uOroberts];
+	uOroberts.friends = [u1, u3, u7, u8, u9, uNveron];
+	uNveron.friends = [u2, u4, u6, u7, uOroberts];
 
 
 
@@ -381,9 +387,8 @@ export async function seed() {
 	await User.save(u7);
 	await User.save(u8);
 	await User.save(u9);
-	await User.save(uOwen);
-
-
+	await User.save(uOroberts);
+	await User.save(uNveron);
 
 
 
