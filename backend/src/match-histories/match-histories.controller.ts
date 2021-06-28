@@ -14,7 +14,7 @@ export class MatchHistoriesController {
 	@Get()
 	@UseGuards(JwtAuthGuard)
 	async findUserHistory(@User() user: UserType) {
-		this.logger.log("@GET("+user+")");
+		this.logger.log("@GET()");
 		return this.matchHistoriesService.findUserHistory(user);
 	}
 
@@ -26,7 +26,7 @@ export class MatchHistoriesController {
 	
 	@Get(':id')
 	findOne(@Param('id') id: number) {
-		this.logger.log("@GET("+id+")");
+		this.logger.log("@GET(id="+id+")");
 		return this.matchHistoriesService.findOne(id);
 	}
 
@@ -44,7 +44,7 @@ export class MatchHistoriesController {
 	@Patch(':id')
 	@UseGuards(JwtAuthGuard)
 	update(@Param('id') id: string, @Body() updateMatchHistoryDto: UpdateMatchHistoryDto) {
-		this.logger.log("@PATCH("+id+")");
+		this.logger.log("@PATCH(id="+id+")");
 		this.logger.warn("This operation is not supposed to be done. It has been blocked");
 		//return this.matchHistoriesService.update(+id, updateMatchHistoryDto);
 		return ;
@@ -53,7 +53,7 @@ export class MatchHistoriesController {
 	@Delete(':id')
 	@UseGuards(JwtAuthGuard)
 	remove(@Param('id') id: string) {
-		this.logger.log("@DELETE("+id+")");
+		this.logger.log("@DELETE(id="+id+")");
 		this.logger.warn("This operation is not supposed to be done. It has been blocked");
 		// return this.matchHistoriesService.remove(+id);
 		return ;

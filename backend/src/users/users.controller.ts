@@ -21,9 +21,17 @@ export class UsersController {
 		return (current);
 	}
 
+	@Get("all")
+	async findAll() {
+		this.logger.log("@GET(all)");
+		const current = await this.usersService.findAll();
+
+		return (current);
+	}
+
 	@Get(':id')
 	async findOne(@Param('id') id: number) {
-		this.logger.log("@GET("+id+")");
+		this.logger.log("@GET(id="+id+")");
 		const current = await this.usersService.findOne(id);
 
 		return (current);

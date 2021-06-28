@@ -13,6 +13,8 @@ export async function seed() {
 
     await reset_db();
 
+	//-------------USERS-------------
+
     const usrDto1 = new CreateUserDto();
     usrDto1.login = "User1Login";
     usrDto1.nickname = "User1Nickname";
@@ -104,6 +106,35 @@ export async function seed() {
 	// console.log(u7.friends + " login: " + u7.login);
 	// console.log(u8.friends + " login: " + u8.login);
 	// console.log(u9.friends + " login: " + u9.login);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//-------------MATCHES-------------
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     //await User.update(u1, { friends: [{id: u1.id}] });
@@ -281,6 +312,65 @@ export async function seed() {
 	// uOwen.match_histories = [matchHistoryO1];
 	// uOwen.match_histories = [matchHistoryO2];
 	// uOwen.match_histories = [matchHistoryO3];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//-------------FRIENDS-------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	u1.friends = [uOwen];
+	u2.friends = [];
+	u3.friends = [u6, uOwen];
+	u4.friends = [u6, u9];
+	u5.friends = [];
+	u6.friends = [u3, u4, u9];
+	u7.friends = [u9, uOwen];
+	u8.friends = [u9, uOwen]
+	u9.friends = [u4, u6, u7, u8, uOwen];
+	uOwen.friends = [u1, u3, u7, u8, u9];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	await User.save(u1);
 	await User.save(u2);

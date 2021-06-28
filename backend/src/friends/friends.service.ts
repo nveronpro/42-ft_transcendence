@@ -1,26 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateFriendDto } from './dto/create-friend.dto';
 import { UpdateFriendDto } from './dto/update-friend.dto';
+import { User } from '../../src/users/entities/user.entity';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class FriendsService {
-  create(createFriendDto: CreateFriendDto) {
-    return 'This action adds a new friend';
-  }
+	constructor(private manager: EntityManager) {
+	}
 
-  findAll() {
-    return `This action returns all friends`;
-  }
+	private readonly logger = new Logger(FriendsService.name);
 
-  findOne(id: number) {
-    return `This action returns a #${id} friend`;
-  }
+	async findUserFriends(user: User) {
+		const res = await this.manager.query("SELECT  * FROM \"user\" WHERE id IN (SELECT \"userId_2\" as user_friends from user_friends_user where \"userId_1\"=$1);", [user.id]);
 
-  update(id: number, updateFriendDto: UpdateFriendDto) {
-    return `This action updates a #${id} friend`;
-  }
+		this.logger.debug("friends:" + res);
+		return res;
+		return 'This action return all the User\'s friends';
+	}
 
-  remove(id: number) {
-    return `This action removes a #${id} friend`;
-  }
+	findUserBegining(name: string) {
+		return `This action finds Users with name starting with "name"`;
+	}
+
+	addFriend(user: User, id: number) {
+		return `This action returns adds	User#${id} as a friend`;
+	}
+
+	removeFriend(user: User, id: number) {
+		return `This action removes User#${id} as a friend`;
+	}
+
 }
