@@ -18,18 +18,6 @@ export default {
       startingX: 250,
     };
   },
-  methods: {
-    setDeath: function() {
-      this.start = true;
-      this.showDeath = true;
-      console.log(this.hasDied);
-      setTimeout(() => {
-        this.showDeath = false;
-        this.score = 0;
-        console.log(this.showDeath);
-      }, 2000);
-    },
-  },
 };
 </script>
 

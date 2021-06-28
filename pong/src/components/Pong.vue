@@ -105,15 +105,9 @@ export default {
         this.posX <= 15 && this.posX >= 0
       ) {
         this.vxBall = -this.vxBall;
-        console.log(this.barX, this.barY)
-        console.log(this.posX, this.posY)
       }
       else if (this.posX + this.vxBall < 0) {
-        console.log("died!");
-        console.log(this.barX, this.barY)
-        console.log(this.posX, this.posY)
         this.moving = false;
-        this.$emit("ball-death");
         this.posX = 250;
         this.posY = 0;
         this.barX = 0;
