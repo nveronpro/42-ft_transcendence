@@ -3,8 +3,12 @@ import { CreateMatchHistoryDto } from '../match-histories/dto/create-match-histo
 
 import { User } from '../users/entities/user.entity';
 import { MatchHistory } from '../match-histories/entities/match-history.entity';
+import { CreateFriendRequestDto } from '../friends/dto/create-friendRequest.dto';
+import { FriendRequest } from '../friends/entities/friendRequest.entity';
+
 
 async function reset_db() {
+	await FriendRequest.delete({});
     await MatchHistory.delete({});
     await User.delete({});
 }
@@ -78,6 +82,35 @@ export async function seed() {
     usrDto9.looses = 0;
     usrDto9.current_status = "none";
 
+
+    const usrRequest1 = new CreateUserDto();
+    usrRequest1.login = "RequestAcceptLogin";
+    usrRequest1.nickname = "RequestAcceptNickname";
+    usrRequest1.wins = 0;
+    usrRequest1.looses = 0;
+    usrRequest1.current_status = "none";
+
+    const usrRequest2 = new CreateUserDto();
+    usrRequest2.login = "RequestRefuseLogin";
+    usrRequest2.nickname = "RequestRefuseNickname";
+    usrRequest2.wins = 0;
+    usrRequest2.looses = 0;
+    usrRequest2.current_status = "none";
+
+	const usrRequest3 = new CreateUserDto();
+    usrRequest3.login = "RequestSentLogin";
+    usrRequest3.nickname = "RequestSentNickname";
+    usrRequest3.wins = 0;
+    usrRequest3.looses = 0;
+    usrRequest3.current_status = "none";
+
+	const usrRequest4 = new CreateUserDto();
+    usrRequest4.login = "RequestSent2Login";
+    usrRequest4.nickname = "RequestSent2Nickname";
+    usrRequest4.wins = 0;
+    usrRequest4.looses = 0;
+    usrRequest4.current_status = "none";
+
     const usrDtoOroberts = new CreateUserDto();
     usrDtoOroberts.login = "oroberts";
     usrDtoOroberts.nickname = "Nickname_oroberts";
@@ -108,6 +141,12 @@ export async function seed() {
 	let u7 = await User.create(usrDto7).save();
 	let u8 = await User.create(usrDto8).save();
 	let u9 = await User.create(usrDto9).save();
+
+	let ur1 = await User.create(usrRequest1).save();
+	let ur2 = await User.create(usrRequest2).save();
+	let ur3 = await User.create(usrRequest3).save();
+	let ur4 = await User.create(usrRequest4).save();
+
 	let uOroberts = await User.create(usrDtoOroberts).save();
 	let uNveron = await User.create(usrDtoNveron).save();
 	let uMavileo = await User.create(usrDtoMavileo).save();
@@ -139,6 +178,12 @@ export async function seed() {
 	u7 = await User.findOne({ id: u7.id });
 	u8 = await User.findOne({ id: u8.id });
 	u9 = await User.findOne({ id: u9.id });
+
+	ur1 = await User.findOne({ id: ur1.id });
+	ur2 = await User.findOne({ id: ur2.id });
+	ur3 = await User.findOne({ id: ur3.id });
+	ur4 = await User.findOne({ id: ur4.id });
+
 	uOroberts = await User.findOne({ id: uOroberts.id });
 	uNveron = await User.findOne({ id: uNveron.id });
 	uMavileo = await User.findOne({ id: uMavileo.id });
@@ -416,30 +461,128 @@ export async function seed() {
 
 
 
-
-
 	await User.save(u1);
 	await User.save(u2);
 	await User.save(u3);
 	await User.save(u4);
-	//await User.save(u5);
+	await User.save(u5);
 	await User.save(u6);
 	await User.save(u7);
 	await User.save(u8);
 	await User.save(u9);
+
+	await User.save(ur1);
+	await User.save(ur2);
+	await User.save(ur3);
+	await User.save(ur4);
+
 	await User.save(uOroberts);
 	await User.save(uNveron);
 	await User.save(uMavileo);
 
+
+	//-------------FRIEND REQUESTS-------------
+
+    u1 = await User.findOne({ id: u1.id });
+	u2 = await User.findOne({ id: u2.id });
+	u3 = await User.findOne({ id: u3.id });
+	u4 = await User.findOne({ id: u4.id });
+	u5 = await User.findOne({ id: u5.id });
+	u6 = await User.findOne({ id: u6.id });
+	u7 = await User.findOne({ id: u7.id });
+	u8 = await User.findOne({ id: u8.id });
+	u9 = await User.findOne({ id: u9.id });
+
+	ur1 = await User.findOne({ id: ur1.id });
+	ur2 = await User.findOne({ id: ur2.id });
+	ur3 = await User.findOne({ id: ur3.id });
+	ur4 = await User.findOne({ id: ur4.id });
+
+	uOroberts = await User.findOne({ id: uOroberts.id });
+	uNveron = await User.findOne({ id: uNveron.id });
+	uMavileo = await User.findOne({ id: uMavileo.id });
+	
+	console.log("creating friend requests !");
+
+	const fr1_oroberts = new CreateFriendRequestDto();
+	fr1_oroberts.sender = ur1;
+	fr1_oroberts.receiver = ur2;
+
+	const fr2_oroberts = new CreateFriendRequestDto();
+	fr2_oroberts.sender = ur2;
+	fr2_oroberts.receiver = uOroberts;
+
+	const fr3_oroberts = new CreateFriendRequestDto();
+	fr3_oroberts.sender = uOroberts;
+	fr3_oroberts.receiver = ur3;
+
+	// const fr4_oroberts = new CreateFriendRequestDto();
+	// fr4_oroberts.sender = uOroberts;
+	// fr4_oroberts.receiver = ur4;
+
+
+	const fr1_nveron = new CreateFriendRequestDto();
+	fr1_nveron.sender = ur1;
+	fr1_nveron.receiver = uNveron;
+
+	const fr2_nveron = new CreateFriendRequestDto();
+	fr2_nveron.sender = ur2;
+	fr2_nveron.receiver = uNveron;
+
+	const fr3_nveron = new CreateFriendRequestDto();
+	fr3_nveron.sender = uNveron;
+	fr3_nveron.receiver = ur3;
+
+	// const fr4_nveron = new CreateFriendRequestDto();
+	// fr4_nveron.sender = uNveron;
+	// fr4_nveron.receiver = ur4;
+
+
+	const fr1_mavileo = new CreateFriendRequestDto();
+	fr1_mavileo.sender = ur1;
+	fr1_mavileo.receiver = uMavileo;
+
+	const fr2_mavileo = new CreateFriendRequestDto();
+	fr2_mavileo.sender = ur2;
+	fr2_mavileo.receiver = uMavileo;
+
+	const fr3_mavileo = new CreateFriendRequestDto();
+	fr3_mavileo.sender = uMavileo;
+	fr3_mavileo.receiver = ur3;
+
+	// const fr4_mavileo = new CreateFriendRequestDto();
+	// fr4_mavileo.sender = uMavileo;
+	// fr4_mavileo.receiver = ur4;
+
+	console.log("saving friend requests !");
+
+	let fr_1o = await FriendRequest.create(fr1_oroberts);
+	await FriendRequest.create(fr2_oroberts).save();
+	await FriendRequest.create(fr3_oroberts).save();
+	// await FriendRequest.create(fr4_oroberts).save();
+
+	await FriendRequest.create(fr1_nveron).save();
+	await FriendRequest.create(fr2_nveron).save();
+	await FriendRequest.create(fr3_nveron).save();
+	// await FriendRequest.create(fr4_nveron).save();
+
+	await FriendRequest.create(fr1_mavileo).save();
+	await FriendRequest.create(fr2_mavileo).save();
+	await FriendRequest.create(fr3_mavileo).save();
+	// await FriendRequest.create(fr4_mavileo).save();
+
+	// fr_1o = await FriendRequest.findOne({ id: fr_1o.id });
+
+	// console.log("FriendRequest:" + fr_1o + ":[" + fr_1o.id + ", " + fr_1o.sender + ", " + fr_1o.receiver + "]");
 
 
     //u1 = await User.findOne({ id: u1.id });
     //u1.match_histories = [matchHistory1];
     //await User.save(u1);
 
-    console.log("MATCH HISTORY:")
-    console.log(matchHistory1);
-    console.log(u1.match_histories[0]);
+    //console.log("MATCH HISTORY:")
+    //console.log(matchHistory1);
+    //console.log(u1.match_histories[0]);
 	console.log ("--------------------END OF SEED------------------");
 
 
