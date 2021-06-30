@@ -506,7 +506,7 @@ export async function seed() {
 
 	const fr1_oroberts = new CreateFriendRequestDto();
 	fr1_oroberts.sender = ur1;
-	fr1_oroberts.receiver = ur2;
+	fr1_oroberts.receiver = uOroberts;
 
 	const fr2_oroberts = new CreateFriendRequestDto();
 	fr2_oroberts.sender = ur2;
@@ -516,9 +516,9 @@ export async function seed() {
 	fr3_oroberts.sender = uOroberts;
 	fr3_oroberts.receiver = ur3;
 
-	// const fr4_oroberts = new CreateFriendRequestDto();
-	// fr4_oroberts.sender = uOroberts;
-	// fr4_oroberts.receiver = ur4;
+	const fr4_oroberts = new CreateFriendRequestDto();
+	fr4_oroberts.sender = uOroberts;
+	fr4_oroberts.receiver = ur4;
 
 
 	const fr1_nveron = new CreateFriendRequestDto();
@@ -533,9 +533,9 @@ export async function seed() {
 	fr3_nveron.sender = uNveron;
 	fr3_nveron.receiver = ur3;
 
-	// const fr4_nveron = new CreateFriendRequestDto();
-	// fr4_nveron.sender = uNveron;
-	// fr4_nveron.receiver = ur4;
+	const fr4_nveron = new CreateFriendRequestDto();
+	fr4_nveron.sender = uNveron;
+	fr4_nveron.receiver = ur4;
 
 
 	const fr1_mavileo = new CreateFriendRequestDto();
@@ -550,26 +550,26 @@ export async function seed() {
 	fr3_mavileo.sender = uMavileo;
 	fr3_mavileo.receiver = ur3;
 
-	// const fr4_mavileo = new CreateFriendRequestDto();
-	// fr4_mavileo.sender = uMavileo;
-	// fr4_mavileo.receiver = ur4;
+	const fr4_mavileo = new CreateFriendRequestDto();
+	fr4_mavileo.sender = uMavileo;
+	fr4_mavileo.receiver = ur4;
 
 	console.log("saving friend requests !");
 
-	let fr_1o = await FriendRequest.create(fr1_oroberts);
+	await FriendRequest.create(fr1_oroberts).save();
 	await FriendRequest.create(fr2_oroberts).save();
 	await FriendRequest.create(fr3_oroberts).save();
-	// await FriendRequest.create(fr4_oroberts).save();
+	await FriendRequest.create(fr4_oroberts).save();
 
 	await FriendRequest.create(fr1_nveron).save();
 	await FriendRequest.create(fr2_nveron).save();
 	await FriendRequest.create(fr3_nveron).save();
-	// await FriendRequest.create(fr4_nveron).save();
+	await FriendRequest.create(fr4_nveron).save();
 
 	await FriendRequest.create(fr1_mavileo).save();
 	await FriendRequest.create(fr2_mavileo).save();
 	await FriendRequest.create(fr3_mavileo).save();
-	// await FriendRequest.create(fr4_mavileo).save();
+	await FriendRequest.create(fr4_mavileo).save();
 
 	// fr_1o = await FriendRequest.findOne({ id: fr_1o.id });
 
