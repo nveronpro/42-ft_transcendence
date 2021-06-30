@@ -1,153 +1,98 @@
 <template>
-	<div id="container">
-		<p>this will be the Friends component</p>
-		<div>
-			<div id="search" class="inside">
-				<p>This is the search zone !</p>
-				<input/>
-				<ul id="result-list">
+	<div>
+		<div class="container-fluid" style="height: 90.5vh;">
+			<div class="row g-2 h-100">
+				<div class="col-md-4 col-sm-12">
+					<div class="p-3 border bg-light h-100 overflow-auto">
+						<div class="card mb-2">
+							<div class="card-header">
+								<form class="form-inline my-2 my-lg-0">
+									<input class="form-control mr-sm-2 w-100" type="search" v-model="keyword" placeholder="Search a friend">
+								</form>
+							</div>
+						</div>
+						<div class="my-3 p-3 bg-body rounded shadow-sm">
+							<h6 class="border-bottom pb-2 mb-0">Resulat de la recherche</h6>
+							<router-link class="d-flex text-muted pt-3" v-for="(all_user, index) of filterImages" :key="index" :to="'/friend/' + all_user.user_id">
+								<svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em"></text></svg>
+								<p class="pb-3 mb-0 small lh-sm border-bottom">
+									<strong class="d-block text-gray-dark">{{all_user.user_login}}</strong>
+									Deux, trois information sur l'utilisateur
+								</p>
+							</router-link>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-8 col-sm-12">
+					<div class="p-3 border bg-light h-100">
+						<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+							<div class="col" v-for="friend in friends" :key="friend.id">
+								<div class="card">
+									<router-link class="card-block stretched-link text-decoration-none" :to="'/friend/' + friend.id">
+										<div class="card-body text-center">
+											<h5 class="card-title text-dark text-decoration-none">{{friend.login}}</h5>
+											<a :src="'/friend/' + friend.id"><img src="https://avatarfiles.alphacoders.com/123/thumb-123713.jpg" class="card-img" alt="..."></a>
+										</div>
+									</router-link>
+								</div>
+							</div>
 
-					<li class="search-result">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Alpha</p>
-						<img src="https://via.placeholder.com/15/FF0000" alt="Status" class="status">
-					</li>
-
-					<li class="search-result">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Beta</p>
-						<img src="https://via.placeholder.com/15/00FF00/" alt="Status" class="status">
-					</li>
-
-					<li class="search-result">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Gamma</p>
-						<img src="https://via.placeholder.com/15/888888/" alt="Status" class="status">
-					</li>
-
-				</ul>
-			</div>
-			<div id="friends" class="inside">
-				<p>This is the friend zone !</p>
-				<ul id="friends-list">
-					<li class="friend-result search-result">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Alpha2</p>
-						<img src="https://via.placeholder.com/15/FF0000/" alt="Status" class="status">
-					</li>
-					<li class="friend-result search-result">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Beta2</p>
-						<img src="https://via.placeholder.com/15/00FF00/" alt="Status" class="status">
-					</li>
-					<li class="friend-result search-result">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Gamma2</p>
-						<img src="https://via.placeholder.com/15/888888/" alt="Status" class="status">
-					</li>
-					<li class="friend-result search-result">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Epsilon</p>
-						<img src="https://via.placeholder.com/15/FF0000/" alt="Status" class="status">
-					</li>
-					<li class="friend-result search-result">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Omega</p>
-						<img src="https://via.placeholder.com/15/00FF00/" alt="Status" class="status">
-					</li>
-					<li class="friend-result search-result">
-						<img src="http://placehold.jp/50x50.png" alt="Avatar" class="avatar" >
-						<p class="nickname">Pi</p>
-						<img src="https://via.placeholder.com/15/888888/" alt="Status" class="status">
-						
-					</li>
-				</ul>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 </template>
 
-
-<style>
-#container {
-	height: 100%;
-	display: flex;
-	flex-flow: column;
-	background-color: darkgrey;
-}
-#search {
-	float: left;
-	width: 20%;
-	margin-left: 2%;
-	border-right: 5px solid green;
-	background-color: yellowgreen;
-}
-#result-list {
-	margin: 5px;
-	list-style-type:none;
-	padding: 10px;
-	border: solid black 2px;
-}
-.search-result {
-	margin-top: 5px;
-	height: 52px;
-	border: solid 1px darkgreen;
-	line-height: 52px;
-	background-color: lightgreen;
-}
-.search-result .nickname {
-	display: inline;
-	vertical-align: middle;
-}
-.search-result img {
-	display: inline;
-	vertical-align: middle;	
-}
-.search-result .avatar {
-	width: 50px;
-	height: 50px;
-	border: 1px solid greenyellow;
-	float: left;
-}
-.search-result .status {
-	width: 15px;
-	height: 15px;
-	border: 1px solid white;
-	float: right;
-}
-#friends {
-	float: right;
-	width: 76%;
-	margin-right: 2%;
-	border-left: 5px solid red;
-	background-color: pink;
-}
-#friends-list {
-	margin: 5px;
-	list-style-type:none;
-	padding: 10px;
-	border: solid black 2px;
-	display: flex;
-	flex-wrap: wrap;
-}
-#friends-list li {
-	list-style: none;
-	flex: 0 0 30%;
-	margin: 1%;
-}
-</style>
-
-
 <script>
-// import axios from "axios";
-// import { server } from "../../helper";
-// import router from "../../router";
-export default {
-	data() {
-		return {
-			friends: [],
-		};
-	},
-	methods: {},
-};
+	import axios from "axios";
+
+	export default {
+		data(){
+			return {
+				keyword: "",
+				user: null,
+				all_users: null,
+				friends: null,
+			}
+		},
+		async created () {
+			axios
+			.get('/api/auth/me')
+			.then(response => (this.user = response.data))
+
+			axios
+			.get('/api/friends/')
+			.then(response => (this.friends = response.data))
+
+			axios
+			.get('/api/users/all')
+			.then(response => (this.all_users = response.data))
+		},
+		computed: {
+			filterImages() {
+				const { all_users, keyword } = this;
+				let u = JSON.parse(JSON.stringify( this.all_users ));
+				if (keyword !== ""){
+					return u.filter(({ user_login }) => user_login.toLowerCase().includes(keyword.toLowerCase()));
+				}
+				return null;
+			},
+		},
+		methods: {
+			send: function (id) {
+				let _id = id;
+				axios
+				.post('/api/friends/send/'+ _id)
+				.then()
+			},
+			remove: function (id) {
+				let _id = id;
+				axios
+				.delete('/api/friends/'+ _id)
+				.then()
+			},
+		},
+	}
 </script>

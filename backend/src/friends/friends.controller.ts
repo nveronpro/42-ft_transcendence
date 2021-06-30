@@ -14,11 +14,18 @@ export class FriendsController {
 	constructor(private readonly friendsService: FriendsService) {}
 	private readonly logger = new Logger(FriendsController.name);
 
-	@Get()
+	@Get("sent")
 	@UseGuards(JwtAuthGuard)
-	async findUserFriends(@User() user: UserType) {
-		this.logger.log("@GET("+")");
-		return this.friendsService.findUserFriends(user);
+	async getSentRequests(@User() user: UserType) {
+		this.logger.log("@GET(sent)");
+		return this.friendsService.getSentRequests(user);
+	}
+	
+	@Get("received")
+	@UseGuards(JwtAuthGuard)
+	async getReceivedRequests(@User() user: UserType) {
+		this.logger.log("@GET(received)");
+		return this.friendsService.getReceivedRequests(user);
 	}
 
 	@Get(':name')
@@ -27,11 +34,32 @@ export class FriendsController {
 		return this.friendsService.findUserBegining(name);
 	}
 
-	@Post(':id')
+	@Post('send/:id')
 	@UseGuards(JwtAuthGuard)
-	create(@User() user: UserType, @Param('id') id: number) {
+	sendFriendRequest(@User() user: UserType, @Param('id') id: number) {
 	this.logger.log("@POST(id="+id+")");
-		return this.friendsService.addFriend(user, id);
+		return this.friendsService.sendFriendRequest(user, id);
+	}
+
+	@Get()
+	@UseGuards(JwtAuthGuard)
+	async findUserFriends(@User() user: UserType) {
+		this.logger.log("@GET("+")");
+		return this.friendsService.findUserFriends(user);
+	}
+
+	@Post('accept/:id')
+	@UseGuards(JwtAuthGuard)
+	acceptFriendRequest(@User() user: UserType, @Param('id') id: number) {
+	this.logger.log("@POST(id="+id+")");
+		return this.friendsService.acceptFriendRequest(user, id);
+	}
+
+	@Post('refuse/:id')
+	@UseGuards(JwtAuthGuard)
+	refuseFriendRequest(@User() user: UserType, @Param('id') id: number) {
+	this.logger.log("@POST(id="+id+")");
+		return this.friendsService.refuseFriendRequest(user, id);
 	}
 
 	@Delete(':id')

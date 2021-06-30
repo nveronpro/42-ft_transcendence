@@ -30,7 +30,6 @@ export class UsersService {
 		.getRawMany();
 
 		//const allUsers = await User.find();
-		console.log(res);
 		return res;
 	}
 
@@ -41,6 +40,7 @@ export class UsersService {
 		.from(User, "user")
 		.where("user.id = :id", {id: id})
 		.getRawMany();
+
 		return res;
 	}
 
