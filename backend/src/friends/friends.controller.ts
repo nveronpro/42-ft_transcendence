@@ -34,6 +34,13 @@ export class FriendsController {
 		return this.friendsService.sendFriendRequest(user, id);
 	}
 
+	@Get("received")
+	@UseGuards(JwtAuthGuard)
+	async getReceivedRequests(@User() user: UserType) {
+		this.logger.log("@GET(received)");
+		return this.friendsService.getReceivedRequests(user);
+	}
+
 	@Get()
 	@UseGuards(JwtAuthGuard)
 	async findUserFriends(@User() user: UserType) {
