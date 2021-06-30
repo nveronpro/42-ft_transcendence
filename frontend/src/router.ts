@@ -3,6 +3,8 @@ import FriendsComponent from '@/components/Friends.vue';
 import StatsComponent from '@/components/Stats.vue';
 import ProfileComponent from '@/components/Profile.vue';
 import ChatComponent from '@/components/Chat.vue';
+import FriendProfileComponent from '@/components/FriendProfile.vue';
+import LeaderboardComponent from '@/components/Leaderboard.vue';
 
 let routes = [];
 
@@ -13,6 +15,8 @@ routes = [
 	{ path: '/stats', name: 'Stats', component: StatsComponent },
 	{ path: '/profile', name: 'Profile', component: ProfileComponent },
 	{ path: '/chat', name: 'Chat', component: ChatComponent },
+	{ path: '/friend/:id', name: 'FriendProfile', component: FriendProfileComponent },
+    { path: '/leaderboard', name: 'Leaderboard', component: LeaderboardComponent },
 ];
 
 export default { routes };

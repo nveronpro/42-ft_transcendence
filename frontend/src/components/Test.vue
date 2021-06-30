@@ -3,7 +3,6 @@
       <div class="text-center">
        <input id="server_address" value="/api/users/"/>
        <button v-on:click="pingContainer()">PingTheServer !</button>
-       <button v-on:click="ft_login()">LOGIN !</button>
       </div>
     </div>
 </template>
@@ -15,9 +14,6 @@
       this.pingContainer();
     },
     methods: {
-      async ft_login() {
-        window.location.href = "http://localhost:3000/auth/login";
-      },
       pingContainer() {
         axios
           .get(document.getElementById('server_address').value)

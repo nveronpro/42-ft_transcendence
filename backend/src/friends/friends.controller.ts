@@ -20,6 +20,13 @@ export class FriendsController {
 		this.logger.log("@GET(sent)");
 		return this.friendsService.getSentRequests(user);
 	}
+	
+	@Get("received")
+	@UseGuards(JwtAuthGuard)
+	async getReceivedRequests(@User() user: UserType) {
+		this.logger.log("@GET(received)");
+		return this.friendsService.getReceivedRequests(user);
+	}
 
 	@Get(':name')
 	findUserBegining(@Param('name') name: string) {
@@ -32,13 +39,6 @@ export class FriendsController {
 	sendFriendRequest(@User() user: UserType, @Param('id') id: number) {
 	this.logger.log("@POST(id="+id+")");
 		return this.friendsService.sendFriendRequest(user, id);
-	}
-
-	@Get("received")
-	@UseGuards(JwtAuthGuard)
-	async getReceivedRequests(@User() user: UserType) {
-		this.logger.log("@GET(received)");
-		return this.friendsService.getReceivedRequests(user);
 	}
 
 	@Get()

@@ -8,6 +8,9 @@ import StatsComponent from '@/components/Stats.vue';
 import ProfileComponent from '@/components/Profile.vue';
 import ChatComponent from '@/components/Chat.vue';
 import TestComponent from '@/components/Test.vue';
+import FriendProfileComponent from '@/components/FriendProfile.vue';
+import LeaderboardComponent from '@/components/Leaderboard.vue';
+
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -19,6 +22,8 @@ const router = createRouter({
     { path: '/stats', name: 'Stats', component: StatsComponent },
     { path: '/profile', name: 'Profile', component: ProfileComponent },
     { path: '/chat', name: 'Chat', component: ChatComponent },
+    { path: '/friend/:id', name: 'FriendProfile', component: FriendProfileComponent },
+    { path: '/leaderboard', name: 'Leaderboard', component: LeaderboardComponent },
   ]
 })
 
