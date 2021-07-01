@@ -18,6 +18,12 @@ export class MatchHistoriesController {
 		return this.matchHistoriesService.findUserHistory(user);
 	}
 
+	@Get("/friend/:id")
+	async findFriendHistory(@Param('id') id: number) {
+		this.logger.log("@GET()");
+		return this.matchHistoriesService.findFriendHistory(id);
+	}
+
 	@Get("/all")
 	findAll() {
 		this.logger.log("@GET(\"/all\")");

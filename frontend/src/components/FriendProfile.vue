@@ -28,6 +28,55 @@
 					</div>
 				</div>
 			</div>
+			<div class="col-12">
+				<div class="p-3 border bg-light h-100 overflow-auto">
+					<div v-for="match_history in match_histories" :key="match_history.id" class="row mb-3 mr-1 ml-1 p-2">
+						<div class="col-3">
+							<div class="card">
+								<div class="card-body">
+									<div class="row">
+										<div class="col-4">
+											<img src="https://avatarfiles.alphacoders.com/123/thumb-123713.jpg" class="card-img-top w-75" alt="...">
+										</div>
+										<div class="col-6 d-flex align-items-center">
+												<p class="card-text">
+													{{match_history.winner_login}}<br>
+												</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="card">
+								<div class="card-body">
+									<div class="row text-center">
+										<div class="col-12 fs-4">
+										{{match_history.score}}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-3">
+							<div class="card text-end">
+								<div class="card-body">
+									<div class="row">
+										<div class="col-6 d-flex align-items-center">
+											<p class="card-text">
+												{{match_history.looser_login}}<br>
+											</p>
+										</div>
+										<div class="col-4">
+											<img src="https://pbs.twimg.com/profile_images/603551118493376513/EZ7zKg3W.jpg" class="card-img-top w-75" alt="...">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -40,6 +89,7 @@
 			return {
 				user: null,
 				friends: null,
+				match_histories: null,
 			}
 		},
 		mounted () {
@@ -50,6 +100,10 @@
 			axios
 			.get('/api/friends/')
 			.then(response => (this.friends = response.data))
+
+			axios
+			.get('/api/match-histories/friend/' + this.$route.params.id)
+			.then(response => (this.match_histories = response.data))
 		},
 		methods: {
 			send: function (id) {
@@ -60,7 +114,6 @@
 			},
 			remove: function (id) {
 				let _id = id;
-				console.log("okokokkokokokokokokokkokok");
 				axios
 				.delete('/api/friends/'+ _id)
 				.then()
