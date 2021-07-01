@@ -22,6 +22,10 @@ export class MatchHistoriesService {
 		.values(createMatchHistoryDto)
 		.execute();
 
+
+		const updateWinner = await this.manager.query("UPDATE \"user\" SET \"wins\" = \"wins\" + 1 WHERE \"id\" = $1;", [createMatchHistoryDto.winner.id]);
+		const updateLooser = await this.manager.query("UPDATE \"user\" SET \"looses\" = \"looses\" + 1 WHERE \"id\" = $1;", [createMatchHistoryDto.looser.id]);
+
 		this.logger.verbose("result:" + res);
 
 		// return (res);

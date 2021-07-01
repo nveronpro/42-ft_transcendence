@@ -5,7 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from '../auth/decorators/user.decorator';
 
 import { JwtAuthGuard } from '../../src/auth/guards/jwt-auth.guard';
-//import { User } from './entities/user.entity';
+import { User as UserType} from './entities/user.entity';
 
 @Controller('users')
 export class UsersController {
@@ -27,6 +27,19 @@ export class UsersController {
 		const current = await this.usersService.findAll();
 
 		return (current);
+	}
+
+	@Get('/avatar')
+	@UseGuards(JwtAuthGuard)
+	async getUserAvatar(@User() user: UserType) {
+		this.logger.log("@GET(avatar)");
+		const current = await this.usersService.getUserAvatar(user);
+
+		const res = "<img class=\"avatar\" src=\"data:image/png;base64," + current[0].avatar + "\">";
+		
+		this.logger.debug("res: " + res);
+
+		return (res);
 	}
 
 	@Get(':id')
