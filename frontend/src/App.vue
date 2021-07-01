@@ -49,17 +49,22 @@
 	export default {
 		name: 'App',
 		components: {
-			"footer-view" : ChatComponent
+			"footer-view" : ChatComponent,
 		},
 		data(){
 			return {
 				user: null,
+				users: null,
 			}
 		},
 		mounted () {
 			axios
 			.get('/api/auth/me')
 			.then(response => (this.user = response.data))
-		}
+
+			axios
+			.get('/api/users/all/')
+			.then(response => (this.users = response.data))
+		},
 	}
 </script>
