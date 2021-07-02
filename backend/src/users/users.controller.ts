@@ -21,6 +21,12 @@ export class UsersController {
 		return (current);
 	}
 
+	@Get("/nickname/:nick")
+	async isNicknameUnique(@Param("nick") nick: string)
+	{
+		const res = this.usersService.isNicknameUnique(nick);
+	}
+
 	@Get("all")
 	async findAll() {
 		this.logger.log("@GET(all)");

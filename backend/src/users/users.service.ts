@@ -23,6 +23,13 @@ export class UsersService {
 		return newUser;
 	}
 
+	//if no entry is found, then the nickname dosn't exists
+	async isNicknameUnique(nick) {
+		const res = await this.manager.query("SELECT * FROM \"user\" WHERE \"nickname\" = $1;", [nick]);
+
+		return (Object.keys(res).length == 0);
+	}
+
 	async findAll() {
 		const res = await this.manager
 		.createQueryBuilder()
