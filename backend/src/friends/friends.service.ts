@@ -35,24 +35,48 @@ export class FriendsService {
 	}
 
 	async sendFriendRequest(user: User, receiverId: number) {
-		const exists = await this.manager.query("select * from \"friend_request\" WHERE \"senderId\"=$1 AND \"receiverId\"=$2;", [user.id, receiverId]);
-		if (Object.keys(exists).length == 0)
-		{
-			const insert = await this.manager.query("INSERT INTO \"friend_request\" (\"senderId\", \"receiverId\") VALUES ($1, $2);", [user.id, receiverId]);
-			return insert;
-		}
-		else
+		//has a friend request already been sent
+		let exists = await this.manager.query("select * from \"friend_request\" WHERE \"senderId\"=$1 AND \"receiverId\"=$2;", [user.id, receiverId]);
+		if (Object.keys(exists).length != 1)
 		{
 			this.logger.error("Someone tried to add a FriendRequest while it already exists ! Sender:#" + user.id + " receiver:#" + receiverId);
 			return "";
 		}
+
+		//has a friend request already been sent by the other user
+		exists = await this.manager.query("select * from \"friend_request\" WHERE \"senderId\"=$1 AND \"receiverId\"=$2;", [receiverId, user.id]);
+		if (Object.keys(exists).length != 1)
+		{
+			this.logger.warn("Someone tried to add a FriendRequest while the other user already sent one ! Sender:#" + user.id + " receiver:#" + receiverId);
+			return "";
+		}
+
+		//are users already friends
+		let already_friends = await this.manager.query("select * from \"user_friends_user\" WHERE \"userId_1\"=$1 AND \"userId_2\"=$2;", [user.id, receiverId]);
+		if (Object.keys(exists).length != 1)
+		{
+			this.logger.warn("User:#" + user.id + " and User:#" + receiverId + " are already friends. not sending the request");
+			return "";
+		}
+
+		
+		const insert = await this.manager.query("INSERT INTO \"friend_request\" (\"senderId\", \"receiverId\") VALUES ($1, $2);", [user.id, receiverId]);
+		return insert;
 	}
 
 	async acceptFriendRequest(user: User, requestId: number) {
-		const request = await this.manager.query("select * from \"friend_request\" WHERE \"id\"=$1;", [requestId]); 
+		//does the friend_request exists ?
+		let request = await this.manager.query("select * from \"friend_request\" WHERE \"id\"=$1;", [requestId]); 
 		if (Object.keys(request).length == 0){
 			this.logger.error(`something went wrong ! cannot find the friend request #${requestId}`);
 			return ("");
+		}
+
+		let already_friends = await this.manager.query("select * from \"user_friends_user\" WHERE \"userId_1\"=$1 AND \"userId_2\"=$2;", [user.id, request[0].receiverId]);
+		if (Object.keys(already_friends).length != 1)
+		{
+			this.logger.warn("User:#" + user.id + " and User:#" + request[0].receiverId + " are already friends. not sending the request");
+			return "";
 		}
 
 		this.logger.debug("request[0]:" + request[0]);
@@ -66,6 +90,13 @@ export class FriendsService {
 	}
 
 	async refuseFriendRequest(user: User, requestId: number) {
+		//does the friend_request exists ?
+		let request = await this.manager.query("select * from \"friend_request\" WHERE \"id\"=$1;", [requestId]); 
+		if (Object.keys(request).length == 0){
+			this.logger.error(`something went wrong ! cannot find the friend request #${requestId}`);
+			return ("");
+		}
+		
 		await this.manager.query("DELETE FROM friend_request WHERE id=$1", [requestId]);
 		return `request${requestId} Completed (refused).`;
 	}

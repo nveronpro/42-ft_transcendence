@@ -12,9 +12,9 @@ export class AuthController {
   @Get('/login')
   @Redirect('/', 302) // CHANGE THE CODE
   login(@Res() res: Response){
-    console.log("test login");
+    //console.log("test login");
     const url_login = this.authService.login();
-	this.logger.log("url:"+url_login);
+	  //this.logger.log("url:"+url_login);
     return {url: url_login};
   }
 

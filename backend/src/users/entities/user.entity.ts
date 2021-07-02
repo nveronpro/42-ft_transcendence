@@ -7,10 +7,11 @@ export class User extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@Column()
+	//being the 42 logins, this constraint should IN THEORY always be fullfilled
+	@Column({unique: true})
 	login: string;
 
-	@Column()
+	@Column({unique: true})
 	nickname: string;
 
 	@Column()
