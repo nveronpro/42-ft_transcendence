@@ -8,6 +8,7 @@ import { MatchHistoriesModule } from './match-histories/match-histories.module';
 import { AuthModule } from './auth/auth.module';
 import { Connection } from 'typeorm';
 import { FriendsModule } from './friends/friends.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { FriendsModule } from './friends/friends.module';
     UsersModule,
     MatchHistoriesModule,
     AuthModule,
-    FriendsModule
+    FriendsModule,
+    ProfileModule
   ],
   controllers: [AppController],
   providers: [AppService],

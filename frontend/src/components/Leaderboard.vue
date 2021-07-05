@@ -8,7 +8,7 @@
               <th scope="col">Login</th>
               <th scope="col">Wins</th>
               <th scope="col">Looses</th>
-              <th scope="col">Points</th>
+              <th scope="col">Score</th>
             </tr>
           </thead>
           <tbody>
@@ -27,7 +27,7 @@
 
 
 <script>
-	import axios from "axios";
+  import axios from "axios";
 
 	export default {
     name: "Leaderboard",
@@ -45,5 +45,5 @@
           })
       })
     },
-	}
+  }
 </script>

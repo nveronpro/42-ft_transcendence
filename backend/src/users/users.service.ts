@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {EntityRepository, Repository, EntityManager, Connection} from "typeorm";
 import { CreateUserDto } from './dto/create-user.dto';
@@ -9,6 +9,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersService {
 	constructor(private manager: EntityManager) {
 	}
+	private readonly logger = new Logger(UsersService.name);
 
 	async create(userData: CreateUserDto) {
 		const newUser = await new User();
@@ -20,6 +21,13 @@ export class UsersService {
 		newUser.friends = userData.friends;
 		await this.manager.save(newUser);
 		return newUser;
+	}
+
+	//if no entry is found, then the nickname dosn't exists
+	async isNicknameUnique(nick) {
+		const res = await this.manager.query("SELECT * FROM \"user\" WHERE \"nickname\" = $1;", [nick]);
+
+		return (Object.keys(res).length == 0);
 	}
 
 	async findAll() {
@@ -42,6 +50,13 @@ export class UsersService {
 		.getRawMany();
 
 		return res;
+	}
+
+	async getUserAvatar(user: User) {
+		const res = await this.manager.query("SELECT avatar FROM \"user\" WHERE \"id\" = $1;", [user.id]);
+		this.logger.debug("user#" + user.id + "'s avatar:" + res[0].avatar);
+
+		return (res);
 	}
 
 	async findOneWhithLogin(login: string) {

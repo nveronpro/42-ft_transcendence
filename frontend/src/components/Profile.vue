@@ -5,8 +5,9 @@
 				<div class="card">
 					<div class="card-body text-center">
 						<label for="image">
-							<input type="file" name="image" id="image" style="display:none;" @change="handleFileUpload" />
-							<img src="https://avatarfiles.alphacoders.com/123/thumb-123713.jpg" class="card-img" alt="...">
+							<input type="file" ref="file" name="image" id="image" style="display:none;" @change="handleFileUpload()" />
+							<div id="avatar">
+							</div>
 						</label>
 					</div>
 				</div>
@@ -46,24 +47,37 @@
 </template>
 
 <script>
-	import axios from "axios";
+    import axios from "axios";
 
-	export default {
-		data(){
-			return {
-				user: null,
-				friend_requests: null,
+    export default {
+        data(){
+            return {
+                user: null,
+                friend_requests: null,
 				file: '',
-			}
-		},
-		mounted () {
-			axios
-			.get('/api/auth/me')
-			.then(response => (this.user = response.data))
+            }
+        },
+        mounted () {
+            axios
+            .get('/api/auth/me')
+            .then(response => (this.user = response.data))
 
 			axios
 			.get('/api/friends/received')
 			.then(response => (this.friend_requests = response.data))
+
+			axios
+			.get('/api/users/avatar')
+			.then((response) => {
+				let image = document.querySelector("#avatar img");
+
+				if (image)
+					document.getElementById("avatar").removeChild(image);
+				document.getElementById("avatar").insertAdjacentHTML('beforeend', response.data);
+
+				let elem = document.querySelector("#avatar img");
+				elem.classList.add("card-img");
+			})
 		},
 		methods: {
 			accept: function (id) {
