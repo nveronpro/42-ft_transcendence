@@ -31,7 +31,7 @@ export class User extends BaseEntity {
 	@JoinTable()
 	match_histories: MatchHistory[];
 
-	@Column(/*"bytea", */{nullable: true})
+	@Column({nullable: true})
 	avatar: string;
 
 }

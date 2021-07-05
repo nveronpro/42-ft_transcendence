@@ -16,4 +16,6 @@ export class CreateUserDto {
     current_status: string;
 
     match_histories: MatchHistory[];
+
+    avatar: string;
 }

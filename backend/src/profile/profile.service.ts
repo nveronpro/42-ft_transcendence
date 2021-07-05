@@ -8,24 +8,37 @@ import { EntityManager } from 'typeorm';
 export class ProfileService {
 	constructor(private manager: EntityManager) {
 	}
-  private readonly logger = new Logger(ProfileService.name);
+
+	private readonly logger = new Logger(ProfileService.name);
 
 	async updateAvatar(user: UserType, file/*: Express.Multer.File*/) {
-		const res = await this.manager.query("UPDATE \"user\" SET \"avatar\" = $1 WHERE \"id\"=$2;", [file.buffer.toString('base64'), user.id]);
-		return (res);
+		try {
+			const res = await this.manager.query("UPDATE \"user\" SET \"avatar\" = $1 WHERE \"id\"=$2;", [file.buffer.toString('base64'), user.id]);
+			return (res);
+		} catch (error) {
+			this.logger.error("updateAvatar: An error has occured. Please check the database (or something). See error for more informations.");
+			this.logger.error(error);
+			return ("An error has occured. Please check the database (or something).");
+		}
 	}
 
 	async updateNickname(user: UserType, nick: string) {
-	  const exists = await this.manager.query("SELECT * FROM \"user\" WHERE \"nickname\" = $1;", [nick]);
+		try {
+			const exists = await this.manager.query("SELECT * FROM \"user\" WHERE \"nickname\" = $1;", [nick]);
 
-		if (Object.keys(exists).length != 0)
-    {
-      this.logger.error(`the User#${user.id} attemps to change it's nickname to an already existing nickname: ${nick} !`);
-      return ("");
-    }
+			if (Object.keys(exists).length != 0)
+			{
+				this.logger.error(`the User#${user.id} attemps to change it's nickname to an already existing nickname: ${nick} !`);
+				return ("");
+			}
 
-    const res = await this.manager.query("UPDATE \"user\" SET \"nickname\" = $1 WHERE \"id\" = $2;", [nick, user.id]);
+			const res = await this.manager.query("UPDATE \"user\" SET \"nickname\" = $1 WHERE \"id\" = $2;", [nick, user.id]);
 
-    return (res);
+			return (res);
+		} catch (error) {
+			this.logger.error("updateNickname: An error has occured. Please check the database (or something). See error for more informations.");
+			this.logger.error(error);
+			return ("An error has occured. Please check the database (or something).");
+		}
 	}
 }
