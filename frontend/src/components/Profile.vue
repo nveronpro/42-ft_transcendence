@@ -17,7 +17,6 @@
 					<div class="card-body">
 						<h5 class="card-title fs-1 mb-1">{{user.login}}</h5>
 						<p class="card-text mb-5">Joueur pro de pong</p>
-						
 					</div>
 					<div class="card-footer bg-transparent border-Secondary">
 						<p class="card-text mb-auto"><small class="text-muted">{{user.current_status}}</small></p>

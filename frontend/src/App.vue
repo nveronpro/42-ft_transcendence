@@ -12,30 +12,43 @@
 			</div>
 		</div>
 		<div v-else>
-			<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-3">
-				<div class="container-fluid">
-					<a href="#" class="navbar-brand mr-3">FT_TRANSCENDENCE</a>
-					<button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
-						<span class="navbar-toggler-icon"></span>
-					</button>
-					<div class="collapse navbar-collapse" id="navbarCollapse">
-						<div class="navbar-nav">
-							<router-link class="nav-item nav-link" to="/home">Home</router-link>
-							<router-link class="nav-item nav-link" to="/Leaderboard">Leaderboard</router-link>
-							<router-link class="nav-item nav-link" to="/friends">Friends</router-link>
-							<router-link class="nav-item nav-link" to="/stats">Stats</router-link>
-							<router-link class="nav-item nav-link" to="/profile">Profile</router-link>
-							<router-link class="nav-item nav-link" to="/test">Test</router-link>
+			<div v-if="google_auth_verify === true">
+				<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-3">
+					<div class="container-fluid">
+						<a href="#" class="navbar-brand mr-3">FT_TRANSCENDENCE</a>
+						<button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+							<span class="navbar-toggler-icon"></span>
+						</button>
+						<div class="collapse navbar-collapse" id="navbarCollapse">
+							<div class="navbar-nav">
+								<router-link class="nav-item nav-link" to="/home">Home</router-link>
+								<router-link class="nav-item nav-link" to="/Leaderboard">Leaderboard</router-link>
+								<router-link class="nav-item nav-link" to="/friends">Friends</router-link>
+								<router-link class="nav-item nav-link" to="/stats">Stats</router-link>
+								<router-link class="nav-item nav-link" to="/profile">Profile</router-link>
+								<router-link class="nav-item nav-link" to="/test">Test</router-link>
 
-						</div>
-						<div class="navbar-nav ml-auto">
-							<div v-if="user !== null">
-								<button type="button" class="btn btn-primary" onclick='window.location.href="http://localhost:3000/auth/logout"'>Logout as {{ user.login }}</button>
+							</div>
+							<div class="navbar-nav ml-auto">
+								<div v-if="user !== null">
+									<button type="button" class="btn btn-primary" onclick='window.location.href="http://localhost:3000/auth/logout"'>Logout as {{ user.login }}</button>
+								</div>
 							</div>
 						</div>
-					</div>
-				</div>    
-			</nav>
+					</div>    
+				</nav>
+			</div>
+			<div v-else>
+				<div id="qrcode">
+
+				</div>
+				<form @submit.prevent="google_auth">
+					<input type="text" v-model="code"> 
+					<button type="submit">
+						Submit From Vue Property
+					</button>
+				</form>
+			</div>
 			<router-view/>
 			<footer-view/>
 		</div>
@@ -55,16 +68,40 @@
 			return {
 				user: null,
 				users: null,
+				google_auth_verify: null,
+				code: '',
 			}
 		},
 		mounted () {
 			axios
 			.get('/api/auth/me')
-			.then(response => (this.user = response.data))
+			.then(response => ( this.user = response.data ))
 
 			axios
 			.get('/api/users/all/')
 			.then(response => (this.users = response.data))
+
+			this.google_auth_verify = false;
 		},
+		created () {
+			axios
+			.get('/api/auth/me')
+			.then(response => {
+				var img = document.createElement("img");
+				img.src = response.data.qrcode_data;
+				let doc = document.getElementById("qrcode");
+				if (!doc.querySelector("img"))
+					doc.appendChild(img);
+			})
+		},
+		methods: {
+			google_auth: function (){
+				if (this.google_auth_verify === false){
+					axios
+					.post('/api/auth/google_auth?code=' + this.code)
+					.then(response => (this.google_auth_verify = response.data))
+				}
+			}
+		}
 	}
 </script>

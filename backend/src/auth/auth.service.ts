@@ -8,6 +8,9 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import {Response, Request} from 'express';
 
+import * as speakeasy from 'speakeasy';
+import * as qrcode from 'qrcode';
+
 const intra42auth = new ClientOAuth2({
   clientId: process.env.API_ID,
 	clientSecret: process.env.API_SECRET,
@@ -44,7 +47,16 @@ export class AuthService {
     const url = intra42auth.code.getUri()
     return url;
   }
-  
+
+  google_auth(code: string, user: User) {
+    return speakeasy.totp.verify({
+      secret: user.secret,
+      encoding: 'ascii',
+      token: code,
+      window: 2
+    });
+  }
+
   public async callback(code: string, res: Response) {
     let url = `http://localhost:3000/auth/callback?code=${code}`
     try {
@@ -63,6 +75,12 @@ export class AuthService {
         usrDto1.wins = 0;
         usrDto1.looses = 0;
         usrDto1.current_status = "none";
+
+        var secret = speakeasy.generateSecret({
+          name: usrDto1.login
+        });
+        user.secret = secret.ascii;
+        user.qrcode_data = await qrcode.toDataURL(secret.otpauth_url);
         await User.create(usrDto1).save();
       }
       const payload = {

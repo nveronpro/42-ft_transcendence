@@ -23,6 +23,12 @@ export class User extends BaseEntity {
 	@Column()
 	current_status: string;
 
+	@Column({nullable: true})
+	secret: string;
+
+	@Column({nullable: true})
+	qrcode_data: string;
+
 	@ManyToMany(() => User)
 	@JoinTable()
 	friends: User[];

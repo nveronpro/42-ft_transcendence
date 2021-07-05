@@ -15,5 +15,9 @@ export class CreateUserDto {
 
     current_status: string;
 
+    secret: string;
+
+    qrcode_data: string;
+
     match_histories: MatchHistory[];
 }
