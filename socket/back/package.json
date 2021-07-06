@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "@nestjs/platform-socket.io": "^7.6.18",
+    "@nestjs/websockets": "^7.6.18",
+    "@types/node": "^16.0.0",
+    "body-parser": "^1.19.0",
+    "nodemon": "^2.0.9",
+    "redis": "^3.1.2",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^6.6.7",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.5"
+  },
+  "devDependencies": {
+    "@types/socket.io": "^3.0.2"
+  }
+}
