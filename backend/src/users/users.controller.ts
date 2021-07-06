@@ -39,14 +39,34 @@ export class UsersController {
 	@UseGuards(JwtAuthGuard)
 	async getUserAvatar(@User() user: UserType) {
 		this.logger.log("@GET(avatar)");
-		const current = await this.usersService.getUserAvatar(user);
+		const current = await this.usersService.getUserAvatar(user.id);
 
 		const res = "<img class=\"avatar\" src=\"data:image/png;base64," + current[0].avatar + "\">";
 		
-		this.logger.debug("res: " + res);
+		// this.logger.debug("res: " + res);
 
 		return (res);
 	}
+
+	@Get('/avatar/:id')
+	async getUserAvatarById(@Param("id") userId: number) {
+		this.logger.log("@GET(avatar)");
+		const current = await this.usersService.getUserAvatar(userId);
+
+		if (current[0]!= undefined) {
+
+			const res = "<img class=\"avatar\" src=\"data:image/png;base64," + current[0].avatar + "\">";
+			
+			// this.logger.debug("res: " + res);
+
+			return (res);
+		}
+		else {
+			this.logger.error(`getUserAvatarById: User#${userId} does not exists`);
+			return ("");
+		}
+	}
+
 
 	@Get(':id')
 	async findOne(@Param('id') id: number) {

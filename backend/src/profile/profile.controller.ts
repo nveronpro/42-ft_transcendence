@@ -17,7 +17,7 @@ export class ProfileController {
 	@UseInterceptors(FileInterceptor('file'))
 	async updateAvatar(@User() user: UserType, @UploadedFile() file/*: Express.Multer.File*/) {
 		this.logger.log("@PATCH(avatar)");
-		this.logger.debug("file: " + file.buffer.toString('base64'));
+		//this.logger.debug("file: " + file.buffer.toString('base64'));
 		const ret = this.profileService.updateAvatar(user, file);
 		this.logger.log("@PATCH(avatar): Avatar updated");
 		return ret;
