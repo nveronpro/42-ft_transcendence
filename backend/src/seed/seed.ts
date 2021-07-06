@@ -5,6 +5,7 @@ import { User } from '../users/entities/user.entity';
 import { MatchHistory } from '../match-histories/entities/match-history.entity';
 import { CreateFriendRequestDto } from '../friends/dto/create-friendRequest.dto';
 import { FriendRequest } from '../friends/entities/friendRequest.entity';
+import { avatars_64 } from '../ressources/avatar_default';
 
 import * as speakeasy from 'speakeasy';
 import * as qrcode from 'qrcode';
@@ -27,6 +28,7 @@ export async function seed() {
     usrDto1.wins = 0;
     usrDto1.looses = 0;
     usrDto1.current_status = "none";
+	usrDto1.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDto2 = new CreateUserDto();
     usrDto2.login = "User2Login";
@@ -34,6 +36,7 @@ export async function seed() {
     usrDto2.wins = 0;
     usrDto2.looses = 0;
     usrDto2.current_status = "none";
+	usrDto2.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDto3 = new CreateUserDto();
     usrDto3.login = "User3Login";
@@ -41,6 +44,7 @@ export async function seed() {
     usrDto3.wins = 0;
     usrDto3.looses = 0;
     usrDto3.current_status = "none";
+	usrDto3.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDto4 = new CreateUserDto();
     usrDto4.login = "User4Login";
@@ -48,6 +52,7 @@ export async function seed() {
     usrDto4.wins = 0;
     usrDto4.looses = 0;
     usrDto4.current_status = "none";
+	usrDto4.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
 	const usrDto5 = new CreateUserDto();
     usrDto5.login = "User5Login";
@@ -55,6 +60,7 @@ export async function seed() {
     usrDto5.wins = 0;
     usrDto5.looses = 0;
     usrDto5.current_status = "none";
+	usrDto5.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDto6 = new CreateUserDto();
     usrDto6.login = "User6Login";
@@ -62,6 +68,7 @@ export async function seed() {
     usrDto6.wins = 0;
     usrDto6.looses = 0;
     usrDto6.current_status = "none";
+	usrDto6.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDto7 = new CreateUserDto();
     usrDto7.login = "User7Login";
@@ -69,6 +76,7 @@ export async function seed() {
     usrDto7.wins = 0;
     usrDto7.looses = 0;
     usrDto7.current_status = "none";
+	usrDto7.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDto8 = new CreateUserDto();
     usrDto8.login = "User8Login";
@@ -76,6 +84,7 @@ export async function seed() {
     usrDto8.wins = 0;
     usrDto8.looses = 0;
     usrDto8.current_status = "none";
+	usrDto8.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDto9 = new CreateUserDto();
     usrDto9.login = "User9Login";
@@ -83,6 +92,7 @@ export async function seed() {
     usrDto9.wins = 0;
     usrDto9.looses = 0;
     usrDto9.current_status = "none";
+	usrDto9.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
 
     const usrRequest1 = new CreateUserDto();
@@ -91,6 +101,7 @@ export async function seed() {
     usrRequest1.wins = 0;
     usrRequest1.looses = 0;
     usrRequest1.current_status = "none";
+	usrRequest1.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrRequest2 = new CreateUserDto();
     usrRequest2.login = "RequestRefuseLogin";
@@ -98,6 +109,7 @@ export async function seed() {
     usrRequest2.wins = 0;
     usrRequest2.looses = 0;
     usrRequest2.current_status = "none";
+	usrRequest2.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
 	const usrRequest3 = new CreateUserDto();
     usrRequest3.login = "RequestSentLogin";
@@ -105,6 +117,7 @@ export async function seed() {
     usrRequest3.wins = 0;
     usrRequest3.looses = 0;
     usrRequest3.current_status = "none";
+	usrRequest3.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
 	const usrRequest4 = new CreateUserDto();
     usrRequest4.login = "RequestSent2Login";
@@ -112,6 +125,7 @@ export async function seed() {
     usrRequest4.wins = 0;
     usrRequest4.looses = 0;
     usrRequest4.current_status = "none";
+	usrRequest4.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDtoOroberts = new CreateUserDto();
     usrDtoOroberts.login = "oroberts";
@@ -119,6 +133,7 @@ export async function seed() {
     usrDtoOroberts.wins = 0;
     usrDtoOroberts.looses = 0;
     usrDtoOroberts.current_status = "none";
+	usrDtoOroberts.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDtoNveron = new CreateUserDto();
     usrDtoNveron.login = "nveron";
@@ -126,6 +141,7 @@ export async function seed() {
     usrDtoNveron.wins = 0;
     usrDtoNveron.looses = 0;
     usrDtoNveron.current_status = "none";
+	usrDtoNveron.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
 	const usrDtoMavileo = new CreateUserDto();
     usrDtoMavileo.login = "mavileo";
@@ -133,6 +149,7 @@ export async function seed() {
     usrDtoMavileo.wins = 0;
     usrDtoMavileo.looses = 0;
     usrDtoMavileo.current_status = "none";
+	usrDtoMavileo.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
 	var secretOroberts = speakeasy.generateSecret({
         name: usrDtoOroberts.login
@@ -608,6 +625,7 @@ export async function seed() {
     //console.log(matchHistory1);
     //console.log(u1.match_histories[0]);
 	console.log ("--------------------END OF SEED------------------");
+
 
 
     //await reset_db();

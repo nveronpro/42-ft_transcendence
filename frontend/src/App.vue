@@ -45,7 +45,7 @@
 				<form @submit.prevent="google_auth">
 					<input type="text" v-model="code"> 
 					<button type="submit">
-						Submit From Vue Property
+						Submit
 					</button>
 				</form>
 			</div>
@@ -83,7 +83,7 @@
 
 			this.google_auth_verify = false;
 		},
-		created () {
+		updated () {
 			axios
 			.get('/api/auth/me')
 			.then(response => {

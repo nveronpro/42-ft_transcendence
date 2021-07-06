@@ -20,4 +20,6 @@ export class CreateUserDto {
     qrcode_data: string;
 
     match_histories: MatchHistory[];
+
+    avatar: string;
 }

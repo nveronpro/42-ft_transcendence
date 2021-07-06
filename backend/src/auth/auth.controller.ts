@@ -56,7 +56,7 @@ export class AuthController {
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   async profile(@User() user){
-    console.log(user);
+    // console.log(user);
     return user;
   }
 }

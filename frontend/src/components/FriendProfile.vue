@@ -4,10 +4,8 @@
 			<div class="col-4">
 				<div class="card">
 					<div class="card-body text-center">
-						<label for="image">
-							<input type="file" name="image" id="image" style="display:none;" @change="onFileChange" />
-							<img src="https://avatarfiles.alphacoders.com/123/thumb-123713.jpg" class="card-img" alt="...">
-						</label>
+						<div id="avatar">
+						</div>
 					</div>
 				</div>
 			</div>
@@ -104,6 +102,19 @@
 			axios
 			.get('/api/match-histories/friend/' + this.$route.params.id)
 			.then(response => (this.match_histories = response.data))
+
+			axios
+			.get('/api/users/avatar')
+			.then((response) => {
+				let image = document.querySelector("#avatar img");
+
+				if (image)
+					document.getElementById("avatar").removeChild(image);
+				document.getElementById("avatar").insertAdjacentHTML('beforeend', response.data);
+
+				let elem = document.querySelector("#avatar img");
+				elem.classList.add("card-img");
+			})
 		},
 		methods: {
 			send: function (id) {
