@@ -76,9 +76,9 @@ export class UsersService {
 		}
 	}
 
-	async getUserAvatar(user: User) {
+	async getUserAvatar(userId: number) {
 		try {
-			const res = await this.manager.query("SELECT avatar FROM \"user\" WHERE \"id\" = $1;", [user.id]);
+			const res = await this.manager.query("SELECT avatar FROM \"user\" WHERE \"id\" = $1;", [userId]);
 
 			return (res);
 		} catch (error) {
