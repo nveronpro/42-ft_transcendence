@@ -62,7 +62,7 @@ export class MatchHistoriesService {
 
 			this.logger.verbose(`This action returns User #${user.id}'s match history`);
 
-			const res = await this.manager.query("SELECT match_history.*, a.login as winner_login, a.nickname as winner_nickname, b.login as looser_login, b.nickname as looser_nickname from match_history LEFT JOIN \"user\" A ON \"match_history\".\"winnerId\"=A.\"id\" LEFT JOIN \"user\" B ON \"match_history\".\"looserId\"=B.\"id\" WHERE A.id=$1 OR B.id=$1;", [user.id]);
+			const res = await this.manager.query("SELECT match_history.*, a.login as winner_login, a.nickname as winner_nickname, a.avatar as winner_avatar, b.login as looser_login, b.nickname as looser_nickname, b.avatar as looser_avatar from match_history LEFT JOIN \"user\" A ON \"match_history\".\"winnerId\"=A.\"id\" LEFT JOIN \"user\" B ON \"match_history\".\"looserId\"=B.\"id\" WHERE A.id=$1 OR B.id=$1;", [user.id]);
 
 			this.logger.verbose("result:" + res);
 
@@ -80,7 +80,7 @@ export class MatchHistoriesService {
 
 			this.logger.verbose(`This action returns User #${id}'s match history`);
 
-			const res = await this.manager.query("SELECT match_history.*, a.login as winner_login, a.nickname as winner_nickname, b.login as looser_login, b.nickname as looser_nickname from match_history LEFT JOIN \"user\" A ON \"match_history\".\"winnerId\"=A.\"id\" LEFT JOIN \"user\" B ON \"match_history\".\"looserId\"=B.\"id\" WHERE A.id=$1 OR B.id=$1;", [id]);
+			const res = await this.manager.query("SELECT match_history.*, a.login as winner_login, a.nickname as winner_nickname, a.avatar as winner_avatar, b.login as looser_login, b.nickname as looser_nickname, b.avatar as looser_avatar from match_history LEFT JOIN \"user\" A ON \"match_history\".\"winnerId\"=A.\"id\" LEFT JOIN \"user\" B ON \"match_history\".\"looserId\"=B.\"id\" WHERE A.id=$1 OR B.id=$1;", [id]);
 
 			this.logger.verbose("result:" + res);
 
