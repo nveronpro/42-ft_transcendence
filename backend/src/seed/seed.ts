@@ -7,6 +7,8 @@ import { CreateFriendRequestDto } from '../friends/dto/create-friendRequest.dto'
 import { FriendRequest } from '../friends/entities/friendRequest.entity';
 import { avatars_64 } from '../ressources/avatar_default';
 
+import * as speakeasy from 'speakeasy';
+import * as qrcode from 'qrcode';
 
 async function reset_db() {
 	await FriendRequest.delete({});
@@ -149,6 +151,28 @@ export async function seed() {
     usrDtoMavileo.current_status = "none";
 	usrDtoMavileo.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
+	var secretOroberts = speakeasy.generateSecret({
+        name: usrDtoOroberts.login
+	});
+
+	usrDtoOroberts.secret = secretOroberts.ascii;
+	usrDtoOroberts.qrcode_data = await qrcode.toDataURL(secretOroberts.otpauth_url);
+
+	var secretNveron = speakeasy.generateSecret({
+        name: usrDtoNveron.login
+	});
+
+	usrDtoNveron.secret = secretNveron.ascii;
+	usrDtoNveron.qrcode_data = await qrcode.toDataURL(secretNveron.otpauth_url);
+
+	var secretMavileo = speakeasy.generateSecret({
+        name: usrDtoMavileo.login
+	});
+
+	usrDtoMavileo.secret = secretMavileo.ascii;
+	usrDtoMavileo.qrcode_data = await qrcode.toDataURL(secretMavileo.otpauth_url);
+
+	
     let u1 = await User.create(usrDto1).save();
     let u2 = await User.create(usrDto2).save();
 	let u3 = await User.create(usrDto3).save();

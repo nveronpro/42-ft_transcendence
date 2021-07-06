@@ -38,6 +38,12 @@ export class AuthController {
     res.cookie('auth-cookie', token, { httpOnly: true });
   }
 
+  @Post('/google_auth')
+  @UseGuards(JwtAuthGuard)
+  google_auth(@Query('code') code, @User() user){
+    return this.authService.google_auth(code, user);
+  }
+
   @Get('/cookie')
   cookie(@Req() request: Request){
     console.log(request?.cookies["auth-cookie"]);
