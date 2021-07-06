@@ -37,20 +37,25 @@
 						</div>
 					</div>    
 				</nav>
+				<router-view/>
+				<footer-view/>
 			</div>
 			<div v-else>
-				<div id="qrcode">
+				<div class="px-4 py-5 my-5 text-center">
+					<div id="qrcode">
 
+					</div>
+					<p class="lead mb-4">Scan this qrcode with google_auth</p>
+					<div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+						<form @submit.prevent="google_auth">
+							<div class="input-group mb-3">
+								<input type="text" class="form-control" v-model="code" placeholder="Google code" aria-label="Recipient's username" aria-describedby="button-addon2">
+								<button class="btn btn-outline-secondary" type="submit" id="button-addon2">Login</button>
+							</div>
+						</form>
+					</div>
 				</div>
-				<form @submit.prevent="google_auth">
-					<input type="text" v-model="code"> 
-					<button type="submit">
-						Submit
-					</button>
-				</form>
 			</div>
-			<router-view/>
-			<footer-view/>
 		</div>
 	</div>
 </template>

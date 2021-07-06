@@ -4,8 +4,7 @@
 			<div class="col-4">
 				<div class="card">
 					<div class="card-body text-center">
-						<div id="avatar">
-						</div>
+						<img :src="'data:image/png;base64,' + user[0].user_avatar" class="card-img" alt="...">
 					</div>
 				</div>
 			</div>
@@ -34,7 +33,7 @@
 								<div class="card-body">
 									<div class="row">
 										<div class="col-4">
-											<img src="https://avatarfiles.alphacoders.com/123/thumb-123713.jpg" class="card-img-top w-75" alt="...">
+											<img :src="'data:image/png;base64,' + match_history.winner_avatar" class="card-img-top w-75" alt="...">
 										</div>
 										<div class="col-6 d-flex align-items-center">
 												<p class="card-text">
@@ -66,7 +65,7 @@
 											</p>
 										</div>
 										<div class="col-4">
-											<img src="https://pbs.twimg.com/profile_images/603551118493376513/EZ7zKg3W.jpg" class="card-img-top w-75" alt="...">
+											<img :src="'data:image/png;base64,' + match_history.looser_avatar" class="card-img-top w-75" alt="...">
 										</div>
 									</div>
 								</div>
@@ -102,19 +101,6 @@
 			axios
 			.get('/api/match-histories/friend/' + this.$route.params.id)
 			.then(response => (this.match_histories = response.data))
-
-			axios
-			.get('/api/users/avatar')
-			.then((response) => {
-				let image = document.querySelector("#avatar img");
-
-				if (image)
-					document.getElementById("avatar").removeChild(image);
-				document.getElementById("avatar").insertAdjacentHTML('beforeend', response.data);
-
-				let elem = document.querySelector("#avatar img");
-				elem.classList.add("card-img");
-			})
 		},
 		methods: {
 			send: function (id) {

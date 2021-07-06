@@ -31,7 +31,7 @@
 									<router-link class="card-block stretched-link text-decoration-none" :to="'/friend/' + friend.id">
 										<div class="card-body text-center">
 											<h5 class="card-title text-dark text-decoration-none">{{friend.login}}</h5>
-											<a :src="'/friend/' + friend.id"><img src="https://avatarfiles.alphacoders.com/123/thumb-123713.jpg" class="card-img" alt="..."></a>
+											<a :src="'/friend/' + friend.id"><img :src="'data:image/png;base64,' + friend.avatar" class="card-img" alt="..."></a>
 										</div>
 									</router-link>
 								</div>

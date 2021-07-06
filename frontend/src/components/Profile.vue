@@ -24,7 +24,7 @@
 				</div>
 			</div>
 			<div class="col-12">
-				<div id="block" class="my-3 p-3 bg-body rounded shadow-sm">
+				<div class="my-3 p-3 bg-body rounded shadow-sm">
 					<h6 class="border-bottom pb-2 mb-0">Demandes d'amis reçus</h6>
 					<div v-for="friend_request in friend_requests" :key="friend_request.id" class="d-flex text-muted pt-3">
 						<svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em"></text></svg>
@@ -32,10 +32,10 @@
 							<strong class="d-block text-gray-dark">{{friend_request.sender_login}}</strong>
 							{{friend_request.sender_login}} voudrais vous ajoutez en amis !
 						</p>
-						<button v-on:click="refuse(friend_request.id)" type="button" onclick='document.getElementById("block").removeChild(this.parentNode);' class="btn btn-outline-danger ml-auto mb-3">
+						<button v-on:click="refuse(friend_request.id)" type="button" class="btn btn-outline-danger ml-auto mb-3">
 							<i class="fas fa-minus"></i>
 						</button>
-						<button v-on:click="accept(friend_request.id)" type="button" onclick='document.getElementById("block").removeChild(this.parentNode);' class="btn btn-outline-success ml-auto mb-3">
+						<button v-on:click="accept(friend_request.id)" type="button" class="btn btn-outline-success ml-auto mb-3">
 							<i class="fas fa-plus"></i>
 						</button>
 					</div>
