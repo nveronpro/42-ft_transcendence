@@ -15,6 +15,8 @@ export class CreateUserDto {
 
     current_status: string;
 
+    two_factor_auth: boolean;
+
     secret: string;
 
     qrcode_data: string;

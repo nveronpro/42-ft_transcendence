@@ -23,6 +23,9 @@ export class User extends BaseEntity {
 	@Column()
 	current_status: string;
 
+	@Column({ default: false })
+	two_factor_auth: boolean;
+
 	@Column({nullable: true})
 	secret: string;
 

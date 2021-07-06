@@ -12,7 +12,7 @@
 			</div>
 		</div>
 		<div v-else>
-			<div v-if="google_auth_verify === true">
+			<div v-if="google_auth_verify === true || user.two_factor_auth == false">
 				<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-3">
 					<div class="container-fluid">
 						<a href="#" class="navbar-brand mr-3">FT_TRANSCENDENCE</a>
