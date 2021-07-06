@@ -2,12 +2,13 @@
 	<div>
 		<div class="container-fluid" style="height: 90.5vh;">
 			<div class="row g-2 h-100">
-				<div class="col-md-4 col-sm-12">
+				<div class="col-lg-4 col-md-12 col-sm-12">
 					<div class="p-3 border bg-light h-100">
 						<div class="card mb-3">
 							<div class="row">
 								<div class="col-6">
-									<img src="https://avatarfiles.alphacoders.com/123/thumb-123713.jpg" class="card-img-top m-3" alt="...">
+									<div id="avatar">
+									</div>
 								</div>
 								<div class="col-6">
 									<div class="card-body">
@@ -33,7 +34,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-md-8 col-sm-12">
+				<div class="col-lg-8 col-md-12 col-sm-12">
 					<div class="p-3 border bg-light h-100 overflow-auto">
 						<div v-for="match_history in match_histories" :key="match_history.id" class="row mb-3 mr-1 ml-1 p-2">
 							<div class="col-3">
@@ -105,6 +106,20 @@
 			axios
 			.get('/api/match-histories/')
 			.then(response => (this.match_histories = response.data))
+
+			axios
+			.get('/api/users/avatar')
+			.then((response) => {
+				let image = document.querySelector("#avatar img");
+
+				if (image)
+					document.getElementById("avatar").removeChild(image);
+				document.getElementById("avatar").insertAdjacentHTML('beforeend', response.data);
+
+				let elem = document.querySelector("#avatar img");
+				elem.classList.add("card-img-top");
+				elem.classList.add("m-3");
+			})
 		},
 	}
 </script>
