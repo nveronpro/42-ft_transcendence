@@ -5,7 +5,7 @@
           <thead>
             <tr>
               <th scope="col">#</th>
-              <th scope="col">Login</th>
+              <th scope="col">Nickname</th>
               <th scope="col">Wins</th>
               <th scope="col">Looses</th>
               <th scope="col">Score</th>
@@ -14,7 +14,7 @@
           <tbody>
             <tr v-for="(user, index) of users" :key="user.id" :fields="fields">
               <td>{{index + 1}}</td>
-              <td>{{user.user_login}}</td>
+              <td>{{user.user_nickname}}</td>
               <td>{{user.user_wins}}</td>
               <td>{{user.user_looses}}</td>
               <td>{{(user.user_wins * 3) + (user.user_looses * -2)}}</td>
