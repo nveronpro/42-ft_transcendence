@@ -29,4 +29,11 @@ export class ProfileController {
 		this.logger.log("@PATCH(nickname/" + nick + ")");
 		return this.profileService.updateNickname(user, nick);
 	}
+
+	@Post("2fa/:bool")
+	@UseGuards(JwtAuthGuard)
+	async update2fa(@User() user: UserType, @Param("bool") bool: boolean) {
+		this.logger.log("@POST(2fa/" + bool + ")");
+		return this.profileService.update2fa(user, bool);
+	}
 }

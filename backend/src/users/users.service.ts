@@ -99,6 +99,19 @@ export class UsersService {
 		}
 	}
 
+	async updateStatus(user: User, status: string) {
+		try {
+			const toUpdate = await this.manager.findOne(User, { id: user.id });
+			toUpdate.current_status = status;
+			User.save(toUpdate);
+			return ;
+		} catch (error) {
+			this.logger.error("updateStatus: An error has occured. Please check the database (or something). See error for more informations.");
+			this.logger.error(error);
+			return ("An error has occured. Please check the database (or something).");
+		}
+	}
+
 
 	/*
     login: string;
