@@ -78,6 +78,8 @@
 			}
 		},
 		mounted () {
+			axios.post('/api/users/status/online');
+			
 			axios
 			.get('/api/auth/me')
 			.then(response => ( this.user = response.data ))
@@ -98,6 +100,12 @@
 				if (!doc.querySelector("img"))
 					doc.appendChild(img);
 			})
+		},
+		created() {
+			window.addEventListener('beforeunload', function () {
+				axios
+				.post('/api/users/status/offline');
+			});
 		},
 		methods: {
 			google_auth: function (){

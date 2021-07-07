@@ -23,10 +23,17 @@ export class ProfileController {
 		return ret;
 	}
 
-	@Patch("nickname/:nick")
+	@Post("nickname/:nick")
 	@UseGuards(JwtAuthGuard)
 	async updateNickname(@User() user: UserType, @Param("nick") nick: string) {
 		this.logger.log("@PATCH(nickname/" + nick + ")");
 		return this.profileService.updateNickname(user, nick);
+	}
+
+	@Post("2fa/:bool")
+	@UseGuards(JwtAuthGuard)
+	async update2fa(@User() user: UserType, @Param("bool") bool: boolean) {
+		this.logger.log("@POST(2fa/" + bool + ")");
+		return this.profileService.update2fa(user, bool);
 	}
 }

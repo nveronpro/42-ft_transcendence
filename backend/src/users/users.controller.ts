@@ -83,6 +83,13 @@ export class UsersController {
 		return this.usersService.create(createUserDto);
 	}
 
+	@Post("/status/:status")
+	@UseGuards(JwtAuthGuard)
+	updateStatus(@User() user: UserType, @Param("status") status: string) {
+		this.logger.log("@POST(\"/status/" + status + "\")");
+		return this.usersService.updateStatus(user, status);
+	}
+
 	@Patch()
 	@UseGuards(JwtAuthGuard)
 	update(@User() user, @Body() updateUserDto: UpdateUserDto) {

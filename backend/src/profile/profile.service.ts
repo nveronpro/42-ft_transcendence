@@ -3,6 +3,7 @@ import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { User as UserType} from '../../src/users/entities/user.entity';
 import { EntityManager } from 'typeorm';
+import { User } from 'src/auth/decorators/user.decorator';
 
 @Injectable()
 export class ProfileService {
@@ -41,4 +42,16 @@ export class ProfileService {
 			return ("An error has occured. Please check the database (or something).");
 		}
 	}
+
+	async update2fa(user: UserType, bool: boolean) {
+        try {
+            const res = await this.manager.query("UPDATE \"user\" SET two_factor_auth=$1 WHERE \"id\" = $2;", [bool, user.id]);
+            return ;
+        } catch (error) {
+            this.logger.error("update2fa: An error has occured. Please check the database (or something). See error for more informations.");
+            this.logger.error(error);
+            return ("An error has occured. Please check the database (or something).");
+        }
+
+    }
 }
