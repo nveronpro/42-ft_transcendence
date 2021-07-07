@@ -27,7 +27,7 @@ export async function seed() {
     usrDto1.nickname = "User1Nickname";
     usrDto1.wins = 0;
     usrDto1.looses = 0;
-    usrDto1.current_status = "none";
+    usrDto1.current_status = "offline";
 	usrDto1.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDto2 = new CreateUserDto();
@@ -35,7 +35,7 @@ export async function seed() {
     usrDto2.nickname = "User2Nickname";
     usrDto2.wins = 0;
     usrDto2.looses = 0;
-    usrDto2.current_status = "none";
+    usrDto2.current_status = "offline";
 	usrDto2.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDto3 = new CreateUserDto();
@@ -43,7 +43,7 @@ export async function seed() {
     usrDto3.nickname = "User3Nickname";
     usrDto3.wins = 0;
     usrDto3.looses = 0;
-    usrDto3.current_status = "none";
+    usrDto3.current_status = "offline";
 	usrDto3.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDto4 = new CreateUserDto();
@@ -51,7 +51,7 @@ export async function seed() {
     usrDto4.nickname = "User4Nickname";
     usrDto4.wins = 0;
     usrDto4.looses = 0;
-    usrDto4.current_status = "none";
+    usrDto4.current_status = "offline";
 	usrDto4.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
 	const usrDto5 = new CreateUserDto();
@@ -59,7 +59,7 @@ export async function seed() {
     usrDto5.nickname = "User5Nickname";
     usrDto5.wins = 0;
     usrDto5.looses = 0;
-    usrDto5.current_status = "none";
+    usrDto5.current_status = "offline";
 	usrDto5.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDto6 = new CreateUserDto();
@@ -67,7 +67,7 @@ export async function seed() {
     usrDto6.nickname = "User6Nickname";
     usrDto6.wins = 0;
     usrDto6.looses = 0;
-    usrDto6.current_status = "none";
+    usrDto6.current_status = "offline";
 	usrDto6.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDto7 = new CreateUserDto();
@@ -75,7 +75,7 @@ export async function seed() {
     usrDto7.nickname = "User7Nickname";
     usrDto7.wins = 0;
     usrDto7.looses = 0;
-    usrDto7.current_status = "none";
+    usrDto7.current_status = "offline";
 	usrDto7.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDto8 = new CreateUserDto();
@@ -83,7 +83,7 @@ export async function seed() {
     usrDto8.nickname = "User8Nickname";
     usrDto8.wins = 0;
     usrDto8.looses = 0;
-    usrDto8.current_status = "none";
+    usrDto8.current_status = "offline";
 	usrDto8.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDto9 = new CreateUserDto();
@@ -91,7 +91,7 @@ export async function seed() {
     usrDto9.nickname = "User9Nickname";
     usrDto9.wins = 0;
     usrDto9.looses = 0;
-    usrDto9.current_status = "none";
+    usrDto9.current_status = "offline";
 	usrDto9.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
 
@@ -100,7 +100,7 @@ export async function seed() {
     usrRequest1.nickname = "RequestAcceptNickname";
     usrRequest1.wins = 0;
     usrRequest1.looses = 0;
-    usrRequest1.current_status = "none";
+    usrRequest1.current_status = "offline";
 	usrRequest1.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrRequest2 = new CreateUserDto();
@@ -108,7 +108,7 @@ export async function seed() {
     usrRequest2.nickname = "RequestRefuseNickname";
     usrRequest2.wins = 0;
     usrRequest2.looses = 0;
-    usrRequest2.current_status = "none";
+    usrRequest2.current_status = "offline";
 	usrRequest2.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
 	const usrRequest3 = new CreateUserDto();
@@ -116,7 +116,7 @@ export async function seed() {
     usrRequest3.nickname = "RequestSentNickname";
     usrRequest3.wins = 0;
     usrRequest3.looses = 0;
-    usrRequest3.current_status = "none";
+    usrRequest3.current_status = "offline";
 	usrRequest3.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
 	const usrRequest4 = new CreateUserDto();
@@ -124,7 +124,7 @@ export async function seed() {
     usrRequest4.nickname = "RequestSent2Nickname";
     usrRequest4.wins = 0;
     usrRequest4.looses = 0;
-    usrRequest4.current_status = "none";
+    usrRequest4.current_status = "offline";
 	usrRequest4.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDtoOroberts = new CreateUserDto();
@@ -132,7 +132,7 @@ export async function seed() {
     usrDtoOroberts.nickname = "Nickname_oroberts";
     usrDtoOroberts.wins = 0;
     usrDtoOroberts.looses = 0;
-    usrDtoOroberts.current_status = "none";
+    usrDtoOroberts.current_status = "offline";
 	usrDtoOroberts.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
     const usrDtoNveron = new CreateUserDto();
@@ -140,7 +140,7 @@ export async function seed() {
     usrDtoNveron.nickname = "Nickname_nveron";
     usrDtoNveron.wins = 0;
     usrDtoNveron.looses = 0;
-    usrDtoNveron.current_status = "none";
+    usrDtoNveron.current_status = "offline";
 	usrDtoNveron.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
 	const usrDtoMavileo = new CreateUserDto();
@@ -148,7 +148,7 @@ export async function seed() {
     usrDtoMavileo.nickname = "Nickname_mavileo";
     usrDtoMavileo.wins = 0;
     usrDtoMavileo.looses = 0;
-    usrDtoMavileo.current_status = "none";
+    usrDtoMavileo.current_status = "offline";
 	usrDtoMavileo.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
 	var secretOroberts = speakeasy.generateSecret({
