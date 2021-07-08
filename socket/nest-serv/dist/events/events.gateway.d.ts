@@ -3,6 +3,6 @@ import { Pos } from '../interfaces/pos.interface';
 export declare class EventsGateway {
     server: Server;
     position: Pos;
-    co(): void;
+    test(data: string): void;
     move(data: string): Promise<string>;
 }

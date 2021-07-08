@@ -18,12 +18,10 @@ import {
     position: Pos;
 
     
-    @SubscribeMessage('connection')
-    co()  {
-      console.log("New connection");
-      this.position.x = 200;
-      this.position.y = 200;
-      this.server.emit("position", this.position);
+    @SubscribeMessage('test')
+    test(@MessageBody() data: string): void  {
+      console.log("New test");
+      this.server.emit("test", data);
     }
 
     @SubscribeMessage('move')

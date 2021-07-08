@@ -16,11 +16,9 @@ exports.EventsGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 let EventsGateway = class EventsGateway {
-    co() {
-        console.log("New connection");
-        this.position.x = 200;
-        this.position.y = 200;
-        this.server.emit("position", this.position);
+    test(data) {
+        console.log("New test");
+        this.server.emit("test", data);
     }
     async move(data) {
         console.log(data);
@@ -32,11 +30,12 @@ __decorate([
     __metadata("design:type", socket_io_1.Server)
 ], EventsGateway.prototype, "server", void 0);
 __decorate([
-    websockets_1.SubscribeMessage('connection'),
+    websockets_1.SubscribeMessage('test'),
+    __param(0, websockets_1.MessageBody()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], EventsGateway.prototype, "co", null);
+], EventsGateway.prototype, "test", null);
 __decorate([
     websockets_1.SubscribeMessage('move'),
     __param(0, websockets_1.MessageBody()),
