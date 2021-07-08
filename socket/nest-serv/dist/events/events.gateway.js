@@ -17,29 +17,44 @@ const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 let EventsGateway = class EventsGateway {
     newCo(coords, client) {
-        console.log(this.first);
-        if (this.first == false) {
-            client.emit("is-spect", true);
+        console.log(this.players);
+        if (this.players == undefined) {
+            this.players = 1;
+            client.emit("role", 1);
             return;
         }
-        this.first = false;
-        client.emit("is-spect", false);
+        if (this.players == 1) {
+            this.players += 1;
+            client.emit("role", 2);
+            return;
+        }
+        this.players += 1;
+        client.emit("role", 0);
     }
-    barTop(coords) {
-        coords.barY -= 15;
+    bar1Top(coords) {
+        coords.bar1Y -= 15;
         this.server.emit("new-coords", coords);
     }
-    barBottom(coords) {
-        coords.barY += 15;
+    bar1Bottom(coords) {
+        coords.bar1Y += 15;
+        this.server.emit("new-coords", coords);
+    }
+    bar2Top(coords) {
+        coords.bar2Y -= 15;
+        this.server.emit("new-coords", coords);
+    }
+    bar2Bottom(coords) {
+        coords.bar2Y += 15;
         this.server.emit("new-coords", coords);
     }
     move(coords) {
+        console.log('move');
         this.moving = true;
         coords.moving = true;
         coords.posX += coords.vxBall;
         coords.posY += coords.vyBall;
-        if (coords.posY <= coords.barY + 100 &&
-            coords.posY >= coords.barY &&
+        if (coords.posY <= coords.bar1Y + 100 &&
+            coords.posY >= coords.bar1Y &&
             coords.posX <= 15 && coords.posX >= 0) {
             coords.vxBall = -coords.vxBall;
         }
@@ -48,8 +63,31 @@ let EventsGateway = class EventsGateway {
             coords.moving = false;
             coords.posX = 300;
             coords.posY = 0;
-            coords.barX = 0;
-            coords.barY = 220;
+            coords.bar1X = 0;
+            coords.bar1Y = 220;
+            coords.bar2X = 685;
+            coords.bar2Y = 220;
+            coords.score2++;
+            console.log('score' + coords.score1 + ' : ' + coords.score2);
+            this.server.emit('new-coords', coords);
+            return;
+        }
+        if (coords.posY <= coords.bar2Y + 100 &&
+            coords.posY >= coords.bar2Y &&
+            coords.posX >= 685 && coords.posX <= 700) {
+            coords.vxBall = -coords.vxBall;
+        }
+        else if (coords.posX + coords.vxBall > 700) {
+            this.moving = false;
+            coords.moving = false;
+            coords.posX = 300;
+            coords.posY = 0;
+            coords.bar1X = 0;
+            coords.bar1Y = 220;
+            coords.bar2X = 685;
+            coords.bar2Y = 220;
+            coords.score1++;
+            console.log('score' + coords.score1 + ' : ' + coords.score2);
             this.server.emit('new-coords', coords);
             return;
         }
@@ -80,19 +118,33 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], EventsGateway.prototype, "newCo", null);
 __decorate([
-    websockets_1.SubscribeMessage('bar-top'),
+    websockets_1.SubscribeMessage('bar1-top'),
     __param(0, websockets_1.MessageBody()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
-], EventsGateway.prototype, "barTop", null);
+], EventsGateway.prototype, "bar1Top", null);
 __decorate([
-    websockets_1.SubscribeMessage('bar-bottom'),
+    websockets_1.SubscribeMessage('bar1-bottom'),
     __param(0, websockets_1.MessageBody()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
-], EventsGateway.prototype, "barBottom", null);
+], EventsGateway.prototype, "bar1Bottom", null);
+__decorate([
+    websockets_1.SubscribeMessage('bar2-top'),
+    __param(0, websockets_1.MessageBody()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], EventsGateway.prototype, "bar2Top", null);
+__decorate([
+    websockets_1.SubscribeMessage('bar2-bottom'),
+    __param(0, websockets_1.MessageBody()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], EventsGateway.prototype, "bar2Bottom", null);
 __decorate([
     websockets_1.SubscribeMessage('move'),
     __param(0, websockets_1.MessageBody()),

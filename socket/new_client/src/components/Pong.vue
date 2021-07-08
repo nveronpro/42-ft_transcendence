@@ -3,18 +3,21 @@
     <canvas ref="pong"> </canvas>
     <div @click="alert()"> </div>
     <div class="play-buttons">
-      <h1 v-if="this.spect == false">You are a player</h1>
-      <h1 v-else>You are a spectator</h1>
+      <h1 v-if="this.role == 0">You are a spectator</h1>
+      <h1 v-if="this.role == 1">You are a player 1</h1>
+      <h1 v-if="this.role == 2">You are a player 2</h1>
     </div>
     <div class="play-buttons">
-      <button v-if="this.spect == false" v-on:click="beSpect()">Be a spectator</button>
-      <button v-if="this.spect == false" v-on:click="move()">Play</button>
-      <button v-if="this.spect == true" v-on:click="bePlayer()">Be a player</button>
+      <button v-if="this.role != 0" v-on:click="beSpect()">Be a spectator</button>
+      <button v-if="this.role != 0" v-on:click="move()">Play</button>
+      <button v-if="this.role == 0" v-on:click="bePlayer1()">Be a player 1</button>
+      <button v-if="this.role == 0" v-on:click="bePlayer2()">Be a player 2</button>
     </div>
   </div>
 </template>
 
 <script>
+
 import io from 'socket.io-client'
 var socket = io('localhost:3000')
 export default {
@@ -33,12 +36,16 @@ export default {
         width: 700,
         posX: 300,
         posY: 0,
-        barX: 0,
-        barY: 220,
+        bar1X: 0,
+        bar1Y: 220,
+        bar2X: 685,
+        bar2Y: 220,
         vxBall: -2,
         vyBall: 5,
+        score1: 0,
+        score2: 0
       },
-      spect: false
+      role: 0
     };
   },
 
@@ -51,9 +58,9 @@ export default {
   created() {
     console.log(socket);
     socket.emit('new-co', this.coords);
-    socket.on("is-spect", spect => {
-      console.log('spect mode : ' + spect);
-			this.spect = spect;
+    socket.on("role", role => {
+      console.log('role mode : ' + role);
+			this.role = role;
 		});
   },
 
@@ -64,17 +71,25 @@ export default {
     this.provider.canvas.height = "500";
 
     window.addEventListener('keydown', (e) =>{
-    if(e.keyCode === 38 && this.coords.barY > 0 && this.spect == false){
-      socket.emit('bar-top', this.coords);
-    }else if (e.keyCode === 40 && this.coords.barY < this.provider.canvas.height-100 && this.spect == false){
-      console.log(this.coords.barX)
-      socket.emit('bar-bottom', this.coords);
+    if(e.keyCode === 38 && this.coords.bar1Y > 0 && this.role == 1){
+      console.log('haut');
+      socket.emit('bar1-top', this.coords);
+    }else if (e.keyCode === 40 && this.coords.bar1Y < this.provider.canvas.height-100 && this.role == 1){
+      socket.emit('bar1-bottom', this.coords);
     }
     });
 
-    socket.on("is-spect", spect => {
-      console.log('spect mode : ' + spect);
-			this.spect = spect;
+    window.addEventListener('keydown', (e) =>{
+    if(e.keyCode === 38 && this.coords.bar2Y > 0 && this.role == 2){
+      socket.emit('bar2-top', this.coords);
+    }else if (e.keyCode === 40 && this.coords.bar2Y < this.provider.canvas.height-100 && this.role == 2){
+      socket.emit('bar2-bottom', this.coords);
+    }
+    });
+
+    socket.on("role", role => {
+      console.log('role mode : ' + role);
+			this.role = role;
 		});
 
     socket.on("new-coords", coords => {
@@ -82,8 +97,10 @@ export default {
       this.coords = coords;
       if (coords.posX == 300 &&
         coords.posY == 0 &&
-        coords.barX == 0 &&
-        coords.barY == 220) {
+        coords.bar1X == 0 &&
+        coords.bar2Y == 220 &&
+        coords.bar2X == 685 &&
+        coords.bar2Y == 220) {
         ctx.clearRect(0, 0, coords.width, coords.height);
         this.drawBar();
       }
@@ -99,7 +116,8 @@ export default {
     drawBar: function() {
       let ctx = this.provider.context;
       ctx.beginPath();
-      ctx.fillRect(this.coords.barX, this.coords.barY, 15, 100);
+      ctx.fillRect(this.coords.bar1X, this.coords.bar1Y, 15, 100);
+      ctx.fillRect(this.coords.bar2X, this.coords.bar2Y, 15, 100);
       ctx.fill();
     },
     drawBall: function() {
@@ -116,15 +134,21 @@ export default {
       ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     },
-    bePlayer: function() {
-      this.spect = false;
+    bePlayer1: function() {
+      this.role = 1;
+      console.log('role mode : ' + this.role);
+    },
+    bePlayer2: function() {
+      this.role = 2;
+      console.log('role mode : ' + this.role);
     },
     beSpect: function() {
-      this.spect = true;
+      this.role = 0;
+      console.log('role mode : ' + this.role);
     },
     move: function() {
       console.log('move');
-      if (this.coords.moving == false && this.spect == false) {
+      if (this.coords.moving == false && this.role != 0) {
         this.coords.moving = true;
         this.moveBall();
       } else {
@@ -134,7 +158,7 @@ export default {
     moveBall: function() {
       if (!this.coords.moving)
         return;
-      if (!this.spect)
+      if (this.role != 0)
         socket.emit('move', this.coords);
       this.raf = window.requestAnimationFrame(this.moveBall);
     },
