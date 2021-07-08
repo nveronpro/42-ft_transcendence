@@ -82,7 +82,7 @@ export default {
     socket.on("new-coords", coords => {
       let ctx = this.provider.context;
       this.coords = coords;
-      if (coords.posX == 250 &&
+      if (coords.posX == 300 &&
         coords.posY == 0 &&
         coords.barX == 0 &&
         coords.barY == 220) {
@@ -144,6 +144,8 @@ export default {
       this.raf = window.requestAnimationFrame(this.moveSpect);
     },
     moveBall: function() {
+      if (!this.coords.moving)
+        return;
       socket.emit('move', this.coords);
       this.raf = window.requestAnimationFrame(this.moveBall);
     },

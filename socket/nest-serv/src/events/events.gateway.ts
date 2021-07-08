@@ -76,10 +76,11 @@ export class EventsGateway {
     else if (coords.posX + coords.vxBall < 0) {
       this.moving = false;
       coords.moving = false;
-      coords.posX = 250;
+      coords.posX = 300;
       coords.posY = 0;
       coords.barX = 0;
       coords.barY = 220;
+      this.server.emit('new-coords', coords);
       return;
     }
     if (coords.moving) {
