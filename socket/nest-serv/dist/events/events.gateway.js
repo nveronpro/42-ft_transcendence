@@ -16,20 +16,37 @@ exports.EventsGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 let EventsGateway = class EventsGateway {
-    newCo(data, client) {
+    newCo(coords, client) {
         console.log(this.first);
         if (this.first == false) {
-            client.emit("is-spect", true);
+            coords.spect = false;
+            coords.moving = this.moving;
+            client.emit("is-spect", coords);
             return;
         }
         this.first = false;
-        client.emit("is-spect", false);
+        coords.spect = false;
+        client.emit("is-spect", coords);
     }
-    bar(data) {
-        console.log(data);
-        this.server.emit("move-bar", data);
+    bePlayer(coords, client) {
+        coords.spect = false;
+        client.emit("is-spect", coords);
+    }
+    beSpect(coords, client) {
+        coords.spect = true;
+        client.emit("is-spect", coords);
+    }
+    barTop(coords) {
+        coords.barY -= 15;
+        this.server.emit("new-coords", coords);
+    }
+    barBottom(coords) {
+        coords.barY += 15;
+        this.server.emit("new-coords", coords);
     }
     move(coords) {
+        this.moving = true;
+        coords.moving = true;
         coords.posX += coords.vxBall;
         coords.posY += coords.vyBall;
         if (coords.posY <= coords.barY + 100 &&
@@ -38,6 +55,7 @@ let EventsGateway = class EventsGateway {
             coords.vxBall = -coords.vxBall;
         }
         else if (coords.posX + coords.vxBall < 0) {
+            this.moving = false;
             coords.moving = false;
             coords.posX = 250;
             coords.posY = 0;
@@ -68,16 +86,39 @@ __decorate([
     __param(0, websockets_1.MessageBody()),
     __param(1, websockets_1.ConnectedSocket()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, socket_io_1.Socket]),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", void 0)
 ], EventsGateway.prototype, "newCo", null);
 __decorate([
-    websockets_1.SubscribeMessage('bar'),
+    websockets_1.SubscribeMessage('be-player'),
+    __param(0, websockets_1.MessageBody()),
+    __param(1, websockets_1.ConnectedSocket()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", void 0)
+], EventsGateway.prototype, "bePlayer", null);
+__decorate([
+    websockets_1.SubscribeMessage('be-spect'),
+    __param(0, websockets_1.MessageBody()),
+    __param(1, websockets_1.ConnectedSocket()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", void 0)
+], EventsGateway.prototype, "beSpect", null);
+__decorate([
+    websockets_1.SubscribeMessage('bar-top'),
     __param(0, websockets_1.MessageBody()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
-], EventsGateway.prototype, "bar", null);
+], EventsGateway.prototype, "barTop", null);
+__decorate([
+    websockets_1.SubscribeMessage('bar-bottom'),
+    __param(0, websockets_1.MessageBody()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], EventsGateway.prototype, "barBottom", null);
 __decorate([
     websockets_1.SubscribeMessage('move'),
     __param(0, websockets_1.MessageBody()),

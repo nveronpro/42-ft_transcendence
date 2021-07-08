@@ -1,11 +1,13 @@
 import { Server, Socket } from 'socket.io';
-import { Pos } from '../interfaces/pos.interface';
 import { Coords } from '../interfaces/coords.interface';
 export declare class EventsGateway {
     server: Server;
-    position: Pos;
     first: boolean;
-    newCo(data: string, client: Socket): void;
-    bar(data: number): void;
+    moving: boolean;
+    newCo(coords: Coords, client: Socket): void;
+    bePlayer(coords: Coords, client: Socket): void;
+    beSpect(coords: Coords, client: Socket): void;
+    barTop(coords: Coords): void;
+    barBottom(coords: Coords): void;
     move(coords: Coords): void;
 }
