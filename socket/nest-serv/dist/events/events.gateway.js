@@ -16,13 +16,47 @@ exports.EventsGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 let EventsGateway = class EventsGateway {
-    test(data) {
-        console.log("New test");
-        this.server.emit("test", data);
+    newCo(data, client) {
+        console.log(this.first);
+        if (this.first == false) {
+            client.emit("is-spect", true);
+            return;
+        }
+        this.first = false;
+        client.emit("is-spect", false);
     }
-    async move(data) {
+    bar(data) {
         console.log(data);
-        return data;
+        this.server.emit("move-bar", data);
+    }
+    move(coords) {
+        coords.posX += coords.vxBall;
+        coords.posY += coords.vyBall;
+        if (coords.posY <= coords.barY + 100 &&
+            coords.posY >= coords.barY &&
+            coords.posX <= 15 && coords.posX >= 0) {
+            coords.vxBall = -coords.vxBall;
+        }
+        else if (coords.posX + coords.vxBall < 0) {
+            coords.moving = false;
+            coords.posX = 250;
+            coords.posY = 0;
+            coords.barX = 0;
+            coords.barY = 220;
+            return;
+        }
+        if (coords.moving) {
+            if (coords.posY + coords.vyBall < 0) {
+                coords.vyBall = -coords.vyBall;
+            }
+            if (coords.posY + coords.vyBall > coords.height) {
+                coords.vyBall = -coords.vyBall;
+            }
+            if (coords.posX + coords.vxBall > coords.width) {
+                coords.vxBall = -coords.vxBall;
+            }
+        }
+        this.server.emit('new-coords', coords);
     }
 };
 __decorate([
@@ -30,18 +64,26 @@ __decorate([
     __metadata("design:type", socket_io_1.Server)
 ], EventsGateway.prototype, "server", void 0);
 __decorate([
-    websockets_1.SubscribeMessage('test'),
+    websockets_1.SubscribeMessage('new-co'),
+    __param(0, websockets_1.MessageBody()),
+    __param(1, websockets_1.ConnectedSocket()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, socket_io_1.Socket]),
+    __metadata("design:returntype", void 0)
+], EventsGateway.prototype, "newCo", null);
+__decorate([
+    websockets_1.SubscribeMessage('bar'),
     __param(0, websockets_1.MessageBody()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
-], EventsGateway.prototype, "test", null);
+], EventsGateway.prototype, "bar", null);
 __decorate([
     websockets_1.SubscribeMessage('move'),
     __param(0, websockets_1.MessageBody()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
 ], EventsGateway.prototype, "move", null);
 EventsGateway = __decorate([
     websockets_1.WebSocketGateway()

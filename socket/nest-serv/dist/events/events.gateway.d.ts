@@ -1,8 +1,11 @@
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { Pos } from '../interfaces/pos.interface';
+import { Coords } from '../interfaces/coords.interface';
 export declare class EventsGateway {
     server: Server;
     position: Pos;
-    test(data: string): void;
-    move(data: string): Promise<string>;
+    first: boolean;
+    newCo(data: string, client: Socket): void;
+    bar(data: number): void;
+    move(coords: Coords): void;
 }
