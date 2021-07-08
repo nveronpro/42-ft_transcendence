@@ -5,8 +5,6 @@ export declare class EventsGateway {
     first: boolean;
     moving: boolean;
     newCo(coords: Coords, client: Socket): void;
-    bePlayer(coords: Coords, client: Socket): void;
-    beSpect(coords: Coords, client: Socket): void;
     barTop(coords: Coords): void;
     barBottom(coords: Coords): void;
     move(coords: Coords): void;

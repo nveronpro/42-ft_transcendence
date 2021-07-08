@@ -8,5 +8,4 @@ export interface Coords {
     barY: number;
     vxBall: number;
     vyBall: number;
-    spect: boolean;
 }

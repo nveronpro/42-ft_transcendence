@@ -19,22 +19,11 @@ let EventsGateway = class EventsGateway {
     newCo(coords, client) {
         console.log(this.first);
         if (this.first == false) {
-            coords.spect = false;
-            coords.moving = this.moving;
-            client.emit("is-spect", coords);
+            client.emit("is-spect", true);
             return;
         }
         this.first = false;
-        coords.spect = false;
-        client.emit("is-spect", coords);
-    }
-    bePlayer(coords, client) {
-        coords.spect = false;
-        client.emit("is-spect", coords);
-    }
-    beSpect(coords, client) {
-        coords.spect = true;
-        client.emit("is-spect", coords);
+        client.emit("is-spect", false);
     }
     barTop(coords) {
         coords.barY -= 15;
@@ -90,22 +79,6 @@ __decorate([
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", void 0)
 ], EventsGateway.prototype, "newCo", null);
-__decorate([
-    websockets_1.SubscribeMessage('be-player'),
-    __param(0, websockets_1.MessageBody()),
-    __param(1, websockets_1.ConnectedSocket()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
-    __metadata("design:returntype", void 0)
-], EventsGateway.prototype, "bePlayer", null);
-__decorate([
-    websockets_1.SubscribeMessage('be-spect'),
-    __param(0, websockets_1.MessageBody()),
-    __param(1, websockets_1.ConnectedSocket()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
-    __metadata("design:returntype", void 0)
-], EventsGateway.prototype, "beSpect", null);
 __decorate([
     websockets_1.SubscribeMessage('bar-top'),
     __param(0, websockets_1.MessageBody()),

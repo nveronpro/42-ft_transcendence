@@ -3,14 +3,13 @@
     <canvas ref="pong"> </canvas>
     <div @click="alert()"> </div>
     <div class="play-buttons">
-      <h1 v-if="this.coords.spect == false">You are a player</h1>
+      <h1 v-if="this.spect == false">You are a player</h1>
       <h1 v-else>You are a spectator</h1>
     </div>
     <div class="play-buttons">
-      <button v-if="this.coords.spect == false" v-on:click="beSpect()">Be a spectator</button>
-      <button v-if="this.coords.spect == false" v-on:click="move()">Play</button>
-      <button v-if="this.coords.spect == true" v-on:click="bePlayer()">Be a player</button>
-      <button v-if="this.coords.spect == true" v-on:click="moveSpect()">Follow the game</button>
+      <button v-if="this.spect == false" v-on:click="beSpect()">Be a spectator</button>
+      <button v-if="this.spect == false" v-on:click="move()">Play</button>
+      <button v-if="this.spect == true" v-on:click="bePlayer()">Be a player</button>
     </div>
   </div>
 </template>
@@ -38,8 +37,8 @@ export default {
         barY: 220,
         vxBall: -2,
         vyBall: 5,
-        spect: false
       },
+      spect: false
     };
   },
 
@@ -52,9 +51,9 @@ export default {
   created() {
     console.log(socket);
     socket.emit('new-co', this.coords);
-    socket.on("is-spect", coords => {
-      console.log('spect mode : ' + coords.spect);
-			this.coords = coords;
+    socket.on("is-spect", spect => {
+      console.log('spect mode : ' + spect);
+			this.spect = spect;
 		});
   },
 
@@ -63,20 +62,19 @@ export default {
     this.provider.canvas = this.$refs["pong"];
     this.provider.canvas.width = "700";
     this.provider.canvas.height = "500";
-    var spect = this.coords.spect;
 
     window.addEventListener('keydown', (e) =>{
-    if(e.keyCode === 38 && this.coords.barY > 0 && spect == false){
+    if(e.keyCode === 38 && this.coords.barY > 0 && this.spect == false){
       socket.emit('bar-top', this.coords);
-    }else if (e.keyCode === 40 && this.coords.barY < this.provider.canvas.height-100 && spect == false){
+    }else if (e.keyCode === 40 && this.coords.barY < this.provider.canvas.height-100 && this.spect == false){
       console.log(this.coords.barX)
       socket.emit('bar-bottom', this.coords);
     }
     });
 
-    socket.on("is-spect", coords => {
-      console.log('spect mode : ' + coords.spect);
-			this.coords = coords;
+    socket.on("is-spect", spect => {
+      console.log('spect mode : ' + spect);
+			this.spect = spect;
 		});
 
     socket.on("new-coords", coords => {
@@ -119,34 +117,25 @@ export default {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     },
     bePlayer: function() {
-      socket.emit('be-player', this.coords);
+      this.spect = false;
     },
     beSpect: function() {
-      socket.emit('be-spect', this.coords);
+      this.spect = true;
     },
     move: function() {
       console.log('move');
-      if (!this.coords.moving || this.coords.spect == false) {
+      if (this.coords.moving == false && this.spect == false) {
         this.coords.moving = true;
         this.moveBall();
       } else {
         return;
       }
     },
-    moveSpect: function() {
-      let height = this.provider.canvas.height;
-      let width = this.provider.canvas.width;
-      let ctx = this.provider.context;
-      this.clear();
-      ctx.clearRect(0, 0, width, height);
-      this.drawBall();
-      this.drawBar();
-      this.raf = window.requestAnimationFrame(this.moveSpect);
-    },
     moveBall: function() {
       if (!this.coords.moving)
         return;
-      socket.emit('move', this.coords);
+      if (!this.spect)
+        socket.emit('move', this.coords);
       this.raf = window.requestAnimationFrame(this.moveBall);
     },
   },

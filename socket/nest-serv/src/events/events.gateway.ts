@@ -25,27 +25,11 @@ export class EventsGateway {
   newCo(@MessageBody() coords: Coords, @ConnectedSocket() client: Socket): void  {
     console.log(this.first);
     if (this.first == false) {
-      //coords.spect = true;
-      coords.spect = false;
-      coords.moving = this.moving;
-      client.emit("is-spect", coords);
+      client.emit("is-spect", true);
       return ;
     }
     this.first = false;
-    coords.spect = false;
-    client.emit("is-spect", coords);
-  }
-
-  @SubscribeMessage('be-player')
-  bePlayer(@MessageBody() coords: Coords, @ConnectedSocket() client: Socket): void  {
-    coords.spect = false;
-    client.emit("is-spect", coords);
-  }
-
-  @SubscribeMessage('be-spect')
-  beSpect(@MessageBody() coords: Coords, @ConnectedSocket() client: Socket): void  {
-    coords.spect = true;
-    client.emit("is-spect", coords);
+    client.emit("is-spect", false);
   }
 
   @SubscribeMessage('bar-top')
