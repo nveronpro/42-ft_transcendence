@@ -4,9 +4,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
   ConnectedSocket,
-  WsResponse,
 } from '@nestjs/websockets';
-import { Dictionary } from 'express-serve-static-core';
 import { Server, Socket } from 'socket.io';
 import { Coords } from '../interfaces/coords.interface';
 
@@ -59,6 +57,7 @@ export class EventsGateway {
           role: 2,
           room: Math.round(this.players / 2).toString()});
         client.join(Math.round(this.players / 2).toString());
+        this.server.to(Math.round(this.players / 2).toString()).emit('is-full', true);
       } else {
         client.emit("role", {
           totalRooms: this.rooms,

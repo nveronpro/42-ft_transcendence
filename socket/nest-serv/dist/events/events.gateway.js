@@ -53,6 +53,7 @@ let EventsGateway = class EventsGateway {
                     room: Math.round(this.players / 2).toString()
                 });
                 client.join(Math.round(this.players / 2).toString());
+                this.server.to(Math.round(this.players / 2).toString()).emit('is-full', true);
             }
             else {
                 client.emit("role", {

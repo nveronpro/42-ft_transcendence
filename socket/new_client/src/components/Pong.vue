@@ -15,6 +15,8 @@
     <div @click="alert()"> </div>
     <div v-if="this.role != -1">
       <div class="play-buttons">
+        <h1 v-if="this.full">There are 2 players in the room, game can start</h1>
+        <h1 v-else>Waiting for a 2nd player...</h1>
         <h1 v-if="this.role == 0">You are a spectator in the room {{this.coords.room}} </h1>
         <h1 v-if="this.role == 1">You are a player 1 in the room {{this.coords.room}} </h1>
         <h1 v-if="this.role == 2">You are a player 2 in the room {{this.coords.room}} </h1>
@@ -56,7 +58,8 @@ export default {
         score2: 0
       },
       role: -1,
-      totalRooms: 0
+      totalRooms: 0,
+      full: false
     };
   },
 
@@ -102,10 +105,18 @@ export default {
 			this.role = data.role;
 			this.totalRooms = data.totalRooms;
       this.coords.room = data.room;
+      if (this.role != 0)
+        this.full = data.full;
+		});
+
+    socket.on("is-full", full => {
+      this.full = full;
 		});
 
     socket.on("new-coords", coords => {
       let ctx = this.provider.context;
+      let height = this.provider.canvas.height;
+      let width = this.provider.canvas.width;
       this.coords = coords;
       if (coords.posX == 300 &&
         coords.posY == 0 &&
@@ -116,8 +127,6 @@ export default {
         ctx.clearRect(0, 0, coords.width, coords.height);
         this.drawBar();
       }
-      let height = this.provider.canvas.height;
-      let width = this.provider.canvas.width;
       this.clear();
       ctx.clearRect(0, 0, width, height);
       this.drawBall();
@@ -154,7 +163,7 @@ export default {
     },
     move: function() {
       console.log('move');
-      if (this.coords.moving == false && this.role != 0) {
+      if (this.coords.moving == false && this.role != 0 && this.full) {
         this.coords.moving = true;
         this.moveBall();
       } else {
