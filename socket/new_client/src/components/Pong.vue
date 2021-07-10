@@ -15,7 +15,7 @@
     <div @click="alert()"> </div>
     <div v-if="this.role != -1">
       <div class="play-buttons">
-        <h1 v-if="this.full">There are 2 players in the room, game can start</h1>
+        <h1 v-if="this.coords.full">There are 2 players in the room, game can start</h1>
         <h1 v-else>Waiting for a 2nd player...</h1>
         <h1 v-if="this.role == 0">You are a spectator in the room {{this.coords.room}} </h1>
         <h1 v-if="this.role == 1">You are a player 1 in the room {{this.coords.room}} </h1>
@@ -30,7 +30,7 @@
 <script>
 
 import io from 'socket.io-client'
-var socket = io('localhost:3000')
+var socket = io('10.11.12.23:3000')
 export default {
   data() {
     return {
@@ -52,14 +52,14 @@ export default {
         bar1Y: 220,
         bar2X: 685,
         bar2Y: 220,
-        vxBall: -2,
-        vyBall: 5,
+        vxBall: -4,
+        vyBall: 10,
         score1: 0,
-        score2: 0
+        score2: 0,
+        full: false
       },
       role: -1,
-      totalRooms: 0,
-      full: false
+      totalRooms: 0
     };
   },
 
@@ -106,11 +106,11 @@ export default {
 			this.totalRooms = data.totalRooms;
       this.coords.room = data.room;
       if (this.role != 0)
-        this.full = data.full;
+        this.coords.full = data.full;
 		});
 
     socket.on("is-full", full => {
-      this.full = full;
+      this.coords.full = full;
 		});
 
     socket.on("new-coords", coords => {
@@ -121,7 +121,7 @@ export default {
       if (coords.posX == 300 &&
         coords.posY == 0 &&
         coords.bar1X == 0 &&
-        coords.bar2Y == 220 &&
+        coords.bar1Y == 220 &&
         coords.bar2X == 685 &&
         coords.bar2Y == 220) {
         ctx.clearRect(0, 0, coords.width, coords.height);
@@ -163,7 +163,7 @@ export default {
     },
     move: function() {
       console.log('move');
-      if (this.coords.moving == false && this.role != 0 && this.full) {
+      if (this.coords.moving == false && this.role != 0 && this.coords.full) {
         this.coords.moving = true;
         this.moveBall();
       } else {

@@ -10,6 +10,7 @@ export declare class EventsGateway {
         key: number;
         socket: Socket;
     }>;
+    coordsArray: Array<Coords>;
     handleConnection(client: Socket): void;
     spect(roomNo: number, client: Socket): void;
     play(coords: Coords, client: Socket): void;

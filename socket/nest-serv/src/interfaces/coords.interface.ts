@@ -13,4 +13,5 @@ export interface Coords {
     vyBall: number;
     score1: number;
     score2: number;
+    full: boolean;
 }
