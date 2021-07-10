@@ -1,5 +1,6 @@
 export interface Coords {
     moving: boolean;
+    room: string;
     width: number;
     height: number;
     posX: number;

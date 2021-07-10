@@ -16,39 +16,53 @@ exports.EventsGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 let EventsGateway = class EventsGateway {
-    newCo(coords, client) {
-        console.log(this.players);
+    handleConnection(client) {
         if (this.players == undefined) {
             this.players = 1;
-            client.emit("role", 1);
-            return;
+            client.emit("role", {
+                role: 1,
+                room: Math.round(this.players / 2).toString()
+            });
+            client.join(Math.round(this.players / 2).toString());
         }
-        if (this.players == 1) {
-            this.players += 1;
-            client.emit("role", 2);
-            return;
+        else {
+            this.players++;
+            if (this.players % 2 == 0) {
+                client.emit("role", {
+                    role: 2,
+                    room: Math.round(this.players / 2).toString()
+                });
+                client.join(Math.round(this.players / 2).toString());
+            }
+            else {
+                client.emit("role", {
+                    role: 1,
+                    room: Math.round(this.players / 2).toString()
+                });
+                client.join(Math.round(this.players / 2).toString());
+            }
         }
-        this.players += 1;
-        client.emit("role", 0);
+        this.rooms = Math.round(this.players / 2);
+        console.log('Players : ' + this.players);
+        console.log('Rooms : ' + this.rooms);
     }
     bar1Top(coords) {
         coords.bar1Y -= 15;
-        this.server.emit("new-coords", coords);
+        this.server.to(coords.room).emit("new-coords", coords);
     }
     bar1Bottom(coords) {
         coords.bar1Y += 15;
-        this.server.emit("new-coords", coords);
+        this.server.to(coords.room).emit("new-coords", coords);
     }
     bar2Top(coords) {
         coords.bar2Y -= 15;
-        this.server.emit("new-coords", coords);
+        this.server.to(coords.room).emit("new-coords", coords);
     }
     bar2Bottom(coords) {
         coords.bar2Y += 15;
-        this.server.emit("new-coords", coords);
+        this.server.to(coords.room).emit("new-coords", coords);
     }
     move(coords) {
-        console.log('move');
         this.moving = true;
         coords.moving = true;
         coords.posX += coords.vxBall;
@@ -68,8 +82,8 @@ let EventsGateway = class EventsGateway {
             coords.bar2X = 685;
             coords.bar2Y = 220;
             coords.score2++;
-            console.log('score' + coords.score1 + ' : ' + coords.score2);
-            this.server.emit('new-coords', coords);
+            console.log('score ' + coords.score1 + ' : ' + coords.score2);
+            this.server.to(coords.room).emit('new-coords', coords);
             return;
         }
         if (coords.posY <= coords.bar2Y + 100 &&
@@ -87,8 +101,8 @@ let EventsGateway = class EventsGateway {
             coords.bar2X = 685;
             coords.bar2Y = 220;
             coords.score1++;
-            console.log('score' + coords.score1 + ' : ' + coords.score2);
-            this.server.emit('new-coords', coords);
+            console.log('score ' + coords.score1 + ' : ' + coords.score2);
+            this.server.to(coords.room).emit('new-coords', coords);
             return;
         }
         if (coords.moving) {
@@ -102,21 +116,13 @@ let EventsGateway = class EventsGateway {
                 coords.vxBall = -coords.vxBall;
             }
         }
-        this.server.emit('new-coords', coords);
+        this.server.to(coords.room).emit('new-coords', coords);
     }
 };
 __decorate([
     websockets_1.WebSocketServer(),
     __metadata("design:type", socket_io_1.Server)
 ], EventsGateway.prototype, "server", void 0);
-__decorate([
-    websockets_1.SubscribeMessage('new-co'),
-    __param(0, websockets_1.MessageBody()),
-    __param(1, websockets_1.ConnectedSocket()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
-    __metadata("design:returntype", void 0)
-], EventsGateway.prototype, "newCo", null);
 __decorate([
     websockets_1.SubscribeMessage('bar1-top'),
     __param(0, websockets_1.MessageBody()),

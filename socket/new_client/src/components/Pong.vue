@@ -1,11 +1,17 @@
 <template>
   <div class="canvas-wrapper">
+    <div class="play-buttons">
+      <h1>You are in the room {{this.coords.room}} </h1>
+    </div>
     <canvas ref="pong"> </canvas>
     <div @click="alert()"> </div>
     <div class="play-buttons">
       <h1 v-if="this.role == 0">You are a spectator</h1>
       <h1 v-if="this.role == 1">You are a player 1</h1>
-      <h1 v-if="this.role == 2">You are a player 2</h1>
+      <h1 v-if="this.role == 2">You are a player 2 </h1>
+    </div>
+    <div class="play-buttons">
+      <h1>Score : {{this.coords.score1}} - {{this.coords.score2}} </h1>
     </div>
     <div class="play-buttons">
       <button v-if="this.role != 0" v-on:click="beSpect()">Be a spectator</button>
@@ -32,6 +38,7 @@ export default {
       colorBall: "black",
       coords: {
         moving: false,
+        room: '0',
         height: 500,
         width: 700,
         posX: 300,
@@ -45,7 +52,8 @@ export default {
         score1: 0,
         score2: 0
       },
-      role: 0
+      role: 0,
+      totalRooms: 0
     };
   },
 
@@ -57,10 +65,11 @@ export default {
 
   created() {
     console.log(socket);
-    socket.emit('new-co', this.coords);
-    socket.on("role", role => {
-      console.log('role mode : ' + role);
-			this.role = role;
+    socket.on("role", data => {
+      console.log('Role : ' + data.role);
+      console.log('Room : ' + data.room);
+			this.role = data.role;
+      this.coords.room = data.room;
 		});
   },
 
@@ -86,12 +95,14 @@ export default {
       socket.emit('bar2-bottom', this.coords);
     }
     });
-
-    socket.on("role", role => {
-      console.log('role mode : ' + role);
-			this.role = role;
+/* 
+    socket.on("role", data => {
+      console.log('Role : ' + data.role);
+      console.log('Room : ' + data.room);
+			this.role = data.role;
+      this.coords.room = data.room;
 		});
-
+ */
     socket.on("new-coords", coords => {
       let ctx = this.provider.context;
       this.coords = coords;
