@@ -6,6 +6,7 @@ import {
   ConnectedSocket,
   WsResponse,
 } from '@nestjs/websockets';
+import { Dictionary } from 'express-serve-static-core';
 import { Server, Socket } from 'socket.io';
 import { Coords } from '../interfaces/coords.interface';
 
@@ -18,31 +19,58 @@ export class EventsGateway {
   rooms: number;
   moving: boolean;
 
+  clientsNo: number;
+  clients: Array<{key: number, socket: Socket}>;
+
   handleConnection(client: Socket) {
+    if (this.players == undefined)
+      this.clientsNo = 0;
+      if (this.rooms == undefined)
+      this.rooms = 0;
+    this.clientsNo++;
+    this.server.emit('rooms', this.rooms);
+  }
+
+  @SubscribeMessage('spect')
+  spect(@MessageBody() roomNo: number, @ConnectedSocket() client: Socket): void  {
+    client.join(roomNo.toString());
+    client.emit("role", {
+      totalRooms: this.rooms,
+      role: 0,
+      room: roomNo.toString()});
+}
+
+  @SubscribeMessage('play')
+  play(@MessageBody() coords: Coords, @ConnectedSocket() client: Socket): void  {
     if (this.players == undefined) {
       this.players = 1;
+      this.rooms = Math.round(this.players / 2);
       client.emit("role", {
+        totalRooms: this.rooms,
         role: 1,
         room: Math.round(this.players / 2).toString()});
       client.join(Math.round(this.players / 2).toString());
     } else {
       this.players++;
+      this.rooms = Math.round(this.players / 2);
       if (this.players % 2 == 0) {
         client.emit("role", {
+          totalRooms: this.rooms,
           role: 2,
           room: Math.round(this.players / 2).toString()});
         client.join(Math.round(this.players / 2).toString());
       } else {
         client.emit("role", {
+          totalRooms: this.rooms,
           role: 1,
           room: Math.round(this.players / 2).toString()});
         client.join(Math.round(this.players / 2).toString());
       }
     }
-    this.rooms = Math.round(this.players / 2);
+    this.server.emit('rooms', this.rooms);
     console.log('Players : ' + this.players);
     console.log('Rooms : ' + this.rooms);
-  }  
+  }
 
   @SubscribeMessage('bar1-top')
   bar1Top(@MessageBody() coords: Coords): void  {

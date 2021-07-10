@@ -1,23 +1,26 @@
 <template>
   <div class="canvas-wrapper">
-    <div class="play-buttons">
-      <h1>You are in the room {{this.coords.room}} </h1>
+    <div v-if="this.role == -1" class="play-buttons">
+      <h1>Welcome in the pong game</h1>
+      <h1>There are actually {{this.totalRooms}} rooms</h1>
+      <h1>Role : {{this.role}}</h1>
+      <div class="play-buttons">
+        <h1 v-if="this.totalRooms > 0">Click on a room to join it as spectator :</h1>
+        <button v-for="i in this.totalRooms" :key="i" v-on:click="joinSpect(i)">Room {{i}}</button>
+        <h1>Or click on 'Play' to join a game :</h1>
+        <button v-on:click="play()">Play</button>
+      </div>
     </div>
     <canvas ref="pong"> </canvas>
     <div @click="alert()"> </div>
-    <div class="play-buttons">
-      <h1 v-if="this.role == 0">You are a spectator</h1>
-      <h1 v-if="this.role == 1">You are a player 1</h1>
-      <h1 v-if="this.role == 2">You are a player 2 </h1>
-    </div>
-    <div class="play-buttons">
-      <h1>Score : {{this.coords.score1}} - {{this.coords.score2}} </h1>
-    </div>
-    <div class="play-buttons">
-      <button v-if="this.role != 0" v-on:click="beSpect()">Be a spectator</button>
-      <button v-if="this.role != 0" v-on:click="move()">Play</button>
-      <button v-if="this.role == 0" v-on:click="bePlayer1()">Be a player 1</button>
-      <button v-if="this.role == 0" v-on:click="bePlayer2()">Be a player 2</button>
+    <div v-if="this.role != -1">
+      <div class="play-buttons">
+        <h1 v-if="this.role == 0">You are a spectator in the room {{this.coords.room}} </h1>
+        <h1 v-if="this.role == 1">You are a player 1 in the room {{this.coords.room}} </h1>
+        <h1 v-if="this.role == 2">You are a player 2 in the room {{this.coords.room}} </h1>
+        <h1>Score : {{this.coords.score1}} - {{this.coords.score2}} </h1>
+        <button v-if="this.role != 0" v-on:click="move()">Play</button>
+      </div>
     </div>
   </div>
 </template>
@@ -38,7 +41,7 @@ export default {
       colorBall: "black",
       coords: {
         moving: false,
-        room: '0',
+        room: '-1',
         height: 500,
         width: 700,
         posX: 300,
@@ -52,7 +55,7 @@ export default {
         score1: 0,
         score2: 0
       },
-      role: 0,
+      role: -1,
       totalRooms: 0
     };
   },
@@ -65,11 +68,8 @@ export default {
 
   created() {
     console.log(socket);
-    socket.on("role", data => {
-      console.log('Role : ' + data.role);
-      console.log('Room : ' + data.room);
-			this.role = data.role;
-      this.coords.room = data.room;
+    socket.on("rooms", totalRooms => {
+			this.totalRooms = totalRooms;
 		});
   },
 
@@ -95,14 +95,15 @@ export default {
       socket.emit('bar2-bottom', this.coords);
     }
     });
-/* 
+
     socket.on("role", data => {
       console.log('Role : ' + data.role);
       console.log('Room : ' + data.room);
 			this.role = data.role;
+			this.totalRooms = data.totalRooms;
       this.coords.room = data.room;
 		});
- */
+
     socket.on("new-coords", coords => {
       let ctx = this.provider.context;
       this.coords = coords;
@@ -145,17 +146,11 @@ export default {
       ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     },
-    bePlayer1: function() {
-      this.role = 1;
-      console.log('role mode : ' + this.role);
+    joinSpect: function(roomNo) {
+      socket.emit('spect', roomNo);
     },
-    bePlayer2: function() {
-      this.role = 2;
-      console.log('role mode : ' + this.role);
-    },
-    beSpect: function() {
-      this.role = 0;
-      console.log('role mode : ' + this.role);
+    play: function() {
+      socket.emit('play', this.coords);
     },
     move: function() {
       console.log('move');

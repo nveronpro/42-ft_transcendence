@@ -5,7 +5,14 @@ export declare class EventsGateway {
     players: number;
     rooms: number;
     moving: boolean;
+    clientsNo: number;
+    clients: Array<{
+        key: number;
+        socket: Socket;
+    }>;
     handleConnection(client: Socket): void;
+    spect(roomNo: number, client: Socket): void;
+    play(coords: Coords, client: Socket): void;
     bar1Top(coords: Coords): void;
     bar1Bottom(coords: Coords): void;
     bar2Top(coords: Coords): void;

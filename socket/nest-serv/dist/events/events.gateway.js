@@ -17,9 +17,27 @@ const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 let EventsGateway = class EventsGateway {
     handleConnection(client) {
+        if (this.players == undefined)
+            this.clientsNo = 0;
+        if (this.rooms == undefined)
+            this.rooms = 0;
+        this.clientsNo++;
+        this.server.emit('rooms', this.rooms);
+    }
+    spect(roomNo, client) {
+        client.join(roomNo.toString());
+        client.emit("role", {
+            totalRooms: this.rooms,
+            role: 0,
+            room: roomNo.toString()
+        });
+    }
+    play(coords, client) {
         if (this.players == undefined) {
             this.players = 1;
+            this.rooms = Math.round(this.players / 2);
             client.emit("role", {
+                totalRooms: this.rooms,
                 role: 1,
                 room: Math.round(this.players / 2).toString()
             });
@@ -27,8 +45,10 @@ let EventsGateway = class EventsGateway {
         }
         else {
             this.players++;
+            this.rooms = Math.round(this.players / 2);
             if (this.players % 2 == 0) {
                 client.emit("role", {
+                    totalRooms: this.rooms,
                     role: 2,
                     room: Math.round(this.players / 2).toString()
                 });
@@ -36,13 +56,14 @@ let EventsGateway = class EventsGateway {
             }
             else {
                 client.emit("role", {
+                    totalRooms: this.rooms,
                     role: 1,
                     room: Math.round(this.players / 2).toString()
                 });
                 client.join(Math.round(this.players / 2).toString());
             }
         }
-        this.rooms = Math.round(this.players / 2);
+        this.server.emit('rooms', this.rooms);
         console.log('Players : ' + this.players);
         console.log('Rooms : ' + this.rooms);
     }
@@ -123,6 +144,22 @@ __decorate([
     websockets_1.WebSocketServer(),
     __metadata("design:type", socket_io_1.Server)
 ], EventsGateway.prototype, "server", void 0);
+__decorate([
+    websockets_1.SubscribeMessage('spect'),
+    __param(0, websockets_1.MessageBody()),
+    __param(1, websockets_1.ConnectedSocket()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, socket_io_1.Socket]),
+    __metadata("design:returntype", void 0)
+], EventsGateway.prototype, "spect", null);
+__decorate([
+    websockets_1.SubscribeMessage('play'),
+    __param(0, websockets_1.MessageBody()),
+    __param(1, websockets_1.ConnectedSocket()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", void 0)
+], EventsGateway.prototype, "play", null);
 __decorate([
     websockets_1.SubscribeMessage('bar1-top'),
     __param(0, websockets_1.MessageBody()),
