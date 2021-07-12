@@ -11,7 +11,6 @@ import TestComponent from '@/components/Test.vue';
 import FriendProfileComponent from '@/components/FriendProfile.vue';
 import LeaderboardComponent from '@/components/Leaderboard.vue';
 
-
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [

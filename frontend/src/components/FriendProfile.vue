@@ -16,10 +16,10 @@
 						<p class="card-text mb-5">Joueur pro de pong</p>
 					</div>
 					<div class="card-footer bg-transparent border-Secondary">
-						<button v-on:click="send(user[0].user_id)" type="button" class="btn btn-outline-success ml-auto mb-3">
+						<button :id="user[0].user_id" v-if="already_friend == false" v-on:click="send(user[0].user_id)" type="button" class="btn btn-outline-success ml-auto mb-3">
 								<i class="fas fa-plus"></i>
 						</button>
-						<button v-on:click="remove(user[0].user_id)" type="button" class="btn btn-outline-danger ml-auto mb-3">
+						<button :id="user[0].user_id" v-if="already_friend == true" v-on:click="remove(user[0].user_id)" type="button" class="btn btn-outline-danger ml-auto mb-3">
 							<i class="fas fa-minus"></i>
 						</button>
 					</div>
@@ -83,6 +83,7 @@
 				user: null,
 				friends: null,
 				match_histories: null,
+				already_friend: false,
 			}
 		},
 		mounted () {
@@ -91,8 +92,8 @@
 			.then(response => (this.user = response.data))
 
 			axios
-			.get('/api/friends/')
-			.then(response => (this.friends = response.data))
+			.get('/api/friends/already/' + this.$route.params.id)
+			.then(response => (this.already_friend = response.data))
 
 			axios
 			.get('/api/match-histories/friend/' + this.$route.params.id)
@@ -103,13 +104,13 @@
 				let _id = id;
 				axios
 				.post('/api/friends/send/'+ _id)
-				.then()
+				.then(this.already_friend = true)
 			},
 			remove: function (id) {
 				let _id = id;
 				axios
 				.delete('/api/friends/'+ _id)
-				.then()
+				.then(this.already_friend = false)
 			},
 		},
 	}
