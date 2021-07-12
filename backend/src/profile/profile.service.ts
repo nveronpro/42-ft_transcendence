@@ -45,15 +45,12 @@ export class ProfileService {
 
 	async update2fa(user: UserType, bool: boolean) {
 		try {
-			const toUpdate = await this.manager.findOne(UserType, { id: user.id });
-			toUpdate.two_factor_auth = bool;
-			UserType.save(toUpdate);
+			const res = await this.manager.query("UPDATE \"user\" SET two_factor_auth=$1 WHERE \"id\" = $2;", [bool, user.id]);
 			return ;
 		} catch (error) {
 			this.logger.error("update2fa: An error has occured. Please check the database (or something). See error for more informations.");
 			this.logger.error(error);
 			return ("An error has occured. Please check the database (or something).");
 		}
-
 	}
 }
