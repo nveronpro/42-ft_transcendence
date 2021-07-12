@@ -103,10 +103,10 @@ export class FriendsService {
 				return ("");
 			}
 
-			let already_friends = await this.manager.query("select * from \"user_friends_user\" WHERE \"userId_1\"=$1 AND \"userId_2\"=$2;", [user.id, request[0].receiverId]);
-			if (Object.keys(already_friends).length != 1)
+			let already_friends = await this.manager.query("select * from \"user_friends_user\" WHERE \"userId_1\"=$1 AND \"userId_2\"=$2;", [user.id, request[0].senderId]);
+			if (Object.keys(already_friends).length != 0)
 			{
-				this.logger.warn("User:#" + user.id + " and User:#" + request[0].receiverId + " are already friends. not sending the request");
+				this.logger.warn("User:#" + user.id + " and User:#" + request[0].senderId + " are already friends. not sending the request");
 				return "";
 			}
 

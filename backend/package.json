@@ -48,7 +48,8 @@
         "rimraf": "^3.0.2",
         "rxjs": "^6.6.6",
         "speakeasy": "^2.0.0",
-        "typeorm": "^0.2.32"
+        "typeorm": "^0.2.32",
+        "vue-beautiful-multi-chat": "^2.3.4"
     },
     "devDependencies": {
         "@nestjs/cli": "^7.6.0",
