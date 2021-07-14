@@ -51,6 +51,9 @@ services:
         build:
             context: .
             dockerfile: ./dockerfile_frontend
+        volumes:
+            - ./frontend/.:/usr/src/app
+            - /usr/src/app/node_modules
         restart: always
         ports:
             - 8080:80
@@ -61,7 +64,6 @@ services:
             - webnet
         depends_on:
             - main
-
 networks:
     webnet:
 volumes:

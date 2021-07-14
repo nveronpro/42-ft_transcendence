@@ -58,6 +58,23 @@ export class FriendsService {
 		}
 	}
 
+	async areUsersAlreadyFriends(userId1: number, userId2: number) {
+		try {
+			let already_friends = await this.manager.query("select * from \"user_friends_user\" WHERE \"userId_1\"=$1 AND \"userId_2\"=$2;", [userId1, userId2]);
+			if (Object.keys(already_friends).length == 0) {
+				return (false);
+			}
+			else {
+				return (true);
+			}
+		} catch (error) {
+			this.logger.error("areUsersAlreadyFriends: An error has occured. Please check the database (or something). See error for more informations.");
+			this.logger.error(error);
+			return ("An error has occured. Please check the database (or something).");
+		}
+
+	}
+
 	async sendFriendRequest(user: User, receiverId: number) {
 		try {
 			//has a friend request already been sent

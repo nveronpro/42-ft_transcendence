@@ -29,7 +29,7 @@
         "@nestjs/platform-express": "^7.6.18",
         "@nestjs/platform-socket.io": "^8.0.0",
         "@nestjs/typeorm": "^7.1.5",
-        "@nestjs/websockets": "^8.0.0",
+        "@nestjs/websockets": "^8.0.2",
         "client-oauth2": "^4.3.3",
         "cookie": "^0.4.0",
         "cookie-parser": "^1.4.5",

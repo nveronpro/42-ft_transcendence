@@ -13,6 +13,7 @@ async function bootstrap() {
 			'debug',
 			// 'verbose'
 		],
+		cors: true,
 	});
 	app.enableCors({
 		"origin": "*",

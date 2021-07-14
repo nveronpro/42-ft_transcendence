@@ -65,7 +65,31 @@
 					</div>
 				</div>
 			</div>
+			<button class="" v-on:click="clickButton"></button>
 		</div>
 	</div>
 
 </template>
+
+
+ <script>
+	import io from 'socket.io-client';
+
+	export default {
+		data() {
+			return {
+				socket: null,
+			}
+		},
+		methods: {
+			clickButton() {
+				this.socket.emit('test', "NICOLAS");
+				console.log('CLICK');
+			}
+		},
+		created () {
+			this.socket = io('/chat/');
+			console.log(this.socket);
+		}
+	}
+ </script>

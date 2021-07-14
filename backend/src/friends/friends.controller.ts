@@ -30,15 +30,14 @@ export class FriendsController {
 
 	@Get(':name')
 	findUserBegining(@Param('name') name: string) {
-	this.logger.log("@GET(name="+name+")");
+		this.logger.log("@GET(name="+name+")");
 		return this.friendsService.findUserBegining(name);
 	}
 
-	@Post('send/:id')
-	@UseGuards(JwtAuthGuard)
-	sendFriendRequest(@User() user: UserType, @Param('id') id: number) {
-	this.logger.log("@POST(id="+id+")");
-		return this.friendsService.sendFriendRequest(user, id);
+	@Get('already/:id')
+	isAlreadyFriends(@User() user: UserType, @Param('id') userId: number) {
+		this.logger.log("@GET(already/:"+userId+")");
+		return (this.friendsService.areUsersAlreadyFriends(user.id, userId));
 	}
 
 	@Get()
@@ -46,6 +45,13 @@ export class FriendsController {
 	async findUserFriends(@User() user: UserType) {
 		this.logger.log("@GET("+")");
 		return this.friendsService.findUserFriends(user);
+	}
+
+	@Post('send/:id')
+	@UseGuards(JwtAuthGuard)
+	sendFriendRequest(@User() user: UserType, @Param('id') id: number) {
+	this.logger.log("@POST(id="+id+")");
+		return this.friendsService.sendFriendRequest(user, id);
 	}
 
 	@Post('accept/:id')

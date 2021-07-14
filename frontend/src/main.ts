@@ -1,7 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
-
 import HomeComponent from '@/components/Home.vue';
 import FriendsComponent from '@/components/Friends.vue';
 import StatsComponent from '@/components/Stats.vue';
@@ -10,6 +9,7 @@ import ChatComponent from '@/components/Chat.vue';
 import TestComponent from '@/components/Test.vue';
 import FriendProfileComponent from '@/components/FriendProfile.vue';
 import LeaderboardComponent from '@/components/Leaderboard.vue';
+
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -29,3 +29,6 @@ const router = createRouter({
 const app = createApp(App);
 app.use(router);
 app.mount('#app');
+
+
+
