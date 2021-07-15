@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { Connection } from 'typeorm';
 import { FriendsModule } from './friends/friends.module';
 import { ProfileModule } from './profile/profile.module';
+import { PongModule } from './pong/pong.module';
 import { ChatModule } from './chat/chat.module';
 
 @Module({
@@ -19,6 +20,7 @@ import { ChatModule } from './chat/chat.module';
     AuthModule,
     FriendsModule,
     ProfileModule,
+    PongModule,
     ChatModule
   ],
   controllers: [AppController],
