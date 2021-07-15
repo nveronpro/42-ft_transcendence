@@ -4,7 +4,6 @@ import { User } from 'src/users/entities/user.entity';
 import { Connection, EntityManager } from 'typeorm';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
-import {genSalt, hash} from 'bcryptjs';
 
 @Injectable()
 export class ChatService {
@@ -24,9 +23,9 @@ export class ChatService {
   async createRoom(user: User, roomName: string, password: string | undefined) {
     const saltOrRound = 42;
     if (password !== undefined) {
-      const salt = await genSalt(saltOrRound);
-      const hashPass = await hash(password, salt);
-      const room = await this.manager.query("INSERT INTO \"chat\" (\"name\", \"password\") VALUES ($1, $2);", [roomName, hashPass]);
+      //const salt = await genSalt(saltOrRound);
+      //const hashPass = await hash(password, salt);
+      //const room = await this.manager.query("INSERT INTO \"chat\" (\"name\", \"password\") VALUES ($1, $2);", [roomName, hashPass]);
     }
     else {
       const room = await this.manager.query("INSERT INTO \"chat\" (\"name\", \"password\") VALUES ($1, $2);", [roomName, null]);

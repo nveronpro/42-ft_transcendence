@@ -73,7 +73,7 @@
 
 
  <script>
-	import { io } from 'socket.io-client'
+	import { io } from 'socket.io-client';
 
 	export default {
 		data() {
@@ -83,12 +83,14 @@
 		},
 		methods: {
 			clickButton() {
+				console.log(this.$cookie)
+
 				this.socket.emit('test', "NICOLAS");
 				console.log('CLICK');
 			}
 		},
 		created () {
-			this.socket = io('http://localhost:8080');
+			this.socket = io('http://localhost:8080', { withCredentials: true });
 			console.log(this.socket);
 		}
 	}

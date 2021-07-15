@@ -1,4 +1,4 @@
-import { Logger, UseGuards } from '@nestjs/common';
+import { Logger, UseGuards, Req } from '@nestjs/common';
 import { User } from '../auth/decorators/user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from '../../node_modules/@nestjs/websockets';
@@ -7,6 +7,7 @@ import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
 import { User as UserType } from '../users/entities/user.entity';
+import {Response, Request} from 'express';
 
 @WebSocketGateway(
   {
@@ -43,19 +44,6 @@ export class ChatGateway {
     this.chatService.joinRoom(user, roomId, password);
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
   afterInit(Server: any){
     this.logger.log('Initialized !');
   }
@@ -90,7 +78,8 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('test')
-  handleTest(client: Socket, data: string) {
+  @UseGuards(JwtAuthGuard)
+  handleTest(@Req() request: Request, @User() user, client: Socket, data: string) {
     this.logger.debug("THIS IS A TEST. A MESSAGE HAS BEEN SUCCESSFULLY RECEIVED !");
     this.logger.debug(data);
     return '';
