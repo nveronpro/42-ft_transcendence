@@ -23,7 +23,7 @@ export class ProfileController {
 		return ret;
 	}
 
-	@Patch("nickname/:nick")
+	@Post("nickname/:nick")
 	@UseGuards(JwtAuthGuard)
 	async updateNickname(@User() user: UserType, @Param("nick") nick: string) {
 		this.logger.log("@PATCH(nickname/" + nick + ")");

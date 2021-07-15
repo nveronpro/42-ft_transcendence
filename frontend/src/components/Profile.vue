@@ -15,11 +15,20 @@
 			<div class="col-8">
 				<div class="card h-100">
 					<div class="card-body">
-						<h5 class="card-title fs-1 mb-1">{{user.login}}</h5>
+						<h5 id="nickname" class="card-title fs-1 mb-1">{{user.nickname}}</h5>
+						<form @submit.prevent="change_nick">
+							<div class="input-group mb-3 w-50">
+								<input type="text" class="form-control" v-model="nick" placeholder="Change your nickname" aria-label="Recipient's username" aria-describedby="button-addon2">
+								<button class="btn btn-outline-secondary" type="submit" id="button-addon2">Change</button>
+							</div>
+						</form>
+						<p><small id="change_nick_status" class="text-danger"></small></p>
+						<small class="text-muted">Current status: {{user.current_status}}</small>
 						<p class="card-text mb-5">Joueur pro de pong</p>
 					</div>
-					<div class="card-footer bg-transparent border-Secondary">
-						<p class="card-text mb-auto"><small class="text-muted">{{user.current_status}}</small></p>
+					<div class="card-footer bg-transparent">
+						<button v-if="user.two_factor_auth == false" type="button" class="btn btn-success" v-on:click="switch_2fa">Activer le 2FA</button>
+						<button v-if="user.two_factor_auth == true" type="button" class="btn btn-danger" v-on:click="switch_2fa">Desactiver le 2FA</button>
 					</div>
 				</div>
 			</div>
@@ -51,15 +60,21 @@
     export default {
         data(){
             return {
-                user: null,
+				user: null,
+				users: null,
                 friend_requests: null,
 				file: '',
+				nick: null,
             }
         },
         mounted () {
             axios
             .get('/api/auth/me')
-            .then(response => (this.user = response.data))
+			.then(response => (this.user = response.data))
+			
+			axios
+            .get('/api/users/all')
+            .then(response => (this.users = response.data))
 
 			axios
 			.get('/api/friends/received')
@@ -79,6 +94,30 @@
 			})
 		},
 		methods: {
+			change_nick: function () {
+				for(let i = 0; this.users[i]; i++)
+				{
+					if (this.users[i].user_nickname == this.nick)
+					{
+						document.getElementById("change_nick_status").innerHTML = this.nick + " is already in use !";
+						return ;
+					}
+				}
+				axios.post('/api/profile/nickname/' + this.nick);
+				document.getElementById("nickname").innerHTML = this.nick;
+			},
+			switch_2fa: function () {
+				if (this.user.two_factor_auth == false)
+				{
+					axios.post('/api/profile/2fa/true');
+					this.user.two_factor_auth = true;
+				}
+				else
+				{
+					axios.post('/api/profile/2fa/false');
+					this.user.two_factor_auth = false;
+				}
+			},
 			accept: function (id) {
 				let _id = id;
 				axios

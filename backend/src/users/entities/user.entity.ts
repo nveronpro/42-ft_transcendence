@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, BaseEntity, ConnectionNotFoundError } from 'typeorm';
+import { ChatUser } from '../../chat/entities/chatUser.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, BaseEntity, ConnectionNotFoundError, OneToMany } from 'typeorm';
 import { MatchHistory } from '../../match-histories/entities/match-history.entity';
 
 @Entity()
@@ -42,4 +43,10 @@ export class User extends BaseEntity {
 
 	@Column({nullable: true})
 	avatar: string;
+
+	//@OneToMany(type => ChatUser, chatUser => chatUser.chat)
+	//userChats: ChatUser;
+
+	@Column({nullable: true})
+	socketId: string;
 }

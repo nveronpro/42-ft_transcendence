@@ -1,7 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
-
 import HomeComponent from '@/components/Home.vue';
 import FriendsComponent from '@/components/Friends.vue';
 import StatsComponent from '@/components/Stats.vue';
