@@ -17,7 +17,7 @@ export class AuthController {
   }
 
   @Get('/logout')
-  @Redirect('http://localhost:8080', 302) // CHANGE THE CODE
+  @Redirect('http://localhost:3000', 302) // CHANGE THE CODE
   logout(@Res() res: Response){
     res.clearCookie('auth-cookie', { httpOnly: true });
   }
@@ -31,7 +31,7 @@ export class AuthController {
   }
 
   @Get('/saveToken')
-  @Redirect('http://localhost:8080', 302) // CHANGE THE CODE
+  @Redirect('http://localhost:3000', 302) // CHANGE THE CODE
   saveToken(@Query('token') token, @Res() res: Response){
     res.cookie('auth-cookie', token, { httpOnly: true });
   }
@@ -44,7 +44,6 @@ export class AuthController {
 
   @Get('/cookie')
   cookie(@Req() request: Request){
-    //console.log(request?.cookies["auth-cookie"]);
     if (request.cookies["auth-cookie"])
       return true;
     else

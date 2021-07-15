@@ -13,17 +13,20 @@ async function bootstrap() {
 			'debug',
 			// 'verbose'
 		],
-		cors: true,
+		cors: {
+			origin: 'http://localhost:3000',
+			credentials: true,
+		  },
 	});
 	app.enableCors({
-		"origin": "*",
-		"methods": "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-		"preflightContinue": false,
-		"optionsSuccessStatus": 204,
+        "origin": "http://localhost:3000",
+        "methods": "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+        "preflightContinue": false,
+        "optionsSuccessStatus": 204,
         credentials: true,
-	});
+    });
 	seed();
 	app.use(cookieParser());
-	await app.listen(3000);
+	await app.listen(8080);
 }
 bootstrap();

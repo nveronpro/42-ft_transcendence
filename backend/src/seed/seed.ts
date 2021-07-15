@@ -193,7 +193,7 @@ export async function seed() {
 	let uMavileo = await User.create(usrDtoMavileo).save();
 
 
-    console.log(u1.friends + " login: " + u1.login);
+    //console.log(u1.friends + " login: " + u1.login);
     // console.log(u2.friends + " login: " + u2.login);
 	// console.log(u3.friends + " login: " + u3.login);
 	// console.log(u4.friends + " login: " + u4.login);
@@ -208,7 +208,7 @@ export async function seed() {
 	//-------------MATCHES-------------
 
     //await User.update(u1, { friends: [{id: u1.id}] });
-    console.log("AFTER");
+    //console.log("AFTER");
 
     u1 = await User.findOne({ id: u1.id });
 	u2 = await User.findOne({ id: u2.id });
@@ -543,7 +543,7 @@ export async function seed() {
 	uNveron = await User.findOne({ id: uNveron.id });
 	uMavileo = await User.findOne({ id: uMavileo.id });
 	
-	console.log("creating friend requests !");
+	//console.log("creating friend requests !");
 
 	const fr1_oroberts = new CreateFriendRequestDto();
 	fr1_oroberts.sender = ur1;
@@ -595,7 +595,7 @@ export async function seed() {
 	fr4_mavileo.sender = uMavileo;
 	fr4_mavileo.receiver = ur4;
 
-	console.log("saving friend requests !");
+	//console.log("saving friend requests !");
 
 	await FriendRequest.create(fr1_oroberts).save();
 	await FriendRequest.create(fr2_oroberts).save();

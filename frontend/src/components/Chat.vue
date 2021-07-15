@@ -73,7 +73,7 @@
 
 
  <script>
-	import io from 'socket.io-client';
+	import { io } from 'socket.io-client'
 
 	export default {
 		data() {
@@ -88,7 +88,7 @@
 			}
 		},
 		created () {
-			this.socket = io('/chat/');
+			this.socket = io('http://localhost:8080');
 			console.log(this.socket);
 		}
 	}

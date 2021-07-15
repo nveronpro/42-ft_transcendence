@@ -17,7 +17,7 @@ const intra42auth = new ClientOAuth2({
 	clientSecret: process.env.API_SECRET,
 	accessTokenUri: 'https://api.intra.42.fr/oauth/token',
 	authorizationUri: 'https://api.intra.42.fr/oauth/authorize',
-	redirectUri: `http://localhost:3000/auth/callback`,
+	redirectUri: `http://localhost:8080/auth/callback`,
 	scopes: ['public']
 })
 
@@ -59,7 +59,7 @@ export class AuthService {
   }
 
   public async callback(code: string, res: Response) {
-    let url = `http://localhost:3000/auth/callback?code=${code}`
+    let url = `http://localhost:8080/auth/callback?code=${code}`
     try {
       let user_connected = await intra42auth.code.getToken(url);
       let response = await user_connected.sign({

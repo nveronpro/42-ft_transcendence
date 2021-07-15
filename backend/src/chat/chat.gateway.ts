@@ -5,7 +5,15 @@ import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
 
-@WebSocketGateway()
+@WebSocketGateway(
+  {
+    cors: {
+      origin: 'http://localhost:3000',
+      methods: ['GET', 'POST'],
+      credentials: true,
+    },
+  }
+)
 export class ChatGateway {
   constructor(private readonly chatService: ChatService) {}
   private readonly logger = new Logger(ChatGateway.name);
@@ -15,7 +23,6 @@ export class ChatGateway {
 
   afterInit(Server: any){
     this.logger.log('Initialized !');
-    console.log(this.server);
   }
 
   handleConnection(client: Socket, ...args: any[]) {

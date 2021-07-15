@@ -6,7 +6,7 @@
 				<div class="col-lg-6 mx-auto">
 				<p class="lead mb-4">Connect you with your 42 account</p>
 					<div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-						<button type="button" class="btn btn-primary" onclick='window.location.href="http://localhost:3000/auth/login"'>Login</button>
+						<button type="button" class="btn btn-primary" onclick='window.location.href="http://localhost:8080/auth/login"'>Login</button>
 					</div>
 				</div>
 			</div>
@@ -63,7 +63,6 @@
 <script>
 	import ChatComponent from './components/Chat.vue';
 	import axios from "axios";
-
 	export default {
 		name: 'App',
 		components: {
@@ -78,21 +77,19 @@
 			}
 		},
 		mounted () {
-			axios.post('/api/users/status/online');
+			axios.post('/users/status/online');
 			
 			axios
-			.get('/api/auth/me')
+			.get('/auth/me')
 			.then(response => ( this.user = response.data ))
-
 			axios
-			.get('/api/users/all/')
+			.get('/users/all/')
 			.then(response => (this.users = response.data))
-
 			this.google_auth_verify = false;
 		},
 		updated () {
 			axios
-			.get('/api/auth/me')
+			.get('/auth/me')
 			.then(response => {
 				var img = document.createElement("img");
 				img.src = response.data.qrcode_data;
@@ -104,14 +101,14 @@
 		created() {
 			window.addEventListener('beforeunload', function () {
 				axios
-				.post('/api/users/status/offline');
+				.post('/users/status/offline');
 			});
 		},
 		methods: {
 			google_auth: function (){
 				if (this.google_auth_verify === false){
 					axios
-					.post('/api/auth/google_auth?code=' + this.code)
+					.post('/auth/google_auth?code=' + this.code)
 					.then(response => (this.google_auth_verify = response.data))
 				}
 			}
