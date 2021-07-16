@@ -128,7 +128,7 @@ export class ChatService {
       }
       // TODO check if used in banned from room
       else {
-        if (room.password != undefined && compare(password, room.password) == false ) {
+        if (room.password != undefined && await compare(password, room.password) == false ) {
           // TODO emit error password mismatch
           return ;
         }
