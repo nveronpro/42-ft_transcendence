@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CircularDependencyException = void 0;
 class CircularDependencyException extends Error {
     constructor(context) {
         const ctx = context ? ` inside ${context}` : ``;

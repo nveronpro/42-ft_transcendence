@@ -1,6 +1,9 @@
 import { User } from '../../users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, BaseEntity, ConnectionNotFoundError, ManyToOne } from 'typeorm';
 import { Chat } from './chat.entity';
+import { UserRole } from './userStatus.enum';
+
+
 
 @Entity()
 export class ChatUsers extends BaseEntity {
@@ -14,6 +17,6 @@ export class ChatUsers extends BaseEntity {
 	@ManyToOne(type => User)
 	user: User;
 
-	@Column()
-	userStatus: number;
+	@Column({type:"enum", enum: UserRole, default: UserRole.USER})
+	userRole: UserRole;
 }

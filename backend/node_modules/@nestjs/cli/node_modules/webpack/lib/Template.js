@@ -18,9 +18,10 @@ const { ConcatSource, PrefixSource } = require("webpack-sources");
 /** @typedef {import("./Module")} Module */
 /** @typedef {import("./ModuleGraph")} ModuleGraph */
 /** @typedef {import("./ModuleTemplate")} ModuleTemplate */
-/** @typedef {import("./ModuleTemplate").RenderContext} RenderContext */
 /** @typedef {import("./RuntimeModule")} RuntimeModule */
 /** @typedef {import("./RuntimeTemplate")} RuntimeTemplate */
+/** @typedef {import("./javascript/JavascriptModulesPlugin").ChunkRenderContext} ChunkRenderContext */
+/** @typedef {import("./javascript/JavascriptModulesPlugin").RenderContext} RenderContext */
 
 const START_LOWERCASE_ALPHABET_CODE = "a".charCodeAt(0);
 const START_UPPERCASE_ALPHABET_CODE = "A".charCodeAt(0);
@@ -283,7 +284,7 @@ class Template {
 	}
 
 	/**
-	 * @param {RenderContext} renderContext render context
+	 * @param {ChunkRenderContext} renderContext render context
 	 * @param {Module[]} modules modules to render (should be ordered by identifier)
 	 * @param {function(Module): Source} renderModule function to render a module
 	 * @param {string=} prefix applying prefix strings
@@ -413,5 +414,7 @@ class Template {
 }
 
 module.exports = Template;
-module.exports.NUMBER_OF_IDENTIFIER_START_CHARS = NUMBER_OF_IDENTIFIER_START_CHARS;
-module.exports.NUMBER_OF_IDENTIFIER_CONTINUATION_CHARS = NUMBER_OF_IDENTIFIER_CONTINUATION_CHARS;
+module.exports.NUMBER_OF_IDENTIFIER_START_CHARS =
+	NUMBER_OF_IDENTIFIER_START_CHARS;
+module.exports.NUMBER_OF_IDENTIFIER_CONTINUATION_CHARS =
+	NUMBER_OF_IDENTIFIER_CONTINUATION_CHARS;
