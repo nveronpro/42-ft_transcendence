@@ -44,14 +44,12 @@ export class ChatGateway {
 
 
   @SubscribeMessage('createGroupChat')
-  async createPublicRoom(
-    client: Socket,
-    @MessageBody('login') login: string,
-    @MessageBody('roomName') roomName: string | undefined,
-    @MessageBody('password') password: string | undefined
-  ) {
-    const user: UserType = await this.chatService.getUserLogin(login);
-
+  async createPublicRoom( client: Socket, ...args: any[] ) {
+    let roomName = args[0].roomName;
+    let login = args[0].login;
+    let password = args[0].password;
+    
+    const user: UserType = await this.chatService.getUserLogin(args[0].login);
     if (user === undefined)
     {
       this.logger.error(`createPublicRoom: The user ${login} can not be found`)
@@ -62,11 +60,9 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('createPrivateChat')
-  async createPrivateRoom(
-    client: Socket,
-    @MessageBody('login') login: string,
-    @MessageBody('user') userId: number
-  ) {
+  async createPrivateRoom( client: Socket, ...args: any[] ) {
+    let login = args[0].login
+    let userId = args[0].user;
     const user: UserType = await this.chatService.getUserLogin(login);
 
     if (user === undefined)
@@ -80,12 +76,10 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('joinChat')
-  async joinRoom(
-    client: Socket,
-    @MessageBody('login') login: string,
-    @MessageBody('roomId') roomId: number,
-    @MessageBody('password') password: string | undefined
-  ) {
+  async joinRoom( client: Socket, ...args: any[] ) {
+    let login = args[0].login;
+    let roomId = args[0].roomId;
+    let password = args[0].password;
     const user: UserType = await this.chatService.getUserLogin(login);
 
     if (user === undefined)
@@ -99,12 +93,10 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('msgToServer')
-  async msgToServer(
-    client: Socket,
-    @MessageBody('login') login: string,
-    @MessageBody('destination') roomId: number,
-    @MessageBody('text') message: string | undefined
-  ) {
+  async msgToServer( client: Socket, ...args: any[] ) {
+    let login = args[0].login;
+    let roomId = args[0].destination;
+    let message = args[0].text;
     const user: UserType = await this.chatService.getUserLogin(login);
 
     if (user === undefined)

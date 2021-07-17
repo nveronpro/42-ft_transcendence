@@ -59,15 +59,15 @@
 		},
 		async created () {
 			axios
-			.get('/api/auth/me')
+			.get('/auth/me')
 			.then(response => (this.user = response.data))
 
 			axios
-			.get('/api/friends/')
+			.get('/friends/')
 			.then(response => (this.friends = response.data))
 
 			axios
-			.get('/api/users/all')
+			.get('/users/all')
 			.then(response => (this.all_users = response.data))
 		},
 		computed: {
@@ -84,13 +84,13 @@
 			send: function (id) {
 				let _id = id;
 				axios
-				.post('/api/friends/send/'+ _id)
+				.post('/friends/send/'+ _id)
 				.then()
 			},
 			remove: function (id) {
 				let _id = id;
 				axios
-				.delete('/api/friends/'+ _id)
+				.delete('/friends/'+ _id)
 				.then()
 			},
 		},

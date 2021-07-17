@@ -44,19 +44,19 @@ export class ChatService {
         //TODO emit error 
         return ;
       }
-
       let room: Chat;
       if (password !== undefined && password !== "") {
         const saltOrRound = 42;
         const salt = await genSalt(saltOrRound);
         const hashPass = await hash(password, salt);
+
         room = await this.manager.query("INSERT INTO \"chat\" (\"name\", \"password\") VALUES ($1, $2);", [roomName, hashPass]);
       }
       else {
         room = await this.manager.query("INSERT INTO \"chat\" (\"name\", \"password\") VALUES ($1, $2);", [roomName, null]);
       }
-
       await this.manager.query("INSERT INTO \"chat_user\" (\"userId\", \"chatId\", \"userRole\") VALUES ($1, $2, $3) ;", [user.id, room.id, UserRole.OWNER]);
+      
       client.join(String(room.id));
       client.emit("open", {id: room.id, name: roomName})
       server.to(String(room.id)).emit(`User ${user.nickname} has joined the chat.`);

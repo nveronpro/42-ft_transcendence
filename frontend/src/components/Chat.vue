@@ -11,12 +11,15 @@
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
 					</div>
 					<div class="offcanvas-body">
+						<label for="inputPassword5" class="form-label">Chat name</label>
+						<input type="text" id="chatName" v-model="name" class="form-control">
+
 						<label for="inputPassword5" class="form-label">Password</label>
-						<input type="password" id="inputPassword5" class="form-control" aria-describedby="passwordHelpBlock">
+						<input type="password" id="inputPassword5" v-model="password" class="form-control" aria-describedby="passwordHelpBlock">
 						<div id="passwordHelpBlock" class="mb-3 form-text">
 						A password is optional. But is you set a password, your convesation will be private
 						</div>
-						<button class="btn btn-primary" type="button">Create a new conversation</button>
+						<button class="btn btn-primary" type="button" @click.prevent="createGroupChat" data-bs-dismiss="offcanvas">Create a new conversation</button>
 					</div>
 				</div>
 			</div>
@@ -30,42 +33,76 @@
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
 					</div>
 					<div class="offcanvas-body">
-						<div class="card mb-2">
-							<div class="card-header">
-								<form class="form-inline my-2 my-lg-0">
-									<input class="form-control mr-sm-2 w-100" type="search" v-model="keyword" placeholder="Search a conversation">
-								</form>
+						<div class="card ">
+							<div class="card-header"> 
+								<ul class="nav nav-tabs card-header-tabs pull-right"  id="myTab" role="tablist">
+									<li class="nav-item">
+										<a class="nav-link active" id="Friends-tab" data-toggle="tab" href="#Friends" role="tab" aria-controls="Friends" aria-selected="true">Friends</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" id="Groups-tab" data-toggle="tab" href="#Groups" role="tab" aria-controls="Groups" aria-selected="false">Groups</a>
+									</li>
+								</ul>
 							</div>
-						</div>
-						<div class="my-3 p-3 bg-body rounded shadow-sm">
-							<h6 class="border-bottom pb-2 mb-0">Resulat de la recherche</h6>
+							<div class="card-body">
+								<div class="tab-content" id="myTabContent">
+									<div class="tab-pane fade show active" id="Friends" role="tabpanel" aria-labelledby="Friends-tab">
+										<div class="card mb-2">
+											<div class="card-header">
+												<form class="form-inline my-2 my-lg-0">
+													<input class="form-control mr-sm-2 w-100" type="search" v-model="keyword" placeholder="Search a friend">
+												</form>
+											</div>
+										</div>
+										<div class="my-3 p-3 bg-body rounded shadow-sm">
+											<h6 class="border-bottom pb-2 mb-0">Resulat de la recherche</h6>
+										</div>
+									</div>
+									<div class="tab-pane fade" id="Groups" role="tabpanel" aria-labelledby="Groups-tab">
+										<div class="card mb-2">
+											<div class="card-header">
+												<form class="form-inline my-2 my-lg-0">
+													<input class="form-control mr-sm-2 w-100" type="search" v-model="keyword" placeholder="Search a group">
+												</form>
+											</div>
+										</div>
+										<div class="my-3 p-3 bg-body rounded shadow-sm">
+											<h6 class="border-bottom pb-2 mb-0">Resulat de la recherche</h6>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="d-flex flex-row chat-tab">
-				<button type="button" class="btn btn-primary position-relative m-2 rounded-circle" data-bs-toggle="offcanvas" data-bs-target="#nveron" aria-expanded="false" aria-controls="nveron">
-				N
+			<div v-for="chat of chats" :key="chat.id" class="d-flex flex-row chat-tab">
+				<button type="button" class="btn btn-primary position-relative m-2 rounded-circle" data-bs-toggle="offcanvas" :data-bs-target="'#' + 'C' + chat.id" aria-expanded="false" :aria-controls="'C' + chat.id">
+				{{chat.name[0]}}
 				</button>
-				<div class="offcanvas offcanvas-start" tabindex="-1" id="nveron" aria-labelledby="nveronLabel">
+				<div class="offcanvas offcanvas-start" tabindex="-1" :id="'C' + chat.id" :aria-labelledby="'C' + chat.id + 'Label'">
 					<div class="offcanvas-header">
-						<h5 class="offcanvas-title" id="nveronLabel">Chat with Nicolas</h5>
+						<h5 class="offcanvas-title" :id="'C' + chat.id + 'Label'">{{chat.name}}</h5>
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
 					</div>
 					<div class="offcanvas-body">
-						<div class="d-flex flex-row bd-highlight mb-3">
-							<div class="p-2 bd-highlight">Nico: blabla</div>
+						<div v-for="message of messages" :key="message.id">
+							<div v-if="message.destination === chat.id">
+								<div v-if="message.login !== this.user.login" class="d-flex flex-row mb-2">
+									<div class="p-2">{{message.login}}: {{message.text}}</div>
+								</div>
+								<div v-else class="d-flex flex-row-reverse">
+									<div class="p-2">{{message.login}}: {{message.text}}</div>
+								</div>
+							</div>
 						</div>
-						<div class="d-flex flex-row-reverse bd-highlight">
-							<div class="p-2 bd-highlight">Moi: bla bla blab lbalb llablal lbl ll abll al</div>
-						</div>	
 					</div>
 					<div class="offcanvas-footer input-group">
-							<input type="text" class="form-control" placeholder="Send message" aria-label="Recipient's username" aria-describedby="button-addon2">
+						<textarea :id="'textarea' + chat.id" class="form-control" v-model="text" placeholder="Enter message..."></textarea>
+						<button id="send" class="btn" @click.prevent="sendMessage(chat.id)">Send</button>
 					</div>
 				</div>
 			</div>
-			<button class="" v-on:click="clickButton"></button>
 		</div>
 	</div>
 
@@ -74,24 +111,62 @@
 
  <script>
 	import { io } from 'socket.io-client';
+	import axios from "axios";
 
 	export default {
 		data() {
 			return {
 				socket: null,
+				user: null,
+				text: '',
+				password: '',
+				name: '',
+				messages: [],
+				chats: [],
 			}
 		},
+		mounted() {
+			axios
+			.get('/auth/me')
+			.then(response => ( this.user = response.data ))
+		},
 		methods: {
-			clickButton() {
-				console.log(this.$cookie)
-
-				this.socket.emit('test', "NICOLAS");
-				console.log('CLICK');
-			}
+			createGroupChat() {
+				const data = {
+					login: this.user.login,
+					roomName: this.name,
+					password: this.password
+				}
+				this.socket.emit('createGroupChat', data);
+				this.name = '';
+				this.password = '';
+			},
+			sendMessage(dest) {
+				const message = {
+					login: this.user.login,
+					text: this.text,
+					destination: dest,
+				}
+				this.socket.emit('msgToServer', message)
+				this.text = ''
+				document.getElementById("textarea" + dest).value = "";
+			},
+			receivedMessage(message) {
+				this.messages.push(message);
+			},
+			openChat(chat) {
+				this.chats.push(chat);
+			},
 		},
 		created () {
 			this.socket = io('http://localhost:8080', { withCredentials: true });
-			console.log(this.socket);
+			
+			this.socket.on('message', (message) => {
+				this.receivedMessage(message)
+			})
+			this.socket.on('open', (chat) => {
+				this.openChat(chat);
+			})
 		}
 	}
  </script>

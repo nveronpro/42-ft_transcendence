@@ -38,7 +38,7 @@
     },
     mounted () {
       axios
-      .get('/api/users/all/')
+      .get('/users/all/')
       .then((response) => {
         this.users = response.data.sort((a, b) => {
           return ((b.user_wins * 3 - b.user_looses * 2) - (a.user_wins * 3 - a.user_looses * 2));
