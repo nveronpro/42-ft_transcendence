@@ -8,13 +8,10 @@ import { UserRole } from './userStatus.enum';
 @Entity()
 export class ChatUsers extends BaseEntity {
 
-	@PrimaryGeneratedColumn()
-	id: number;
+	@ManyToOne(type => Chat, {primary: true})
+	chat: Chat;
 
-	@ManyToOne(type => Chat)
-	chatId: Chat;
-
-	@ManyToOne(type => User)
+	@ManyToOne(type => User, {primary: true})
 	user: User;
 
 	@Column({type:"enum", enum: UserRole, default: UserRole.USER})

@@ -8,6 +8,8 @@ import {genSalt, hash, compare} from 'bcrypt';
 import { Chat } from './entities/chat.entity';
 import { UserRole } from './entities/userStatus.enum';
 import { User } from 'src/auth/decorators/user.decorator';
+import { ChatUsers } from './entities/chatUsers.entity';
+import { CreateChatUserDto } from './dto/create-chatUsers.dto';
 
 
 
@@ -17,9 +19,14 @@ export class ChatService {
   private readonly logger = new Logger(ChatService.name);
 
   async getUserLogin(login: string): Promise<UserType> {
-    const user: UserType = await UserType.findOne({login: login});
-
-    return user;
+    try {
+      const user: UserType = await UserType.findOne({login: login});
+      return user;
+    }
+    catch (error) {
+			this.logger.error("getUserLogin: An error has occured. Please check the database (or something). See error for more informations.");
+			this.logger.error(error);
+		}
   }
 
   async connectUser(user: UserType, sock: Socket) {
@@ -44,25 +51,39 @@ export class ChatService {
         //TODO emit error 
         return ;
       }
+
+      const toCreate: CreateChatDto = new CreateChatDto();
       let room: Chat;
+
+      toCreate.name = roomName;
+      toCreate.private = false;
+
+
       if (password !== undefined && password !== "") {
         const saltOrRound = 42;
         const salt = await genSalt(saltOrRound);
-        const hashPass = await hash(password, salt);
+        toCreate.password = await hash(password, salt);
 
-        room = await this.manager.query("INSERT INTO \"chat\" (\"name\", \"password\") VALUES ($1, $2);", [roomName, hashPass]);
+
+        room = await Chat.create(toCreate).save();
       }
       else {
-        room = await this.manager.query("INSERT INTO \"chat\" (\"name\", \"password\") VALUES ($1, $2);", [roomName, null]);
+        toCreate.password = null;
+        room = await Chat.create(toCreate).save();
       }
-      await this.manager.query("INSERT INTO \"chat_user\" (\"userId\", \"chatId\", \"userRole\") VALUES ($1, $2, $3) ;", [user.id, room.id, UserRole.OWNER]);
+      
+      const newUser: CreateChatUserDto = new CreateChatUserDto();
+      newUser.chat = room;
+      newUser.user = user;
+      newUser.userRole = UserRole.OWNER;
+      await ChatUsers.create(newUser).save();
       
       client.join(String(room.id));
-      client.emit("open", {id: room.id, name: roomName})
-      server.to(String(room.id)).emit(`User ${user.nickname} has joined the chat.`);
+      client.emit("open", {id: room.id, name: roomName});
+      server.to(String(room.id)).emit("message", {login: "Server", destination: room.id, text:`User ${user.nickname} has joined the chat.`});
     }
     catch (error) {
-			this.logger.error("createRoom: An error has occured. Please check the database (or something). See error for more informations.");
+			this.logger.error("createPublicRoom: An error has occured. Please check the database (or something). See error for more informations.");
 			this.logger.error(error);
 			return ("An error has occured. Please check the database (or something).");
 		}
@@ -72,35 +93,50 @@ export class ChatService {
     server: Server,
     client: Socket,
     user: UserType,
-    targetId: number
+    targetLogin: string
   ) {
     try {
       let room: Chat;
 
-      const target: UserType = await UserType.findOne({id: targetId});
-      if (target.current_status == "offline")
-      {
-        // TODO emit error target not connected
-        return ;
-      }
+      const target: UserType = await UserType.findOne({login: targetLogin});
+      // if (target.current_status == "offline")
+      // {
+      //   this.logger.debug("User is offline");
+      //   // TODO emit error target not connected
+      //   return ;
+      // }
       // TODO Check if user is blocked.
 
-      room = await this.manager.query("INSERT INTO \"chat\" (\"name\", \"password\", \"private\") VALUES ($1, $2);", ["Private Messages " + user.nickname + "\\" + target.nickname, null, true]);
+      const roomToCreate: CreateChatDto = new CreateChatDto();
+      roomToCreate.name = "Private Messages " + user.nickname + "\\" + target.nickname;
+      roomToCreate.password = null;
+      roomToCreate.private = true;
 
+      room = await Chat.create(roomToCreate).save();
+      // room = await this.manager.query("INSERT INTO \"chat\" (\"name\", \"password\", \"private\") VALUES ($1, $2);", ["Private Messages " + user.nickname + "\\" + target.nickname, null, true]);
 
-      await this.manager.query("INSERT INTO \"chat_user\" (\"userId\", \"chatId\", \"userRole\") VALUES ($1, $2, $3) ;", [user.id, room.id, UserRole.USER]);
-      await this.manager.query("INSERT INTO \"chat_user\" (\"userId\", \"chatId\", \"userRole\") VALUES ($1, $2, $3) ;", [target.id, room.id, UserRole.USER]);
+      const privateChatUser: CreateChatUserDto = new CreateChatUserDto();
 
-      server.sockets.sockets[target.socketId].join(String(room.id));
+      privateChatUser.chat = room;
+      privateChatUser.user = user;
+
+      privateChatUser.userRole = UserRole.USER
+      ChatUsers.create(privateChatUser).save();
+
+      privateChatUser.user = target;
+      ChatUsers.create(privateChatUser).save();
+
+      // await this.manager.query("INSERT INTO \"chat_user\" (\"userId\", \"chatId\", \"userRole\") VALUES ($1, $2, $3) ;", [user.id, room.id, UserRole.USER]);
+      // await this.manager.query("INSERT INTO \"chat_user\" (\"userId\", \"chatId\", \"userRole\") VALUES ($1, $2, $3) ;", [target.id, room.id, UserRole.USER]);
+
+      //server.sockets.sockets[target.socketId].join(String(room.id));
       client.join(String(room.id));
 
-      client.emit("open", {id: room.id, name: room.name});
-      server.sockets.sockets[target.socketId].emit("open", {id: room.id, name: room.name});
-
-      server.to(String(room.id)).emit(`User ${user.nickname} wishes to chat with ${target.nickname}.`);
+      server.to(String(room.id)).emit("open", {id: room.id, name: room.name});
+      server.to(String(room.id)).emit("message", {login: "Server", destination: room.id, text: `User ${user.nickname} wishes to chat with ${target.nickname}.`});
     }
     catch (error) {
-			this.logger.error("createRoom: An error has occured. Please check the database (or something). See error for more informations.");
+			this.logger.error("createPrivateRoom: An error has occured. Please check the database (or something). See error for more informations.");
 			this.logger.error(error);
 			return ("An error has occured. Please check the database (or something).");
 		}

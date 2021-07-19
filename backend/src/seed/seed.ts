@@ -9,8 +9,12 @@ import { avatars_64 } from '../ressources/avatar_default';
 
 import * as speakeasy from 'speakeasy';
 import * as qrcode from 'qrcode';
+import { ChatUsers } from '../chat/entities/chatUsers.entity';
+import { Chat } from '../chat/entities/chat.entity';
 
 async function reset_db() {
+	await ChatUsers.delete({});
+	await Chat.delete({});
 	await FriendRequest.delete({});
     await MatchHistory.delete({});
     await User.delete({});
