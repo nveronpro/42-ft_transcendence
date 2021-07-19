@@ -18,6 +18,25 @@ export class ChatService {
   constructor(private manager: EntityManager, private connection: Connection) { }
   private readonly logger = new Logger(ChatService.name);
 
+  // +---------------------------------------------------------+
+  // |                      CONTROLLER                         |
+  // +---------------------------------------------------------+
+
+  async getAllPublicChats(){
+    const res = await this.manager.query("SELECT \"id\", \"name\" FROM \"chat\" WHERE \"private\"=false;");
+
+    return (res);
+  }
+
+
+
+
+
+
+  // +---------------------------------------------------------+
+  // |                       GATEWAY                           |
+  // +---------------------------------------------------------+
+
   async getUserLogin(login: string): Promise<UserType> {
     try {
       const user: UserType = await UserType.findOne({login: login});
@@ -126,10 +145,7 @@ export class ChatService {
       privateChatUser.user = target;
       ChatUsers.create(privateChatUser).save();
 
-      // await this.manager.query("INSERT INTO \"chat_user\" (\"userId\", \"chatId\", \"userRole\") VALUES ($1, $2, $3) ;", [user.id, room.id, UserRole.USER]);
-      // await this.manager.query("INSERT INTO \"chat_user\" (\"userId\", \"chatId\", \"userRole\") VALUES ($1, $2, $3) ;", [target.id, room.id, UserRole.USER]);
-
-      //server.sockets.sockets[target.socketId].join(String(room.id));
+      // TODO PUT THIS BACK server.sockets.sockets[target.socketId].join(String(room.id));
       client.join(String(room.id));
 
       server.to(String(room.id)).emit("open", {id: room.id, name: room.name});
