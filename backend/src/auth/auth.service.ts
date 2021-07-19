@@ -59,7 +59,7 @@ export class AuthService {
   }
 
   public async callback(code: string, res: Response) {
-    let url = `http://${process.env.IP}:8080/auth/callback?code=${code}`
+    let url = `http://localhost:8080/auth/callback?code=${code}`
     try {
       let user_connected = await intra42auth.code.getToken(url);
       let response = await user_connected.sign({

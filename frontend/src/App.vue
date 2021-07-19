@@ -6,7 +6,7 @@
 				<div class="col-lg-6 mx-auto">
 				<p class="lead mb-4">Connect you with your 42 account</p>
 					<div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-						<button type="button" class="btn btn-primary" :onclick='get_address("login")'>Login</button>
+						<button type="button" class="btn btn-primary" onclick='window.location.href="http://localhost:8080/auth/login"'>Login</button>
 					</div>
 				</div>
 			</div>
@@ -31,7 +31,7 @@
 							</div>
 							<div class="navbar-nav ml-auto">
 								<div v-if="user !== null">
-									<button type="button" class="btn btn-primary" :onclick='get_address("logout")'>Logout as {{ user.login }}</button>
+									<button type="button" class="btn btn-primary" onclick='window.location.href="http://localhost:8080/auth/logout"'>Logout as {{ user.login }}</button>
 								</div>
 							</div>
 						</div>
@@ -105,18 +105,6 @@
 			});
 		},
 		methods: {
-			get_address(info) {
-				let address;
-				if (info == "login")
-				{
-					address = 'window.location.href="http://' + process.env.VUE_APP_IP + ':8080/auth/login"'
-				}
-				else
-				{
-					address = 'window.location.href="http://' + process.env.VUE_APP_IP + ':8080/auth/logout"'
-				}
-				return address;
-			},
 			google_auth: function (){
 				if (this.google_auth_verify === false){
 					axios
