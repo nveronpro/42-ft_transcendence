@@ -48,6 +48,8 @@ export class ChatGateway {
     let roomName = args[0].roomName;
     let login = args[0].login;
     let password = args[0].password;
+
+    this.logger.verbose("WebSocket/createGroupChat");
     
     const user: UserType = await this.chatService.getUserLogin(args[0].login);
     if (user === undefined)
@@ -65,9 +67,11 @@ export class ChatGateway {
     let userId = args[0].user;
     const user: UserType = await this.chatService.getUserLogin(login);
 
+    this.logger.verbose("WebSocket/createPrivateChat");
+
     if (user === undefined)
     {
-      this.logger.error(`createPublicRoom: The user ${login} can not be found`)
+      this.logger.error(`createPrivateRoom: The user ${login} can not be found`)
       //TODO emit an error has occured 
       return ;
     }
@@ -82,9 +86,11 @@ export class ChatGateway {
     let password = args[0].password;
     const user: UserType = await this.chatService.getUserLogin(login);
 
+    this.logger.verbose("WebSocket/joinChat");
+
     if (user === undefined)
     {
-      this.logger.error(`createPublicRoom: The user ${login} can not be found`)
+      this.logger.error(`joinRoom: The user ${login} can not be found`)
       //TODO emit an error has occured 
       return ;
     }
@@ -93,15 +99,17 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('msgToServer')
-  async msgToServer( client: Socket, ...args: any[] ) {
+  async msgToServer(client: Socket, ...args: any[] ) {
     let login = args[0].login;
     let roomId = args[0].destination;
     let message = args[0].text;
     const user: UserType = await this.chatService.getUserLogin(login);
 
+    this.logger.verbose("WebSocket/msgToServer");
+
     if (user === undefined)
     {
-      this.logger.error(`createPublicRoom: The user ${login} can not be found`)
+      this.logger.error(`msgToServer: The user ${login} can not be found`)
       //TODO emit an error has occured 
       return ;
     }
@@ -109,30 +117,22 @@ export class ChatGateway {
     this.chatService.msgToServer(this.server, client, user, roomId, message);
   }
 
+  @SubscribeMessage('leave')
+  async leaveChannel(client: Socket, ...args: any[] ) {
+    let login = args[0].login;
+    let roomId = args[0].destination;
+    const user: UserType = await this.chatService.getUserLogin(login);
 
+    this.logger.verbose("WebSocket/leave");
 
+    if (user === undefined)
+    {
+      this.logger.error(`leave: The user ${login} can not be found`)
+      //TODO emit an error has occured 
+      return ;
+    }
 
-
-
-
-
-
-
-  //@UseGuards(JwtAuthGuard)
-  @SubscribeMessage('test')
-  handleTest(client: Socket, data: string) {
-    this.logger.debug("THIS IS A TEST. A MESSAGE HAS BEEN SUCCESSFULLY RECEIVED !");
-
-    this.logger.debug("Socket Server");
-    //this.logger.debug(client);
-    console.log(inspect(this.server.sockets.sockets, false, 1, true));
-
-    this.logger.debug("user");
-    //this.logger.debug(user);
-
-    this.logger.debug("data");
-    this.logger.debug(data);
-
-    return '';
+    this.chatService.leaveRoom(this.server, client, user, roomId);
   }
+
 }

@@ -118,12 +118,12 @@ export class ChatService {
       let room: Chat;
 
       const target: UserType = await UserType.findOne({login: targetLogin});
-      // if (target.current_status == "offline")
-      // {
-      //   this.logger.debug("User is offline");
-      //   // TODO emit error target not connected
-      //   return ;
-      // }
+      if (target.current_status == "offline")
+      {
+        this.logger.debug("User is offline");
+        // TODO emit error target not connected
+        return ;
+      }
       // TODO Check if user is blocked.
 
       const roomToCreate: CreateChatDto = new CreateChatDto();
@@ -217,17 +217,6 @@ export class ChatService {
 		}
   }
 
-
-
-
-
-
-
-
-
-
-
-
   async leaveRoom(
     server: Server,
     client: Socket,
@@ -243,7 +232,8 @@ export class ChatService {
       }
       else {
         // TODO send users un channel leave event
-        await this.manager.query("DELETE FROM \"chat_user\" WHERE userId=$1 AND chatId=$2;", [user.id, roomId]);
+        await this.manager.query("DELETE FROM \"chat_users\" WHERE userId=$1 AND chatId=$2;", [user.id, roomId]);
+        server.to(String(roomId)).emit(`User ${user.nickname} has joined the chat`);
         client.leave(String(room[0].id));
       }
     } catch (error) {
@@ -254,14 +244,6 @@ export class ChatService {
   }
 
   sendServerPrivateMessage(
-    server: Server,
-    client: Socket,
-    user: UserType
-  ) {
-
-  }
-
-  sendServerMessage(
     server: Server,
     client: Socket,
     user: UserType
