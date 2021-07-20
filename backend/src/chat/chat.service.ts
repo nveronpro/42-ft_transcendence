@@ -53,9 +53,26 @@ export class ChatService {
     return ;
   }
 
-  async disconnectUser(user: UserType) {
-    const updateWinner = await this.manager.query("UPDATE \"user\" SET \"socketId\" = $1 WHERE \"id\" = $2;", [null, user.id]);
-    //TODO Disconnect from channels
+  async disconnectUser(server: Server, user: UserType) {
+    //Sending to all channels the left message
+    const userChats: ChatUsers[] = await this.manager.query("SELECT * FROM \"chatUsers\" WHERE \"userId\" = $1 AND \"userRole <> $2", [user.id, UserRole.BANNED]);
+    
+    for (let chat in userChats) {
+      server.to(String(userChats[chat].chat)).emit(`User ${user.nickname} has left the chat`);
+    }
+
+    const chatToRemove = await this.manager.query("SELECT \"chatId\" FROM (SELECT \"chatId\", COUNT(\"chatId\") AS number_of_users FROM \"chat_users\" WHERE \"chatId\" IN (SELECT \"chatId\" FROM \"chat_users\" WHERE \"userId\" = $1) GROUP BY \"chatId\") AS A WHERE A.number_of_users = 1;");
+
+    
+    
+    const arrayChatToRemove = chatToRemove.map(a => a.chatId);
+    
+    await this.manager.query("DELETE FROM \"chat\" WHERE \"id\" IN $1;", [arrayChatToRemove]);
+    await this.manager.query("DELETE FROM \"chat_users\" WHERE \"userId\"=$1;", [user.id]);
+
+
+    const disconnectUser = await this.manager.query("UPDATE \"user\" SET \"socketId\" = $1 WHERE \"id\" = $2;", [null, user.id]);
+    
   }
 
   async createPublicRoom(
@@ -67,7 +84,7 @@ export class ChatService {
   ) {
     try {
       if (roomName.length < 3){
-        //TODO emit error 
+        client.emit("error", {text: "The room name is too short. it must be at least 3 characters"});
         return ;
       }
 
@@ -79,7 +96,7 @@ export class ChatService {
 
 
       if (password !== undefined && password !== "") {
-        const saltOrRound = 42;
+        const saltOrRound = 12;
         const salt = await genSalt(saltOrRound);
         toCreate.password = await hash(password, salt);
 
@@ -121,18 +138,21 @@ export class ChatService {
       if (target.current_status == "offline")
       {
         this.logger.debug("User is offline");
-        // TODO emit error target not connected
+        client.emit("error", {text: `the User ${target.nickname} is offline. unable to send message`});
         return ;
       }
+
       // TODO Check if user is blocked.
 
+      //creating room
       const roomToCreate: CreateChatDto = new CreateChatDto();
       roomToCreate.name = "Private Messages " + user.nickname + "\\" + target.nickname;
       roomToCreate.password = null;
       roomToCreate.private = true;
 
       room = await Chat.create(roomToCreate).save();
-      // room = await this.manager.query("INSERT INTO \"chat\" (\"name\", \"password\", \"private\") VALUES ($1, $2);", ["Private Messages " + user.nickname + "\\" + target.nickname, null, true]);
+
+      //adding users to chatRoom in DB
 
       const privateChatUser: CreateChatUserDto = new CreateChatUserDto();
 
@@ -145,7 +165,9 @@ export class ChatService {
       privateChatUser.user = target;
       ChatUsers.create(privateChatUser).save();
 
-      // TODO PUT THIS BACK server.sockets.sockets[target.socketId].join(String(room.id));
+      //adding users to chatRoom in socket
+
+      server.sockets.sockets[target.socketId].join(String(room.id));
       client.join(String(room.id));
 
       server.to(String(room.id)).emit("open", {id: room.id, name: room.name});
@@ -168,27 +190,37 @@ export class ChatService {
     try {
       const room: Chat = await Chat.findOne({id: roomId});
 
+
       if (room == undefined) { // the room does not exist. wout ?
         this.logger.error(`joinRoom: User#${user.id} tried to join room#${roomId} but it doesn't exist !`);
-        // TODO emit error
+        client.emit("error", {text: "You cann not join this room !"});
         return ;
       }
-      else if (room.private === true) {
+
+      if (room.private === true) {
         this.logger.error(`joinRoom: User#${user.id} tried to join room#${roomId} but it is a private room !`);
-        // TODO emit error
+        client.emit("error", {text: "You cann not join this room for it is private !"});
         return ;
       }
-      // TODO check if used in banned from room
-      else {
-        if (room.password != undefined && await compare(password, room.password) == false ) {
-          // TODO emit error password mismatch
-          return ;
-        }
-        await this.manager.query("INSERT INTO \"chat_user\" (\"userId\", \"chatId\") VALUES ($1, $2) ;", [user.id, roomId]);
-        client.join(String(room.id));
-        server.to(String(room.id)).emit(`User ${user.nickname} has joined the chat`);
-        return {id: room.id, name: room.name}
+      const isUserInChannelOrBanned: ChatUsers = (await this.manager.query("SELECT * FROM \"chat_users\" WHERE \"chatId\" = $1 AND \"userId\" = $2;", [roomId, user.id]))[0];
+
+      if (isUserInChannelOrBanned !== undefined)
+      {
+        this.logger.warn(`joinRoom: User#${user.id} tried to join room#${roomId} but can't. he is either banned or already in it`);
+        client.emit("error", {text: "You cann not join this room becaus eeither you're already in it or banned !"});
+        return ;
       }
+
+      //join room !
+      if (room.password != undefined && await compare(password, room.password) == false ) {
+        client.emit("error", {text: "You cann not join this room: Wrong Password !"});
+        return ;
+      }
+      await this.manager.query("INSERT INTO \"chat_user\" (\"userId\", \"chatId\") VALUES ($1, $2) ;", [user.id, roomId]);
+      client.join(String(room.id));
+      server.to(String(room.id)).emit(`User ${user.nickname} has joined the chat`);
+      return {id: room.id, name: room.name};
+
     } catch (error) {
 			this.logger.error("joinRoom: An error has occured. Please check the database (or something). See error for more informations.");
 			this.logger.error(error);
@@ -205,8 +237,13 @@ export class ChatService {
   ) {
     try {
 
-      // TODO check the user has the right to send the message (on channel, not muted).
-
+      const userInChannel: ChatUsers = (await this.manager.query("SELECT * FROM \"chat_users\" WHERE \"chatId\" = $1 AND \"userId\" = $2;", [roomId, user.id]))[0];
+      if (userInChannel === undefined ||
+        userInChannel.userRole == UserRole.MUTED ||
+        userInChannel.userRole == UserRole.BANNED) {
+          client.emit("error", {text: `You cannot send message to this channel`});
+          return ;
+        }
       server.to(String(roomId)).emit("message", {login: user.login, destination: roomId, text: message});
 
     }
@@ -224,17 +261,24 @@ export class ChatService {
     roomId: number
   ) {
     try {
-      const room: Chat[] = await this.manager.query("SELECT * FROM \"chat\" WHERE \"id\" = $1;", [roomId]);
+      const room: Chat = await Chat.findOne({id: roomId});
 
       if (room[0] == undefined) { // the room does not exist. wout ?
         this.logger.error(`leaveRoom: User#${user.id} tried to leave room#${roomId} but it doesn't exists`);
         return ;
       }
       else {
-        // TODO send users un channel leave event
         await this.manager.query("DELETE FROM \"chat_users\" WHERE userId=$1 AND chatId=$2;", [user.id, roomId]);
-        server.to(String(roomId)).emit(`User ${user.nickname} has joined the chat`);
-        client.leave(String(room[0].id));
+        server.to(String(roomId)).emit("message", {login: "Server", destination:room.name, text:`User ${user.nickname} has joined the chat`});
+        client.emit("close", {destination: room.name, text: "You have left the room"});
+        client.leave(String(room.id));
+
+        const users_left = await this.manager.query("SELECT COUNT(\"chatId\") as \"left\" FROM \"chat_users\" WHERE \"chatId\" = $1 GROUP BY \"chatId\"", [])
+        if (users_left[0].left == 0)
+        {
+          this.logger.verbose(`no one left in channel ${room.name}. closing.`)
+          await this.manager.query("DELETE FROM \"chat\" WHERE \"id\" = $1;", [room.id]);
+        }
       }
     } catch (error) {
 			this.logger.error("joinRoom: An error has occured. Please check the database (or something). See error for more informations.");

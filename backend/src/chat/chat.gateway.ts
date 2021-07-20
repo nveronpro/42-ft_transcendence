@@ -35,9 +35,12 @@ export class ChatGateway {
     this.logger.log(`Client connected ${client.id}`);
   }
 
-  handleDisconnect(client: Socket, ...args: any[]) {
+  async handleDisconnect(client: Socket, ...args: any[]) {
+    const user: UserType = await UserType.findOne({socketId: client.id})
+    this.chatService.disconnectUser(this.server, user);
     this.logger.log(`Client disconnected ${client.id}`);
   }
+
 
 
   // TODO check all parameters are well defined
