@@ -30,7 +30,6 @@ initAxios();
 
 const app = createApp(App);
 app.use(router);
-console.log(process.env);
 app.mount('#app');
 
 

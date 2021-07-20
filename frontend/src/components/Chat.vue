@@ -56,13 +56,14 @@
 										</div>
 										<div class="my-3 p-3 bg-body rounded shadow-sm">
 											<h6 class="border-bottom pb-2 mb-0">Resulat de la recherche</h6>
-											<div class="d-flex text-muted pt-3" v-for="(friend, index) of filterFriends" :key="index" v-on:click="createPrivateChat(friend)">
-												<svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em"></text></svg>
+											<a class="d-flex text-muted pt-3" v-for="(friend, index) of filterFriends" :key="index" v-on:click="createPrivateChat(friend)">
+												<svg v-if='friend.current_status === "offline"' class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#ff0800"></rect><text x="50%" y="50%" fill="#ff0800" dy=".3em"></text></svg>
+												<svg v-else class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#00ff37"></rect><text x="50%" y="50%" fill="#00ff37" dy=".3em"></text></svg>
 												<p class="pb-3 mb-0 small lh-sm border-bottom">
 													<strong class="d-block text-gray-dark">{{friend.login}}</strong>
 													Envoyer un message à {{ friend.login }} alias {{ friend.nickname }}
 												</p>
-											</div>
+											</a>
 										</div>
 									</div>
 									<div class="tab-pane fade" id="Groups" role="tabpanel" aria-labelledby="Groups-tab">
@@ -75,12 +76,21 @@
 										</div>
 										<div class="my-3 p-3 bg-body rounded shadow-sm">
 											<h6 class="border-bottom pb-2 mb-0">Resulat de la recherche</h6>
-											<div class="d-flex text-muted pt-3" v-for="(group, index) of filterGroups" :key="index" v-on:click="joinGroup(group)">
-												<svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em"></text></svg>
-												<p class="pb-3 mb-0 small lh-sm border-bottom">
-													<strong class="d-block text-gray-dark">{{group.name}}</strong>
-													Groupe id:{{group.id}}
-												</p>
+											<div class="d-flex flex-column text-muted pt-3" v-for="(group, index) of filterGroups" :key="index">
+												<div class="d-flex">
+													<svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em"></text></svg>
+													<p class="pb-3 mb-0 small flex-grow-1 lh-sm border-bottom">
+														<strong class="d-block text-gray-dark">{{group.name}}</strong>
+														Groupe id:{{group.id}}
+													</p>
+													<button v-if='group.password !== null && group.password !== ""' :id='"button_" + group.id' type="button" class="btn btn-primary align-self-start" @click="joinGroup(group.id)">
+														Password
+													</button>
+													<button v-else type="button" :id='"button_" + group.id' class="btn btn-primary align-self-start" @click="joinGroup(group.id)">
+														Join
+													</button>
+												</div>
+												<input :id='"input_" + group.id' style="display:none;" class="form-control mr-sm-2 w-100" type="search" v-model="password" placeholder="Password">
 											</div>
 										</div>
 									</div>
@@ -150,9 +160,8 @@
 			axios
 			.get('/friends/')
 			.then(response => (this.friends = response.data))
-
 		},
-		beforeUpdate() {
+		updated() {
 			axios
 			.get('/chat/')
 			.then(response => {
@@ -179,12 +188,26 @@
 		},
 		methods: {
 			joinGroup(group) {
+				let input = document.getElementById("input_" + group);
+				let button = document.getElementById("button_" + group);
+
 				const data = {
-					userId: this.User.id,
-					chatId:	group.id,
+					login: this.user.id,
+					destination: group.id,
 					password: this.password
 				}
-				this.socket.emit('join', data);
+				if (button.innerHTML != "Join")
+				{
+					input.style.display = "block";
+					button.innerHTML = "Join"
+				}
+				else {
+					this.socket.emit('join', data);
+					this.password = '';
+					if (input.style.display == "block")
+						button.innerHTML = "Password"
+					input.style.display = "none";
+				}
 			},
 			createPrivateChat(User)
 			{
@@ -197,7 +220,7 @@
 			createGroupChat() {
 				const data = {
 					login: this.user.login,
-					roomName: this.name,
+					destination: this.name,
 					password: this.password
 				}
 				this.socket.emit('createGroupChat', data);
@@ -221,8 +244,8 @@
 			},
 			leaveChat(chat) {
 				const data = {
-					userId: this.user.login,
-					chatId: chat.id,
+					login: this.user.login,
+					destination: chat.id,
 				}
 				this.socket.emit('leave', data);
 			},
