@@ -45,7 +45,7 @@ export class ChatGateway {
 
   @SubscribeMessage('createGroupChat')
   async createPublicRoom( client: Socket, ...args: any[] ) {
-    let roomName = args[0].roomName;
+    let roomName = args[0].destination;
     let login = args[0].login;
     let password = args[0].password;
 
@@ -82,7 +82,7 @@ export class ChatGateway {
   @SubscribeMessage('joinChat')
   async joinRoom( client: Socket, ...args: any[] ) {
     let login = args[0].login;
-    let roomId = args[0].roomId;
+    let roomId = args[0].destination;
     let password = args[0].password;
     const user: UserType = await this.chatService.getUserLogin(login);
 
