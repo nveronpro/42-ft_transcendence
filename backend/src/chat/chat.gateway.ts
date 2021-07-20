@@ -45,7 +45,7 @@ export class ChatGateway {
 
   @SubscribeMessage('createGroupChat')
   async createPublicRoom( client: Socket, ...args: any[] ) {
-    let roomName = args[0].roomName;
+    let roomName = args[0].destination;
     let login = args[0].login;
     let password = args[0].password;
 
@@ -55,7 +55,13 @@ export class ChatGateway {
     if (user === undefined)
     {
       this.logger.error(`createPublicRoom: The user ${login} can not be found`)
-      //TODO emit an error has occured 
+      client.emit("error", "an error has occured");
+      return ;
+    }
+    else if (roomName === undefined)
+    {
+      this.logger.error(`createPublicRoom: a parameter is missing`)
+      client.emit("error", "an error has occured");
       return ;
     }
     this.chatService.createPublicRoom(this.server, client, user, roomName, password);
@@ -72,7 +78,13 @@ export class ChatGateway {
     if (user === undefined)
     {
       this.logger.error(`createPrivateRoom: The user ${login} can not be found`)
-      //TODO emit an error has occured 
+      client.emit("error", "an error has occured");
+      return ;
+    }
+    else if (userId === undefined)
+    {
+      this.logger.error(`createPrivateRoom: a parameter is missing`)
+      client.emit("error", "an error has occured");
       return ;
     }
 
@@ -82,7 +94,7 @@ export class ChatGateway {
   @SubscribeMessage('joinChat')
   async joinRoom( client: Socket, ...args: any[] ) {
     let login = args[0].login;
-    let roomId = args[0].roomId;
+    let roomId = args[0].destination;
     let password = args[0].password;
     const user: UserType = await this.chatService.getUserLogin(login);
 
@@ -91,7 +103,13 @@ export class ChatGateway {
     if (user === undefined)
     {
       this.logger.error(`joinRoom: The user ${login} can not be found`)
-      //TODO emit an error has occured 
+      client.emit("error", "an error has occured");
+      return ;
+    }
+    else if (roomId === undefined)
+    {
+      this.logger.error(`joinRoom: a parameter is missing`)
+      client.emit("error", "an error has occured");
       return ;
     }
 
@@ -110,7 +128,19 @@ export class ChatGateway {
     if (user === undefined)
     {
       this.logger.error(`msgToServer: The user ${login} can not be found`)
-      //TODO emit an error has occured 
+      client.emit("error", "an error has occured");
+      return ;
+    }
+    else if (roomId === undefined)
+    {
+      this.logger.error(`msgToServer: a parameter is missing`)
+      client.emit("error", "an error has occured");
+      return ;
+    }
+    else if (message === undefined)
+    {
+      this.logger.error(`msgToServer: a parameter is missing`)
+      client.emit("error", "an error has occured");
       return ;
     }
 
@@ -127,11 +157,16 @@ export class ChatGateway {
 
     if (user === undefined)
     {
-      this.logger.error(`leave: The user ${login} can not be found`)
-      //TODO emit an error has occured 
+      this.logger.error(`leaveChannel: The user ${login} can not be found`)
+      client.emit("error", "an error has occured");
       return ;
     }
-
+    else if (roomId === undefined)
+    {
+      this.logger.error(`leaveChannel: a parameter is missing`)
+      client.emit("error", "an error has occured");
+      return ;
+    }
     this.chatService.leaveRoom(this.server, client, user, roomId);
   }
 
