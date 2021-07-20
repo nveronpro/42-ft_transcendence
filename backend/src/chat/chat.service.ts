@@ -28,9 +28,27 @@ export class ChatService {
     return (res);
   }
 
+  async block(user: UserType, id: number) {
+    try {
+      this.manager.query("INSERT INTO \"block\" ($1, $2);", [user.id, id]);
+    }
+    catch (error) {
+			this.logger.error("block: An error has occured. Please check the database (or something). See error for more informations.");
+			this.logger.error(error);
+      return ("an error occured");
+		}
+  }
 
-
-
+  async unblock(user: UserType, id: number) {
+    try {
+      this.manager.query("DELETE FROM \"block\" WHERE blocker = $1 AND blocked = $2);", [user.id, id]);
+    }
+    catch (error) {
+			this.logger.error("unblock: An error has occured. Please check the database (or something). See error for more informations.");
+			this.logger.error(error);
+      return ("an error occured");
+		}
+  }
 
 
   // +---------------------------------------------------------+
