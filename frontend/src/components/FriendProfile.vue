@@ -88,28 +88,28 @@
 		},
 		mounted () {
 			axios
-			.get('/api/users/' + this.$route.params.id)
+			.get('/users/' + this.$route.params.id)
 			.then(response => (this.user = response.data))
 
 			axios
-			.get('/api/friends/already/' + this.$route.params.id)
+			.get('/friends/already/' + this.$route.params.id)
 			.then(response => (this.already_friend = response.data))
 
 			axios
-			.get('/api/match-histories/friend/' + this.$route.params.id)
+			.get('/match-histories/friend/' + this.$route.params.id)
 			.then(response => (this.match_histories = response.data))
 		},
 		methods: {
 			send: function (id) {
 				let _id = id;
 				axios
-				.post('/api/friends/send/'+ _id)
+				.post('/friends/send/'+ _id)
 				.then(this.already_friend = true)
 			},
 			remove: function (id) {
 				let _id = id;
 				axios
-				.delete('/api/friends/'+ _id)
+				.delete('/friends/'+ _id)
 				.then(this.already_friend = false)
 			},
 		},

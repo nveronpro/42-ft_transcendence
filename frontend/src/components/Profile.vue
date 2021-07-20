@@ -69,19 +69,19 @@
         },
         mounted () {
             axios
-            .get('/api/auth/me')
+            .get('/auth/me')
 			.then(response => (this.user = response.data))
 			
 			axios
-            .get('/api/users/all')
+            .get('/users/all')
             .then(response => (this.users = response.data))
 
 			axios
-			.get('/api/friends/received')
+			.get('/friends/received')
 			.then(response => (this.friend_requests = response.data))
 
 			axios
-			.get('/api/users/avatar')
+			.get('/users/avatar')
 			.then((response) => {
 				let image = document.querySelector("#avatar img");
 
@@ -108,18 +108,18 @@
 						return ;
 					}
 				}
-				axios.post('/api/profile/nickname/' + this.nick);
+				axios.post('/profile/nickname/' + this.nick);
 				document.getElementById("nickname").innerHTML = this.nick;
 			},
 			switch_2fa: function () {
 				if (this.user.two_factor_auth == false)
 				{
-					axios.post('/api/profile/2fa/true');
+					axios.post('/profile/2fa/true');
 					this.user.two_factor_auth = true;
 				}
 				else
 				{
-					axios.post('/api/profile/2fa/false');
+					axios.post('/profile/2fa/false');
 					this.user.two_factor_auth = false;
 				}
 			},
@@ -127,20 +127,20 @@
 
 				let _id = id;
 				axios
-				.post('/api/friends/accept/'+ _id)
+				.post('/friends/accept/'+ _id)
 				.then(document.getElementById(_id).remove())
 			},
 			refuse: function (id) {
 				let _id = id;
 				axios
-				.post('/api/friends/refuse/'+ _id)
+				.post('/friends/refuse/'+ _id)
 				.then(document.getElementById(_id).remove())
 			},
 			submitFile(){
                 let formData = new FormData();
             
 				formData.append('file', this.file);
-                axios.patch( '/api/profile/avatar', formData, {
+                axios.patch( '/profile/avatar', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
@@ -148,7 +148,7 @@
                 ).then(function(){
 					console.log('SUCCESS!!');
 					axios
-					.get('/api/users/avatar')
+					.get('/users/avatar')
 					.then((response) => {
 						let image = document.querySelector("#avatar img");
 

@@ -96,15 +96,15 @@
 		},
 		mounted () {
 			axios
-			.get('/api/auth/me')
+			.get('/auth/me')
 			.then(response => (this.user = response.data))
 
 			axios
-			.get('/api/match-histories/')
+			.get('/match-histories/')
 			.then(response => (this.match_histories = response.data))
 
 			axios
-			.get('/api/users/avatar')
+			.get('/users/avatar')
 			.then((response) => {
 				let image = document.querySelector("#avatar img");
 

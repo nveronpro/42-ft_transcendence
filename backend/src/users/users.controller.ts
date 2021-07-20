@@ -97,6 +97,16 @@ export class UsersController {
 		return this.usersService.update(user, updateUserDto);
 	}
 
+	@Patch("/same/")
+	@UseGuards(JwtAuthGuard)
+	updateSame(@Body() userToUpdt) {
+		this.logger.log("@PATCH()");
+		console.log(userToUpdt.nickname);
+		console.log(userToUpdt.wins);
+		console.log(userToUpdt.looses);
+		return this.usersService.update(userToUpdt, userToUpdt);
+	}
+
 	@Delete()
 	@UseGuards(JwtAuthGuard)
 	remove(@User() user) {

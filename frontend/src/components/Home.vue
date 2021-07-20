@@ -23,6 +23,7 @@
         <h1>Score : {{this.coords.score1}} - {{this.coords.score2}} </h1>
         <button v-if="this.role != 0 && !this.coords.end" v-on:click="move()">Play</button>
         <button v-if="this.role != 0 && this.coords.end" v-on:click="replay()">Replay</button>
+        <button v-on:click="test()">Test</button>
       </div>
     </div>
   </div>
@@ -44,7 +45,6 @@ export default {
   data() {
     return {
       user: null,
-      users: null,
       provider: {
         context: null,
         canvas: null,
@@ -97,15 +97,8 @@ export default {
     this.provider.canvas.height = "500";
 
     axios
-    .get('/api/auth/me')
+    .get('/auth/me')
     .then(response => (this.user = response.data))
-    
-    axios
-    .get('/api/users/all')
-    .then(response => (this.users = response.data))
-
-    console.log(this.user);
-    console.log(this.users);
 
     window.addEventListener('keydown', (e) =>{
     if(e.keyCode === 38 && this.coords.bar1Y > 0 && this.role == 1){
@@ -130,16 +123,6 @@ export default {
 			this.role = data.role;
 			this.totalRooms = data.totalRooms;
       this.coords.room = data.room;
-      if (this.role != 0)
-        this.coords.full = data.full;
-      if (data.role == 1)
-        this.coords.player1 = this.user;
-      if (data.role == 2)
-        this.coords.player2 = this.user;
-	});
-
-    socket.on("is-full", full => {
-      this.coords.full = full;
 	});
 
     socket.on("new-coords", coords => {
@@ -162,10 +145,21 @@ export default {
 	});
 
     socket.on("end-game", matchHist => {
-      console.log('game ended');
-      console.log(matchHist);
+      console.log('end of the game');
+      matchHist.looser.looses++;
+      matchHist.winner.wins++;
       axios
-      .post('/match-histories/'+ matchHist)
+      .post('/match-histories/', {
+        winner: matchHist.winner,
+        looser: matchHist.looser,
+        score: matchHist.score
+      })
+      .then()
+      axios
+      .patch('/users/same/', matchHist.winner)
+      .then()
+      axios
+      .patch('/users/same/', matchHist.looser)
       .then()
 	});
 
@@ -200,14 +194,17 @@ export default {
       socket.emit('spect', roomNo);
     },
     play: function() {
-      socket.emit('play', this.coords);
+      socket.emit('play', {
+        coords: this.coords,
+        user: this.user});
     },
     test: function() {
-      socket.emit('test', 'test first');
+      //socket.emit('test', 'test first');
+      console.log(this.user);
     },
     move: function() {
       console.log('move');
-      if (this.coords.moving == false && this.role != 0 && this.coords.full && !this.coords.end) {
+      if (this.coords.moving == false && this.role > 0 && this.coords.full && !this.coords.end) {
         this.coords.moving = true;
         this.moveBall();
       } else {
@@ -215,13 +212,14 @@ export default {
       }
     },
     replay: function() {
-      socket.emit('replay', this.coords);
+      socket.emit('replay', this.coords.room);
     },
     moveBall: function() {
+      if (this.role < 1)
+        return;
       if (!this.coords.moving)
         return;
-      if (this.role != 0)
-        socket.emit('move', this.coords);
+      socket.emit('move', this.coords.room);
       this.raf = window.requestAnimationFrame(this.moveBall);
     },
   },

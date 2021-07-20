@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Logger, UnsupportedMediaTypeException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Logger, Res, UnsupportedMediaTypeException } from '@nestjs/common';
 import { MatchHistoriesService } from './match-histories.service';
 import { CreateMatchHistoryDto } from './dto/create-match-history.dto';
 import { UpdateMatchHistoryDto } from './dto/update-match-history.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from '../auth/decorators/user.decorator';
 import { User as UserType} from '../../src/users/entities/user.entity';
+import { UsersService } from '../users/users.service';
 
 @Controller('match-histories')
 export class MatchHistoriesController {
@@ -40,7 +41,7 @@ export class MatchHistoriesController {
 
 	@Post()
 	@UseGuards(JwtAuthGuard)
-	create(@User() user: UserType, @Body() createMatchHistoryDto: CreateMatchHistoryDto) {
+	create(@Res() res, @User() user: UserType, @Body() createMatchHistoryDto: CreateMatchHistoryDto) {
 		this.logger.log("@POST()");
 		this.matchHistoriesService.create(createMatchHistoryDto);
 		return ;

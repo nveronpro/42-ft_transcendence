@@ -8,6 +8,8 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Coords } from './interfaces/coords.interface';
 import { CreateMatchHistoryDto } from './../match-histories/dto/create-match-history.dto';
+import { CoordsAndUser } from './interfaces/coords-and-user.interface';
+import { UsersController } from '../users/users.controller';
 
 function getRandomInt(min: number, max: number) {
   min = Math.ceil(min);
@@ -74,8 +76,10 @@ export class PongGateway {
 }
 
   @SubscribeMessage('play')
-  play(@MessageBody() coords: Coords, @ConnectedSocket() client: Socket): void  {
+  play(@MessageBody() data: CoordsAndUser, @ConnectedSocket() client: Socket): void  {
     console.log('play');
+    var coords = data.coords;
+    var user = data.user;
     if (this.players == undefined) {
       this.players = 0;
       this.coordsArray = [];
@@ -83,16 +87,21 @@ export class PongGateway {
     this.players++;
     this.rooms = Math.round(this.players / 2);
     client.emit("role", {
-      full: (this.players % 2 == 0 ? true : false),
       totalRooms: this.rooms,
       role: (this.players % 2 == 0 ? 2 : 1),
       room: this.rooms.toString()});
     client.join(this.rooms.toString());
     coords.room = this.rooms.toString();
+    if (this.players % 2 == 0) {
+      coords.player2 = user;
+      coords.player1 = this.coordsArray[this.rooms].player1;
+    }
+    else
+      coords.player1 = user;
+    coords.full = (this.players % 2 == 0 ? true : false);
+    this.server.to(this.rooms.toString()).emit('new-coords', coords);
     this.coordsArray[this.rooms] = coords;
     this.server.emit('rooms', this.rooms);
-    if (this.players % 2 == 0)
-      this.server.to(this.rooms.toString()).emit('is-full', true);
     console.log('Players : ' + this.players);
     console.log('Rooms : ' + this.rooms);
     console.log('Role : ' + (this.players % 2 == 0 ? 2 : 1));
@@ -100,30 +109,37 @@ export class PongGateway {
 
   @SubscribeMessage('bar1-top')
   bar1Top(@MessageBody() coords: Coords): void  {
-    coords.bar1Y -= 20;
-    this.server.to(coords.room).emit("new-coords", coords);
+    console.log('bar1-top')
+    this.coordsArray[parseInt(coords.room, 10)].bar1Y -= 20;
+    this.server.to(coords.room).emit('new-coords', this.coordsArray[parseInt(coords.room, 10)]);
   }
 
   @SubscribeMessage('bar1-bottom')
   bar1Bottom(@MessageBody() coords: Coords): void  {
-    coords.bar1Y += 20;
-    this.server.to(coords.room).emit("new-coords", coords);
+    console.log('bar1-bottom')
+    this.coordsArray[parseInt(coords.room, 10)].bar1Y += 20;
+    this.server.to(coords.room).emit('new-coords', this.coordsArray[parseInt(coords.room, 10)]);
   }
 
   @SubscribeMessage('bar2-top')
   bar2Top(@MessageBody() coords: Coords): void  {
-    coords.bar2Y -= 20;
-    this.server.to(coords.room).emit("new-coords", coords);
+    console.log('bar2-top')
+    this.coordsArray[parseInt(coords.room, 10)].bar2Y -= 20;
+    this.server.to(coords.room).emit('new-coords', this.coordsArray[parseInt(coords.room, 10)]);
   }
 
   @SubscribeMessage('bar2-bottom')
   bar2Bottom(@MessageBody() coords: Coords): void  {
-    coords.bar2Y += 20;
-    this.server.to(coords.room).emit("new-coords", coords);
+    console.log('bar2-bottom')
+    this.coordsArray[parseInt(coords.room, 10)].bar2Y += 20;
+    this.server.to(coords.room).emit('new-coords', this.coordsArray[parseInt(coords.room, 10)]);
   }
 
   @SubscribeMessage('move')
-  move(@MessageBody() coords: Coords, @ConnectedSocket() client: Socket): void  {
+  move(@MessageBody() room: string, @ConnectedSocket() client: Socket): void  {
+    var coords = this.coordsArray[parseInt(room, 10)];
+    if (coords && coords.end == true)
+      return ;
     this.moving = true;
     coords.moving = true;
     coords.posX += coords.vxBall;
@@ -139,17 +155,17 @@ export class PongGateway {
       this.moving = false;
       coords = initGame(coords, 2);
       console.log('score ' + coords.score1 + ' : ' + coords.score2);
-      if (coords.score2 > 3) {
+      if (coords.score2 > 0) {
         var matchHist = {
-          score: coords.score1.toString() + ' - ' + coords.score2.toString(),
+          score: coords.score1.toString() + '-' + coords.score2.toString(),
           winner: coords.player1,
           looser: coords.player2,
         };
         client.emit('end-game', matchHist);
         coords.end = true;
       }
-      this.coordsArray[parseInt(coords.room, 10)] = coords;
-      this.server.to(coords.room).emit('new-coords', coords);
+      this.server.to(room).emit('new-coords', coords);
+      this.coordsArray[parseInt(room, 10)] = coords;
       return;
     }
     if (
@@ -163,17 +179,18 @@ export class PongGateway {
       this.moving = false;
       coords = initGame(coords, 1);
       console.log('score ' + coords.score1 + ' : ' + coords.score2);
-      if (coords.score1 > 3) {
+      if (coords.score1 > 0) {
+        console.log('end of the game')
         var matchHist = {
-          score: coords.score1.toString() + ' - ' + coords.score2.toString(),
+          score: coords.score1.toString() + '-' + coords.score2.toString(),
           winner: coords.player1,
           looser: coords.player2,
         };
         client.emit('end-game', matchHist);
         coords.end = true;
       }
-      this.coordsArray[parseInt(coords.room, 10)] = coords;
-      this.server.to(coords.room).emit('new-coords', coords);
+      this.server.to(room).emit('new-coords', coords);
+      this.coordsArray[parseInt(room, 10)] = coords;
       return;
     }
     if (coords.moving) {
@@ -187,15 +204,16 @@ export class PongGateway {
         coords.vxBall = -coords.vxBall;
       }
     }
-    this.server.to(coords.room).emit('new-coords', coords);
+    this.coordsArray[parseInt(room, 10)] = coords;
+    this.server.to(room).emit('new-coords', coords);
   }
 
   @SubscribeMessage('replay')
-  replay(@MessageBody() coords: Coords): void  {
-    coords.end = false;
-    coords.score1 = 0;
-    coords.score2 = 0;
-    this.server.to(coords.room).emit("new-coords", coords);
+  replay(@MessageBody() room: string): void  {
+    this.coordsArray[parseInt(room, 10)].end = false;
+    this.coordsArray[parseInt(room, 10)].score1 = 0;
+    this.coordsArray[parseInt(room, 10)].score2 = 0;
+    this.server.to(room).emit("new-coords", this.coordsArray[parseInt(room, 10)]);
   }
 
   @SubscribeMessage('test')
