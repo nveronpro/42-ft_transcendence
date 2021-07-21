@@ -16,6 +16,13 @@ export class ChatController {
 		return this.chatService.getAllPublicChats();
 	}
 
+	@Get("block/")
+	@UseGuards(JwtAuthGuard)
+	blockedUsers(@User_req() user: User) {
+		return (this.chatService.blockedUsers(user));
+
+	}
+
 	@Post("block/:id")
 	@UseGuards(JwtAuthGuard)
 	blockUser(@User_req() user: User, @Param("id") id: number) {

@@ -152,15 +152,6 @@
 				chats: [],
 			}
 		},
-		mounted() {
-			axios
-			.get('/auth/me')
-			.then(response => ( this.user = response.data ))
-
-			axios
-			.get('/friends/')
-			.then(response => (this.friends = response.data))
-		},
 		updated() {
 			axios
 			.get('/chat/')
@@ -192,8 +183,8 @@
 				let button = document.getElementById("button_" + group);
 
 				const data = {
-					login: this.user.id,
-					destination: group.id,
+					login: this.user.login,
+					destination: group,
 					password: this.password
 				}
 				if (button.innerHTML != "Join")
@@ -202,7 +193,7 @@
 					button.innerHTML = "Join"
 				}
 				else {
-					this.socket.emit('join', data);
+					this.socket.emit('joinChat', data);
 					this.password = '';
 					if (input.style.display == "block")
 						button.innerHTML = "Password"
@@ -253,15 +244,28 @@
 				this.chats.push(chat);
 			},
 		},
-		created () {
+		async created () {
+			const res = await axios.get('/auth/me')
+			this.user = res.data;
+
+			axios
+			.get('/friends/')
+			.then(response => (this.friends = response.data))
+
 			this.socket = io('http://localhost:8080', { withCredentials: true });
-			
+
+			console.log("HELLO");
+
 			this.socket.on('message', (message) => {
 				this.receivedMessage(message)
 			})
 			this.socket.on('open', (chat) => {
 				this.openChat(chat);
 			})
+
+			const tmp_data = {login: this.user.login};
+
+			this.socket.emit('whoami', tmp_data);
 		}
 	}
  </script>

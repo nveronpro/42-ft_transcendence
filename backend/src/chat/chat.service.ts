@@ -10,6 +10,8 @@ import { UserRole } from './entities/userStatus.enum';
 import { User } from 'src/auth/decorators/user.decorator';
 import { ChatUsers } from './entities/chatUsers.entity';
 import { CreateChatUserDto } from './dto/create-chatUsers.dto';
+import { inspect } from 'util';
+import { Block } from '../friends/entities/block.entity';
 
 
 
@@ -50,6 +52,10 @@ export class ChatService {
 		}
   }
 
+  async blockedUsers(user: UserType) {
+    //const res = Block.find({})
+    //const res = await this.manager.query()
+  }
 
   // +---------------------------------------------------------+
   // |                       GATEWAY                           |
@@ -67,13 +73,14 @@ export class ChatService {
   }
 
   async connectUser(user: UserType, sock: Socket) {
+    this.logger.debug("socketId: " + sock.id);
     const updateWinner = await this.manager.query("UPDATE \"user\" SET \"socketId\" = $1 WHERE \"id\" = $2;", [sock.id, user.id]);
     return ;
   }
 
   async disconnectUser(server: Server, user: UserType) {
     //Sending to all channels the left message
-    const userChats: ChatUsers[] = await this.manager.query("SELECT * FROM \"chatUsers\" WHERE \"userId\" = $1 AND \"userRole <> $2", [user.id, UserRole.BANNED]);
+    const userChats: ChatUsers[] = await this.manager.query("SELECT * FROM \"chatUsers\" WHERE \"userId\" = $1 AND \"userRole\" <> $2", [user.id, UserRole.BANNED]);
     
     for (let chat in userChats) {
       server.to(String(userChats[chat].chat)).emit(`User ${user.nickname} has left the chat`);
@@ -153,12 +160,12 @@ export class ChatService {
       let room: Chat;
 
       const target: UserType = await UserType.findOne({login: targetLogin});
-      if (target.current_status == "offline")
-      {
-        this.logger.debug("User is offline");
-        client.emit("error", {text: `the User ${target.nickname} is offline. unable to send message`});
-        return ;
-      }
+      // if (target.current_status == "offline")
+      // {
+      //   this.logger.debug("User is offline");
+      //   client.emit("error", {text: `the User ${target.nickname} is offline. unable to send message`});
+      //   return ;
+      // }
 
       // TODO Check if user is blocked.
 
@@ -185,8 +192,14 @@ export class ChatService {
 
       //adding users to chatRoom in socket
 
-      server.sockets.sockets[target.socketId].join(String(room.id));
+      this.logger.debug("BEFORE FIRST JOIN");
       client.join(String(room.id));
+      this.logger.debug("AFTER FIRST, BEFORE SECOND");
+      //this.logger.debug(inspect(server.sockets.sockets.get(client.id), null, 2));
+      this.logger.debug("socketId: " + target.socketId);
+      this.logger.debug("target socket: " + server.sockets.sockets.get(target.socketId));
+      server.sockets.sockets.get(target.socketId).join(String(room.id));
+      this.logger.debug("AFTER SECOND");
 
       server.to(String(room.id)).emit("open", {id: room.id, name: room.name});
       server.to(String(room.id)).emit("message", {login: "Server", destination: room.id, text: `User ${user.nickname} wishes to chat with ${target.nickname}.`});
@@ -210,13 +223,13 @@ export class ChatService {
 
 
       if (room == undefined) { // the room does not exist. wout ?
-        this.logger.error(`joinRoom: User#${user.id} tried to join room#${roomId} but it doesn't exist !`);
+        this.logger.error(`joinRoom: User#${user.login} tried to join room#${roomId} but it doesn't exist !`);
         client.emit("error", {text: "You cann not join this room !"});
         return ;
       }
 
       if (room.private === true) {
-        this.logger.error(`joinRoom: User#${user.id} tried to join room#${roomId} but it is a private room !`);
+        this.logger.error(`joinRoom: User#${user.login} tried to join room#${roomId} but it is a private room !`);
         client.emit("error", {text: "You cann not join this room for it is private !"});
         return ;
       }
@@ -234,8 +247,9 @@ export class ChatService {
         client.emit("error", {text: "You cann not join this room: Wrong Password !"});
         return ;
       }
-      await this.manager.query("INSERT INTO \"chat_user\" (\"userId\", \"chatId\") VALUES ($1, $2) ;", [user.id, roomId]);
+      await this.manager.query("INSERT INTO \"chat_users\" (\"userId\", \"chatId\") VALUES ($1, $2) ;", [user.id, roomId]);
       client.join(String(room.id));
+      client.emit("open", {id: room.id, name: room.name});
       server.to(String(room.id)).emit(`User ${user.nickname} has joined the chat`);
       return {id: room.id, name: room.name};
 
@@ -281,17 +295,17 @@ export class ChatService {
     try {
       const room: Chat = await Chat.findOne({id: roomId});
 
-      if (room[0] == undefined) { // the room does not exist. wout ?
-        this.logger.error(`leaveRoom: User#${user.id} tried to leave room#${roomId} but it doesn't exists`);
+      if (room == undefined) { // the room does not exist. wout ?
+        this.logger.error(`leaveRoom: User#${user.login} tried to leave room#${roomId} but it doesn't exists`);
         return ;
       }
       else {
-        await this.manager.query("DELETE FROM \"chat_users\" WHERE userId=$1 AND chatId=$2;", [user.id, roomId]);
+        await this.manager.query("DELETE FROM \"chat_users\" WHERE \"userId\"=$1 AND \"chatId\"=$2;", [user.id, roomId]);
         server.to(String(roomId)).emit("message", {login: "Server", destination:room.name, text:`User ${user.nickname} has joined the chat`});
         client.emit("close", {destination: room.name, text: "You have left the room"});
         client.leave(String(room.id));
 
-        const users_left = await this.manager.query("SELECT COUNT(\"chatId\") as \"left\" FROM \"chat_users\" WHERE \"chatId\" = $1 GROUP BY \"chatId\"", [])
+        const users_left = await this.manager.query("SELECT COUNT(\"chatId\") as \"left\" FROM \"chat_users\" WHERE \"chatId\" = $1 GROUP BY \"chatId\"", [room.id])
         if (users_left[0].left == 0)
         {
           this.logger.verbose(`no one left in channel ${room.name}. closing.`)
@@ -305,15 +319,7 @@ export class ChatService {
 		}
   }
 
-  sendServerPrivateMessage(
-    server: Server,
-    client: Socket,
-    user: UserType
-  ) {
-
-  }
-
-  sendServerCommand(
+  async sendServerCommand(
     server: Server,
     client: Socket,
     user: UserType,

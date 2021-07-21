@@ -79,7 +79,7 @@ export class FriendsService {
 		try {
 			//has a friend request already been sent
 			let exists = await this.manager.query("select * from \"friend_request\" WHERE \"senderId\"=$1 AND \"receiverId\"=$2;", [user.id, receiverId]);
-			if (Object.keys(exists).length != 1)
+			if (exists[0] !== undefined)
 			{
 				this.logger.error("Someone tried to add a FriendRequest while it already exists ! Sender:#" + user.id + " receiver:#" + receiverId);
 				return "";
@@ -87,7 +87,7 @@ export class FriendsService {
 
 			//has a friend request already been sent by the other user
 			exists = await this.manager.query("select * from \"friend_request\" WHERE \"senderId\"=$1 AND \"receiverId\"=$2;", [receiverId, user.id]);
-			if (Object.keys(exists).length != 1)
+			if (exists[0] !== undefined)
 			{
 				this.logger.warn("Someone tried to add a FriendRequest while the other user already sent one ! Sender:#" + user.id + " receiver:#" + receiverId);
 				return "";
@@ -95,7 +95,7 @@ export class FriendsService {
 
 			//are users already friends
 			let already_friends = await this.manager.query("select * from \"user_friends_user\" WHERE \"userId_1\"=$1 AND \"userId_2\"=$2;", [user.id, receiverId]);
-			if (Object.keys(exists).length != 1)
+			if (already_friends[0] !== undefined)
 			{
 				this.logger.warn("User:#" + user.id + " and User:#" + receiverId + " are already friends. not sending the request");
 				return "";
