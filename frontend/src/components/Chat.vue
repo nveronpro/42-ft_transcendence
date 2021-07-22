@@ -229,8 +229,28 @@
 				document.getElementById("textarea" + dest).value = "";
 			},
 			receivedMessage(message) {
-				if (message.text != "") {
+				if (message.text != "" && message.text[0] != '/') {
 					this.messages.push(message);
+				}
+				if (message.text[0] === '/' && message.login == this.user.login) {
+					
+					let split = message.text.split(' ');
+					if (split[0] == "/help"){
+						this.messages.push({
+							login: "Server",
+							text: "/profile [user_login/user_nickname]",
+							destination: message.destination,
+						});
+					} else {
+						let data = {
+							command: split[0],
+							user_sender: this.user.login,
+							destination: message.destination,
+							argument0: split[1],
+							argument1: split[2],
+						};
+						this.socket.emit('command', data);
+					}
 				}
 			},
 			leaveChat(chat) {
@@ -243,6 +263,29 @@
 			openChat(chat) {
 				this.chats.push(chat);
 			},
+			closeChat(chat) {
+				var index = this.chats.findIndex(function(obj){
+					return obj.name === chat.destination;
+				})
+				if (index !== -1) {
+					this.chats.splice(index, 1);
+				}
+			},
+			mute(data) {
+				if ( data.actif == true) {
+					this.messages.push({
+						login: "Server",
+						text: "Vous avez été mute...",
+						destination: data.destination,
+					});
+				} else {
+					this.messages.push({
+						login: "Server",
+						text: "Vous avez été unmute...",
+						destination: data.destination,
+					});
+				}
+			}
 		},
 		async created () {
 			const res = await axios.get('/auth/me')
@@ -254,8 +297,6 @@
 
 			this.socket = io('http://localhost:8080', { withCredentials: true });
 
-			console.log("HELLO");
-
 			this.socket.on('message', (message) => {
 				this.receivedMessage(message)
 			})
@@ -263,9 +304,18 @@
 				this.openChat(chat);
 			})
 
+			this.socket.on('close', (chat) => {
+				this.closeChat(chat);
+			})
+
+			this.socket.on('mute', (data) => {
+				this.mute(data);
+			})
+
 			const tmp_data = {login: this.user.login};
 
 			this.socket.emit('whoami', tmp_data);
+
 		}
 	}
  </script>
