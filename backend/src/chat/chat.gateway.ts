@@ -37,6 +37,14 @@ export class ChatGateway {
 
   async handleDisconnect(client: Socket, ...args: any[]) {
     const user: UserType = await UserType.findOne({socketId: client.id})
+
+    if (user === undefined)
+    {
+      this.logger.error(`handleDisconnect: The disconnecting user can not be found`)
+      client.emit("error", "an error has occured");
+      return ;
+    }
+
     this.chatService.disconnectUser(this.server, user);
     this.logger.log(`Client disconnected ${client.id}`);
   }
@@ -221,7 +229,7 @@ export class ChatGateway {
 
     if (user === undefined)
     {
-      this.logger.error(`leaveChannel: The user ${login} can not be found`)
+      this.logger.error(`executeCommand: The user ${login} can not be found`)
       client.emit("error", "an error has occured");
       return ;
     }

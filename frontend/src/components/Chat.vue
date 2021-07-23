@@ -299,17 +299,21 @@
 			this.socket = io('http://localhost:8080', { withCredentials: true });
 
 			this.socket.on('message', (message) => {
+				console.log(`event: message`);
 				this.receivedMessage(message)
 			})
 			this.socket.on('open', (chat) => {
+				console.log(`event: open`);
 				this.openChat(chat);
 			})
 
 			this.socket.on('close', (chat) => {
+				console.log(`event: close`);
 				this.closeChat(chat);
 			})
 
 			this.socket.on('mute', (data) => {
+				console.log(`event: mute`);
 				this.mute(data);
 			})
 
