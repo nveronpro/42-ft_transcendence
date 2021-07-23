@@ -47,7 +47,8 @@ export class ChatGateway {
 
   @SubscribeMessage('whoami')
   async identification( client: Socket, ...args: any[] ) {
-    this.logger.debug("args");
+    //this.logger.debug("args");
+    this.logger.log("WebSocket/whoami");
 
     const user: UserType = await this.chatService.getUserLogin(args[0].login);
     if (user === undefined)
@@ -196,6 +197,8 @@ export class ChatGateway {
 
     const user: UserType = await this.chatService.getUserLogin(login);
 
+    
+
     this.logger.verbose("WebSocket/command");
 
     // ALL
@@ -223,6 +226,7 @@ export class ChatGateway {
       return ;
     }
 
+    this.chatService.sendServerCommand(this.server, client, user, args);
   }
 
 }
