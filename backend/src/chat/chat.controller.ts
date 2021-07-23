@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Logger, UnsupportedMediaTypeException } from '@nestjs/common';
-import { User_req } from '../auth/decorators/user.decorator';
-import { User } from '../users/entities/user.entity';
+import { User } from '../auth/decorators/user.decorator';
+import { User as UserType } from '../users/entities/user.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ChatService } from './chat.service';
 
@@ -11,28 +11,28 @@ export class ChatController {
 
 	@Get()
 	@UseGuards(JwtAuthGuard)
-	getAllPublicChats()
+	getAllPublicChats(@User() user: UserType)
 	{
-		return this.chatService.getAllPublicChats();
+		return this.chatService.getAllPublicChats(user);
 	}
 
 	@Get("block/")
 	@UseGuards(JwtAuthGuard)
-	blockedUsers(@User_req() user: User) {
+	blockedUsers(@User() user: UserType) {
 		return (this.chatService.blockedUsers(user));
 
 	}
 
 	@Post("block/:id")
 	@UseGuards(JwtAuthGuard)
-	blockUser(@User_req() user: User, @Param("id") id: number) {
+	blockUser(@User() user: UserType, @Param("id") id: number) {
 		this.chatService.block(user, id);
 
 	}
 
 	@Post("unblock/:id")
 	@UseGuards(JwtAuthGuard)
-	unblockUser(@User_req() user: User, @Param("id") id: number) {
+	unblockUser(@User() user: UserType, @Param("id") id: number) {
 		this.chatService.unblock(user, id);
 	}
 

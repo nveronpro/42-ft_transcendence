@@ -25,8 +25,9 @@ export class ChatService {
   // |                      CONTROLLER                         |
   // +---------------------------------------------------------+
 
-  async getAllPublicChats(){
-    const res = await this.manager.query("SELECT \"id\", \"name\" FROM \"chat\" WHERE \"private\"=false;");
+  async getAllPublicChats(user: UserType){
+    //this.logger.log("getAllPublicChat. user id:'" + user.id + "'");
+    const res = await this.manager.query('SELECT * from chat WHERE "id" NOT IN (SELECT "id" FROM chat JOIN chat_users ON chat.id = chat_users."chatId" WHERE "userId" = $1)', [user.id]);
 
     return (res);
   }
@@ -79,29 +80,14 @@ export class ChatService {
     return ;
   }
 
-  async disconnectUser(server: Server, user: UserType) {
+  async disconnectUser(server: Server, client: Socket, user: UserType) {
     //Sending to all channels the left message
-    const userChats: ChatUsers[] = await this.manager.query("SELECT * FROM \"chat_users\" WHERE \"userId\" = $1 AND \"userRole\" <> $2", [user.id, UserRole.BANNED]);
-    
-    for (let chat in userChats) {
-      server.to(String(userChats[chat].chat)).emit(`User ${user.nickname} has left the chat`);
+    const userChats = await this.manager.query("SELECT * FROM \"chat_users\" WHERE \"userId\" = $1 AND \"userRole\" <> $2", [user.id, UserRole.BANNED]);
+    let chat: any;
+
+    for (chat in userChats) {
+      this.leaveRoom(server, client, user, userChats[chat].chatId);
     }
-
-    const chatToRemove = await this.manager.query("SELECT \"chatId\" FROM (SELECT \"chatId\", COUNT(\"chatId\") AS number_of_users FROM \"chat_users\" WHERE \"chatId\" IN (SELECT \"chatId\" FROM \"chat_users\" WHERE \"userId\" = $1) GROUP BY \"chatId\") AS A WHERE A.number_of_users = 1;", [user.id]);
-
-
-    const arrayChatToRemove = chatToRemove.map(a => a.chatId);
-
-    for (const toRemoveChat in arrayChatToRemove) {
-      await this.manager.query("DELETE FROM \"chat\" WHERE \"id\" = $1;", [toRemoveChat]);
-    }
-    
-    
-    await this.manager.query("DELETE FROM \"chat_users\" WHERE \"userId\"=$1;", [user.id]);
-
-
-    const disconnectUser = await this.manager.query("UPDATE \"user\" SET \"socketId\" = $1 WHERE \"id\" = $2;", [null, user.id]);
-    
   }
 
   async createPublicRoom(
@@ -228,27 +214,29 @@ export class ChatService {
 
       if (room == undefined) { // the room does not exist. wout ?
         this.logger.error(`joinRoom: User#${user.login} tried to join room#${roomId} but it doesn't exist !`);
-        client.emit("error", {text: "You cann not join this room !"});
+        client.emit("error", {text: "You can not join this room !"});
         return ;
       }
 
       if (room.private === true) {
         this.logger.error(`joinRoom: User#${user.login} tried to join room#${roomId} but it is a private room !`);
-        client.emit("error", {text: "You cann not join this room for it is private !"});
+        client.emit("error", {text: "You can not join this room for it is private !"});
         return ;
       }
       const isUserInChannelOrBanned: ChatUsers = (await this.manager.query("SELECT * FROM \"chat_users\" WHERE \"chatId\" = $1 AND \"userId\" = $2;", [roomId, user.id]))[0];
 
+
+
       if (isUserInChannelOrBanned !== undefined)
       {
         this.logger.warn(`joinRoom: User#${user.id} tried to join room#${roomId} but can't. he is either banned or already in it`);
-        client.emit("error", {text: "You cann not join this room becaus eeither you're already in it or banned !"});
+        client.emit("error", {text: "You can not join this room becaus eeither you're already in it or banned !"});
         return ;
       }
 
       //join room !
       if (room.password != undefined && await compare(password, room.password) == false ) {
-        client.emit("error", {text: "You cann not join this room: Wrong Password !"});
+        client.emit("error", {text: "You can not join this room: Wrong Password !"});
         return ;
       }
       await this.manager.query("INSERT INTO \"chat_users\" (\"userId\", \"chatId\") VALUES ($1, $2) ;", [user.id, roomId]);
@@ -347,14 +335,15 @@ export class ChatService {
     args: any[])
   {
     try {
-      const allCommands: string[] = ["/profile", "/mute", "/kick", "/ban", "/password", "/promote", "/demote", "/close"];
+      const allCommands: string[] = ["/profile", "/mute", "/unmute", "/kick", "/ban", "/unban", "/password", "/promote", "/demote", "/close"];
       const command: String = args[0].command;
       const roomId: String = args[0].destination;
       
       let userPerms: ChatUsers = (await this.manager.query('SELECT * FROM "chat_users" WHERE "chatId" = $1 AND "userId" = $2;', [roomId, user.id]))[0];
 
       let target: UserType;
-      let targetRole: UserRole;
+      let targetChat: ChatUsers;
+      // let targetRole: UserRole;
 
       this.logger.debug("command: \"" + command + "\"");
 
@@ -381,12 +370,11 @@ export class ChatService {
             this.logger.log(`command: ${command}: target does not exists`);
             return ;
           }
-          targetRole = (await ChatUsers.findOne({chat: args[0].destination, user: target})).userRole;
-          if (targetRole === undefined || targetRole === UserRole.BANNED)
+          targetChat = await ChatUsers.findOne({chat: args[0].destination, user: target});
+          if (targetChat === undefined || targetChat.userRole === UserRole.BANNED)
           {
             client.emit("error", {destination: roomId, text: `command: ${command}: target is not on channel`});
             this.logger.log(`command: ${command}: target is not on channel`);
-            
             return ;
           }
         }
@@ -419,14 +407,14 @@ export class ChatService {
             this.logger.log(`command: ${command}: target does not exists`);
           return ;
         }
-        targetRole = (await ChatUsers.findOne({chat: args[0].destination, user: target})).userRole;
-        if (targetRole === undefined || targetRole === UserRole.BANNED)
+        targetChat = await ChatUsers.findOne({chat: args[0].destination, user: target});
+        if (targetChat === undefined|| targetChat.userRole === UserRole.BANNED)
         {
           client.emit("error", {destination: roomId, text: `command: ${command}: target is not on channel`});
-            this.logger.log(`command: ${command}: target is not on channel`);
+          this.logger.log(`command: ${command}: target is not on channel`);
           return ;
         }
-        if (userPerms.userRole != UserRole.OWNER && (targetRole == UserRole.ADMIN || targetRole == UserRole.OWNER))
+        if (userPerms.userRole != UserRole.OWNER && (targetChat.userRole == UserRole.ADMIN || targetChat.userRole == UserRole.OWNER))
         {
           client.emit("error", {destination: roomId, text: `command: ${command}: you do not have the permissions to use this command on this user`});
           this.logger.log(`command: ${command}: you do not have the permissions to use this command on this user`);
@@ -444,15 +432,15 @@ export class ChatService {
             this.logger.log(`command: ${command}: target does not exists`);
           return ;
         }
-        targetRole = (await ChatUsers.findOne({chat: args[0].destination, user: target})).userRole;
-        if (targetRole === undefined || targetRole === UserRole.BANNED)
+        targetChat = await ChatUsers.findOne({chat: args[0].destination, user: target});
+        if (targetChat === undefined|| targetChat.userRole === UserRole.BANNED)
         {
           client.emit("error", {destination: roomId, text: `command: ${command}: target is not on channel`});
-            this.logger.log(`command: ${command}: target is not on channel`);
+          this.logger.log(`command: ${command}: target is not on channel`);
           return ;
         }
 
-        if (targetRole !== UserRole.MUTED)
+        if (targetChat.userRole !== UserRole.MUTED)
         {
           client.emit("error", {destination: roomId, text: `command: ${command}: target is not muted`});
           this.logger.log(`command: ${command}: target is not muted`);
@@ -470,14 +458,14 @@ export class ChatService {
             this.logger.log(`command: ${command}: target does not exists`);
           return ;
         }
-        targetRole = (await ChatUsers.findOne({chat: args[0].destination, user: target})).userRole;
-        if (targetRole === undefined || targetRole === UserRole.BANNED)
+        targetChat = await ChatUsers.findOne({chat: args[0].destination, user: target});
+        if (targetChat === undefined|| targetChat.userRole === UserRole.BANNED)
         {
           client.emit("error", {destination: roomId, text: `command: ${command}: target is not on channel`});
-            this.logger.log(`command: ${command}: target is not on channel`);
+          this.logger.log(`command: ${command}: target is not on channel`);
           return ;
         }
-        if (userPerms.userRole != UserRole.OWNER && (targetRole == UserRole.ADMIN || targetRole == UserRole.OWNER))
+        if (userPerms.userRole != UserRole.OWNER && (targetChat.userRole == UserRole.ADMIN || targetChat.userRole == UserRole.OWNER))
         {
           client.emit("error", {destination: roomId, text: `command: ${command}: you do not have the permissions to use this command on this user`});
           this.logger.log(`command: ${command}: you do not have the permissions to use this command on this user`);
@@ -497,14 +485,16 @@ export class ChatService {
             this.logger.log(`command: ${command}: target does not exists`);
           return ;
         }
-        targetRole = (await ChatUsers.findOne({chat: args[0].destination, user: target})).userRole;
-        if (targetRole === undefined || targetRole === UserRole.BANNED)
+        
+        targetChat = await ChatUsers.findOne({chat: args[0].destination, user: target});
+        if (targetChat === undefined || targetChat.userRole === UserRole.BANNED)
         {
           client.emit("error", {destination: roomId, text: `command: ${command}: target is not on channel`});
-            this.logger.log(`command: ${command}: target is not on channel`);
+          this.logger.log(`command: ${command}: target is not on channel`);
           return ;
         }
-        if (userPerms.userRole != UserRole.OWNER && (targetRole == UserRole.ADMIN || targetRole == UserRole.OWNER))
+
+        if (userPerms.userRole != UserRole.OWNER && (targetChat.userRole == UserRole.ADMIN || targetChat.userRole == UserRole.OWNER))
         {
           client.emit("error", {destination: roomId, text: `command: ${command}: you do not have the permissions to use this command on this user`});
           this.logger.log(`command: ${command}: you do not have the permissions to use this command on this user`);
@@ -513,7 +503,7 @@ export class ChatService {
         server.sockets.sockets.get(String(target.socketId)).leave(String(roomId));
         this.manager.query("UPDATE \"chat_users\" SET \"userRole\" = $1 WHERE \"userId\" = $2 AND \"chatId\" = $3;", [UserRole.BANNED, target.id, roomId]);
         server.sockets.sockets.get(String(target.socketId)).emit("close", {destination: roomId, text: "you have been kicked out of the room."});
-        server.to(String(roomId)).emit("message", {destination: roomId, text:`User ${target.nickname} has left the chat`})
+        server.to(String(roomId)).emit("message", {destination: roomId, text:`User ${target.nickname} has left the chat(ban)`});
 
       }
       else if (command == "/unban")
@@ -525,13 +515,15 @@ export class ChatService {
             this.logger.log(`command: ${command}: target does not exists`);
           return ;
         }
-        targetRole = (await ChatUsers.findOne({chat: args[0].destination, user: target})).userRole;
-        if (targetRole === undefined || targetRole !== UserRole.BANNED)
+
+        targetChat = await ChatUsers.findOne({chat: args[0].destination, user: target});
+        if (targetChat === undefined)
         {
           client.emit("error", {destination: roomId, text: `command: ${command}: target is not banned`});
           this.logger.log(`command: ${command}: target is not banned`);
           return ;
         }
+
         this.manager.query("DELETE FROM \"chat_users\" WHERE \"userId\" = $1 AND \"chatId\" = $2;", [target.id, roomId]);
       }
 
@@ -550,14 +542,14 @@ export class ChatService {
             this.logger.log(`command: ${command}: target does not exists`);
           return ;
         }
-        targetRole = (await ChatUsers.findOne({chat: args[0].destination, user: target})).userRole;
-        if (targetRole === undefined || targetRole === UserRole.BANNED)
+        targetChat = await ChatUsers.findOne({chat: args[0].destination, user: target});
+        if (targetChat === undefined|| targetChat.userRole === UserRole.BANNED)
         {
           client.emit("error", {destination: roomId, text: `command: ${command}: target is not on channel`});
-            this.logger.log(`command: ${command}: target is not on channel`);
+          this.logger.log(`command: ${command}: target is not on channel`);
           return ;
         }
-        if (targetRole == UserRole.OWNER)
+        if (targetChat.userRole == UserRole.OWNER)
         {
           client.emit("error", {destination: roomId, text: `command: ${command}: you do not have the permissions to use this command on this user`});
           this.logger.log(`command: ${command}: you do not have the permissions to use this command on this user`);
@@ -577,14 +569,14 @@ export class ChatService {
             this.logger.log(`command: ${command}: target does not exists`);
           return ;
         }
-        targetRole = (await ChatUsers.findOne({chat: args[0].destination, user: target})).userRole;
-        if (targetRole === undefined || targetRole === UserRole.BANNED)
+        targetChat = await ChatUsers.findOne({chat: args[0].destination, user: target});
+        if (targetChat === undefined|| targetChat.userRole === UserRole.BANNED)
         {
           client.emit("error", {destination: roomId, text: `command: ${command}: target is not on channel`});
-            this.logger.log(`command: ${command}: target is not on channel`);
+          this.logger.log(`command: ${command}: target is not on channel`);
           return ;
         }
-        if (targetRole != UserRole.ADMIN)
+        if (targetChat.userRole != UserRole.ADMIN)
         {
           client.emit("error", {destination: roomId, text: `command: ${command}: User can't be demoted for it isn't an admin`});
           this.logger.log(`command: ${command}:  User can't be demoted for it isn't an admin`);

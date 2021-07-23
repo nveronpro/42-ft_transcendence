@@ -320,6 +320,11 @@
 				this.mute(data);
 			})
 
+			this.socket.on('profile', (data) => {
+				console.log(`event: profile`);
+				// this.mute(data);
+			})
+
 			const tmp_data = {login: this.user.login};
 
 			this.socket.emit('whoami', tmp_data);

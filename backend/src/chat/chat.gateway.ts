@@ -45,7 +45,7 @@ export class ChatGateway {
       return ;
     }
 
-    this.chatService.disconnectUser(this.server, user);
+    this.chatService.disconnectUser(this.server, client, user);
     this.logger.log(`Client disconnected ${client.id}`);
   }
 
