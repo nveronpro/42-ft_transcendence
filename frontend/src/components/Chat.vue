@@ -243,6 +243,7 @@
 						});
 					} else {
 						let data = {
+							login: this.user.login,
 							command: split[0],
 							user_sender: this.user.login,
 							destination: message.destination,
