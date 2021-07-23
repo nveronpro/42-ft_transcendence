@@ -121,9 +121,13 @@
 							</div>
 						</div>
 					</div>
-					<div class="offcanvas-footer input-group">
-						<textarea :id="'textarea' + chat.id" class="form-control" v-model="text" placeholder="Enter message..."></textarea>
-						<button id="send" class="btn" @click.prevent="sendMessage(chat.id)">Send</button>
+					<div class="offcanvas-footer">
+						<div class="input-group mb-3">
+							<input :id="'textarea' + chat.id" type="text" class="form-control" v-model="text" placeholder="Enter message..." aria-describedby="basic-addon2">
+							<div class="input-group-append">
+								<button id="send" class="btn btn-outline-secondary" type="button" @click.prevent="sendMessage(chat.id)">Send</button>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -245,7 +249,6 @@
 						let data = {
 							login: this.user.login,
 							command: split[0],
-							user_sender: this.user.login,
 							destination: message.destination,
 							argument0: split[1],
 							argument1: split[2],
