@@ -57,7 +57,7 @@
 				friends: null,
 			}
 		},
-		async created () {
+		created () {
 			axios
 			.get('/auth/me')
 			.then(response => (this.user = response.data))

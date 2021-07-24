@@ -10,6 +10,9 @@ export class Chat extends BaseEntity {
 	@Column()
 	name: string;
 
-	@Column()
+	@Column({nullable: true})
 	password: string;
+
+	@Column()
+	private: boolean;
 }

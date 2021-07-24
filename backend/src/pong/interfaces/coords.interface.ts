@@ -1,8 +1,13 @@
 import { User } from "src/users/entities/user.entity";
+import { Socket } from 'socket.io';
 
 export interface Coords {
     player1: User;
     player2: User;
+    spects: string[];
+    socketId1: string;
+    socketId2: string;
+    spectsId: string[];
     moving: boolean;
     room: string;
     width: number;

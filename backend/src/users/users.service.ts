@@ -125,7 +125,6 @@ export class UsersService {
     current_status: string;
 	*/
 	async update(user: User, updateUserDto: UpdateUserDto) {
-		//console.log(updateUserDto)
 		try {
 			const res = await this.manager
 			.createQueryBuilder()

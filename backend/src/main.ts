@@ -12,7 +12,7 @@ async function bootstrap() {
 			'warn',
 			'log',
 			'debug',
-			// 'verbose'
+			'verbose'
 		],
 		cors: {
 			origin: 'http://localhost:3000',

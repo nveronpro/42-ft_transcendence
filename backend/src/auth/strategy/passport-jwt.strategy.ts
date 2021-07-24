@@ -12,13 +12,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         jwtFromRequest:ExtractJwt.fromExtractors([(request: Request) => {
           let data = null;
           if (request?.cookies){
-            data = request?.cookies['auth-cookie'];
+            data = request?.cookies['auth-cookie']; //request wih axios
           }
           else {
-            data = request['handshake'].headers['cookie'].split('=')[1];
-          }
-          if(!data){
-                return null;
+            data = request['handshake'].headers['cookie'].split('=')[1]; // request with io
           }
           return data
         }]),

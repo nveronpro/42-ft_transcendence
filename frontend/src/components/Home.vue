@@ -24,6 +24,8 @@
         <button v-if="this.role != 0 && !this.coords.end" v-on:click="move()">Play</button>
         <button v-if="this.role != 0 && this.coords.end" v-on:click="replay()">Replay</button>
         <button v-on:click="test()">Test</button>
+        <h2 v-if="this.coords.spects.length">They are looking the game :</h2>
+        <h2 v-for="s in this.coords.spects" :key="s">- {{s}}, </h2>
       </div>
     </div>
   </div>
@@ -33,7 +35,9 @@
 /* eslint-disable */
 import axios from "axios";
 import io from 'socket.io-client'
-var socket = io('http://localhost:8080', { withCredentials: true });
+var socket = io('http://localhost:8080/', { 
+  path: '/pong/',
+  withCredentials: true });
 
 function getRandomInt(min, max) {
   min = Math.ceil(min);
@@ -53,8 +57,12 @@ export default {
       raf: this.raf,
       colorBall: "black",
       coords: {
-        player1: null,
-        player2: null,
+        player1: null, // Player1 user object
+        player2: null, // Player2 user object
+        spects: [], // Spects nicknames array
+        socketId1: '', // Socket Id of the player1
+        socketId2: '', // Socket Id of the player2
+        spectsId: '', // Spects socket Ids array
         moving: false,
         room: '-1',
         height: 500,
@@ -65,8 +73,8 @@ export default {
         bar1Y: 220,
         bar2X: 685,
         bar2Y: 220,
-        vxBall: -3,
-        vyBall: 7,
+        vxBall: -2,
+        vyBall: 5,
         score1: 0,
         score2: 0,
         full: false,
@@ -103,17 +111,17 @@ export default {
     window.addEventListener('keydown', (e) =>{
     if(e.keyCode === 38 && this.coords.bar1Y > 0 && this.role == 1){
       console.log('haut');
-      socket.emit('bar1-top', this.coords);
+      socket.emit('bar1-top', this.coords.room);
     }else if (e.keyCode === 40 && this.coords.bar1Y < this.provider.canvas.height-100 && this.role == 1){
-      socket.emit('bar1-bottom', this.coords);
+      socket.emit('bar1-bottom', this.coords.room);
     }
     });
 
     window.addEventListener('keydown', (e) =>{
     if(e.keyCode === 38 && this.coords.bar2Y > 0 && this.role == 2){
-      socket.emit('bar2-top', this.coords);
+      socket.emit('bar2-top', this.coords.room);
     }else if (e.keyCode === 40 && this.coords.bar2Y < this.provider.canvas.height-100 && this.role == 2){
-      socket.emit('bar2-bottom', this.coords);
+      socket.emit('bar2-bottom', this.coords.room);
     }
     });
 
@@ -123,13 +131,24 @@ export default {
 			this.role = data.role;
 			this.totalRooms = data.totalRooms;
       this.coords.room = data.room;
-	});
+  	});
+
+    socket.on("reset", totalRooms => {
+      console.log('reset');
+      socket.leave(this.coords.room);
+			this.role = -1;
+			this.totalRooms = totalRooms;
+      this.coords.room = "-1";
+	  });
 
     socket.on("new-coords", coords => {
+      console.log('NEW COORDS')
+      console.log('Spects : ' + coords.spects)
       let ctx = this.provider.context;
       let height = this.provider.canvas.height;
       let width = this.provider.canvas.width;
       this.coords = coords;
+      console.log(coords)
       if (coords.posY == 0 &&
         coords.bar1X == 0 &&
         coords.bar1Y == 220 &&
@@ -146,8 +165,6 @@ export default {
 
     socket.on("end-game", matchHist => {
       console.log('end of the game');
-      matchHist.looser.looses++;
-      matchHist.winner.wins++;
       axios
       .post('/match-histories/', {
         winner: matchHist.winner,
@@ -155,18 +172,27 @@ export default {
         score: matchHist.score
       })
       .then()
-      axios
-      .patch('/users/same/', matchHist.winner)
-      .then()
-      axios
-      .patch('/users/same/', matchHist.looser)
-      .then()
-	});
+  	});
 
-    socket.on("test", data => {
-      console.log(data);
-	});
-  },
+    socket.on("unjoin", id => {
+      console.log('unjoin');
+      if (id == this.coords.socketId1) {
+        console.log("UNJOIN 111");
+        socket.emit("quit", {
+          coords: this.coords,
+          player: 1});
+      }
+      else if (id == this.coords.socketId2)
+        console.log("UNJOIN 222");
+        socket.emit("quit", {
+          coords: this.coords,
+          player: 2});
+	  });
+
+      socket.on("test", data => {
+      socket.emit('test', data);
+	  });
+},
   
   methods: {
     drawBar: function() {
@@ -190,8 +216,10 @@ export default {
       ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     },
-    joinSpect: function(roomNo) {
-      socket.emit('spect', roomNo);
+    joinSpect: function(room) {
+      socket.emit('spect', {
+        room: room,
+        user: this.user});
     },
     play: function() {
       socket.emit('play', {
@@ -200,7 +228,7 @@ export default {
     },
     test: function() {
       //socket.emit('test', 'test first');
-      console.log(this.user);
+      console.log(this.coords);
     },
     move: function() {
       console.log('move');
@@ -215,6 +243,7 @@ export default {
       socket.emit('replay', this.coords.room);
     },
     moveBall: function() {
+      console.log('moveBall moving ' + this.coords.moving)
       if (this.role < 1)
         return;
       if (!this.coords.moving)

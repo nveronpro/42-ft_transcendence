@@ -1,7 +1,7 @@
 <template>
     <div class="container-fluid">
       <div class="text-center">
-       <input id="server_address" value="/api/users/"/>
+       <input id="server_address" value="/users/"/>
        <button v-on:click="pingContainer()">PingTheServer !</button>
       </div>
       <div id="output">

@@ -35,6 +35,7 @@ export class FriendsController {
 	}
 
 	@Get('already/:id')
+	@UseGuards(JwtAuthGuard)
 	isAlreadyFriends(@User() user: UserType, @Param('id') userId: number) {
 		this.logger.log("@GET(already/:"+userId+")");
 		return (this.friendsService.areUsersAlreadyFriends(user.id, userId));

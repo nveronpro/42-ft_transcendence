@@ -31,7 +31,7 @@
 							</div>
 							<div class="navbar-nav ml-auto">
 								<div v-if="user !== null">
-									<button type="button" class="btn btn-primary" onclick='window.location.href="http://localhost:3000/auth/logout"'>Logout as {{ user.login }}</button>
+									<button type="button" class="btn btn-primary" onclick='window.location.href="http://localhost:8080/auth/logout"'>Logout as {{ user.login }}</button>
 								</div>
 							</div>
 						</div>
