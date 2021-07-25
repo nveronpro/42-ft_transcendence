@@ -12,7 +12,7 @@
         <button v-on:click="test()">Test</button>
       </div>
     </div>
-    <canvas ref="pong"> </canvas>
+    <canvas id="pong" ref="pong"> </canvas>
     <div v-if="this.role != -1">
       <div class="play-buttons">
         <h1 v-if="this.coords.full">There are 2 players in the room, game can start</h1>
@@ -24,6 +24,9 @@
         <button v-if="this.role != 0 && !this.coords.end" v-on:click="move()">Play</button>
         <button v-if="this.role != 0 && this.coords.end" v-on:click="replay()">Replay</button>
         <button v-on:click="test()">Test</button>
+        <button v-if="this.role > 0 && this.coords.vxBall != 2 && this.coords.vxBall != -2" v-on:click="normal()">Normal mode</button>
+        <button v-if="this.role > 0 && this.coords.vxBall != 3 && this.coords.vxBall != -3" v-on:click="hard()">Hard mode</button>
+        <button v-if="this.role > 0 && this.coords.vxBall != 4 && this.coords.vxBall != -4" v-on:click="insane()">Insane mode</button>
         <h2 v-if="this.coords.spects.length">They are looking the game :</h2>
         <h2 v-for="s in this.coords.spects" :key="s">- {{s}}, </h2>
       </div>
@@ -62,7 +65,7 @@ export default {
         spects: [], // Spects nicknames array
         socketId1: '', // Socket Id of the player1
         socketId2: '', // Socket Id of the player2
-        spectsId: '', // Spects socket Ids array
+        spectsId: [], // Spects socket Ids array
         moving: false,
         room: '-1',
         height: 500,
@@ -139,6 +142,10 @@ export default {
 			this.role = -1;
 			this.totalRooms = totalRooms;
       this.coords.room = "-1";
+	  });
+
+    socket.on("stop-move", data => {
+      this.coords.moving = false;
 	  });
 
     socket.on("new-coords", coords => {
@@ -225,6 +232,18 @@ export default {
       socket.emit('play', {
         coords: this.coords,
         user: this.user});
+    },
+    normal: function() {
+      if (!this.coords.moving)
+        socket.emit('normal', this.coords.room);
+    },
+    hard: function() {
+      if (!this.coords.moving)
+        socket.emit('hard', this.coords.room);
+    },
+    insane: function() {
+      if (!this.coords.moving)
+        socket.emit('insane', this.coords.room);
     },
     test: function() {
       //socket.emit('test', 'test first');
