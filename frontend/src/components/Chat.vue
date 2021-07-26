@@ -100,7 +100,7 @@
 					</div>
 				</div>
 			</div>
-			<div v-for="chat of chats" :key="chat.id" class="d-flex flex-row chat-tab">
+			<div v-for="chat of chats" :key="chat.id" class="d-flex flex-row chat-tab" :id=" 'Cb' + chat.id">
 				<button type="button" class="btn btn-primary position-relative m-2 rounded-circle" data-bs-toggle="offcanvas" :data-bs-target="'#' + 'C' + chat.id" aria-expanded="false" :aria-controls="'C' + chat.id">
 				{{chat.name[0]}}
 				</button>
@@ -263,13 +263,16 @@
 					destination: chat.id,
 				}
 				this.socket.emit('leave', data);
+				let chatButton = document.getElementById("Cb" + chat.id);
+				chatButton.parentNode.removeChild(chatButton);
+
 			},
 			openChat(chat) {
 				this.chats.push(chat);
 			},
 			closeChat(chat) {
 				var index = this.chats.findIndex(function(obj){
-					return obj.name === chat.destination;
+					return obj.id === chat.destination;
 				})
 				if (index !== -1) {
 					this.chats.splice(index, 1);
