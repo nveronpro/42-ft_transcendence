@@ -137,6 +137,16 @@ export class PongGateway {
     console.log('Role : ' + (this.players % 2 == 0 ? 2 : 1));
   }
 
+  @SubscribeMessage('normal-bg')
+  normalBg(@MessageBody() room: string): void  {
+    this.server.to(room).emit('normal-bg', '');
+  }
+
+  @SubscribeMessage('green-bg')
+  greenBg(@MessageBody() room: string): void  {
+    this.server.to(room).emit('green-bg', '');
+  }
+
   @SubscribeMessage('bar1-top')
   bar1Top(@MessageBody() room: string): void  {
     console.log('bar1-top')

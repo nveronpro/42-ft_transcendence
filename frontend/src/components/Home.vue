@@ -24,9 +24,13 @@
         <button v-if="this.role != 0 && !this.coords.end" v-on:click="move()">Play</button>
         <button v-if="this.role != 0 && this.coords.end" v-on:click="replay()">Replay</button>
         <button v-on:click="test()">Test</button>
+
         <button v-if="this.role > 0 && this.coords.vxBall != 2 && this.coords.vxBall != -2" v-on:click="normal()">Normal mode</button>
         <button v-if="this.role > 0 && this.coords.vxBall != 3 && this.coords.vxBall != -3" v-on:click="hard()">Hard mode</button>
         <button v-if="this.role > 0 && this.coords.vxBall != 4 && this.coords.vxBall != -4" v-on:click="insane()">Insane mode</button>
+
+        <button v-if="this.role > 0" v-on:click="normalBg()">Normal background</button>
+        <button v-if="this.role > 0" v-on:click="greenBg()">Green background</button>
         <h2 v-if="this.coords.spects.length">They are looking the game :</h2>
         <h2 v-for="s in this.coords.spects" :key="s">- {{s}}, </h2>
       </div>
@@ -170,6 +174,21 @@ export default {
       this.drawBar();
 	});
 
+    socket.on("normal-bg", data => {
+      console.log("normal-bg")
+      HTMLElement =document.getElementById("pong");
+      document.getElementById("pong").style.removeProperty('background-color');
+      document.getElementById("pong").style.backgroundImage='url("../../public/background.jpg")';
+      document.getElementById("pong").style.backgroundSize='cover';
+	  });
+
+    socket.on("green-bg", data => {
+      console.log("green-bg")
+      document.getElementById("pong").style.removeProperty('background-image');
+      document.getElementById("pong").style.removeProperty('background-size');
+      document.getElementById("pong").style.backgroundColor='darkgray';
+	  });
+
     socket.on("end-game", matchHist => {
       console.log('end of the game');
       axios
@@ -233,6 +252,14 @@ export default {
         coords: this.coords,
         user: this.user});
     },
+    normalBg: function() {
+      if (!this.coords.moving)
+        socket.emit('normal-bg', this.coords.room);
+    },
+    greenBg: function() {
+      if (!this.coords.moving)
+        socket.emit('green-bg', this.coords.room);
+    },
     normal: function() {
       if (!this.coords.moving)
         socket.emit('normal', this.coords.room);
@@ -279,6 +306,8 @@ canvas {
   border: 3px solid black;
   border-radius: 5px;
   background-color: darkgray;
+  background-image: url("../../public/background.jpg");
+  background-size:cover;
 }
 .canvas-wrapper {
   padding-top: 35px;
