@@ -615,8 +615,8 @@ export class ChatService {
         chatUsers.forEach(data=> {
           server.sockets.sockets.get(data).leave(String(roomId));
         });
-        this.manager.query('DELETE FROM "chat" WHERE "id" = $1;', [roomId]);
         this.manager.query('DELETE FROM "chat_users" WHERE "chatId" = $1;', [roomId]);
+        this.manager.query('DELETE FROM "chat" WHERE "id" = $1;', [roomId]);
       }
       else
       {
