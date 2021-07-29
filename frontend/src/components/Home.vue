@@ -110,6 +110,10 @@ export default {
     this.provider.canvas = this.$refs["pong"];
     this.provider.canvas.width = "700";
     this.provider.canvas.height = "500";
+    
+    socket.on("rooms", totalRooms => {
+			this.totalRooms = totalRooms;
+		});
 
     axios
     .get('/auth/me')
@@ -131,7 +135,7 @@ export default {
       socket.emit('bar2-bottom', this.coords.room);
     }
     });
-
+    
     socket.on("role", data => {
       console.log('Role : ' + data.role);
       console.log('Room : ' + data.room);
@@ -280,6 +284,7 @@ export default {
       console.log('move');
       if (this.coords.moving == false && this.role > 0 && this.coords.full && !this.coords.end) {
         this.coords.moving = true;
+        socket.emit('set-move', this.coords.room);
         this.moveBall();
       } else {
         return;
@@ -290,11 +295,11 @@ export default {
     },
     moveBall: function() {
       console.log('moveBall moving ' + this.coords.moving)
-      if (this.role < 1)
-        return;
-      if (!this.coords.moving)
+      if (this.role < 1 || !this.coords.moving)
         return;
       socket.emit('move', this.coords.room);
+      if (!this.coords.moving)
+        return ;
       this.raf = window.requestAnimationFrame(this.moveBall);
     },
   },

@@ -11,11 +11,47 @@ import { CreateMatchHistoryDto } from './../match-histories/dto/create-match-his
 import { CoordsAndUser } from './interfaces/coords-and-user.interface';
 import { UsersController } from '../users/users.controller';
 import { CannotAttachTreeChildrenEntityError } from 'typeorm';
+import { RoomsSockets } from './interfaces/room-sockets.interface';
 
 function getRandomInt(min: number, max: number) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function arrayRemove(arr, value) { 
+    
+  return arr.filter(function(ele){ 
+      return ele != value; 
+  });
+}
+
+function resetAllGame(): Coords {
+var coords: Coords;
+coords.player1 = null; // Player1 user object
+coords.player2 = null; // Player2 user object
+coords.spects = []; // Spects nicknames array
+coords.socketId1 = ''; // Socket Id of the player1
+coords.socketId2 = ''; // Socket Id of the player2
+coords.spectsId = []; // Spects socket Ids array
+coords.moving = false;
+coords.room = '-1';
+coords.height = 500;
+coords.width = 700;
+coords.posX = getRandomInt(200, 500);
+coords.posY = 0;
+coords.bar1X = 0;
+coords.bar1Y = 220;
+coords.bar2X = 685;
+coords.bar2Y = 220;
+coords.vxBall = -2;
+coords.vyBall = 5;
+coords.score1 = 0;
+coords.score2 = 0;
+coords.full = false;
+coords.end = false;
+
+return coords;
 }
 
 function initGame(coords: Coords, win: number): Coords {
@@ -76,6 +112,10 @@ export class PongGateway {
 
   coordsArray: Array<Coords>;
 
+  roomSockets: RoomsSockets[];
+
+  isMoving: boolean[];
+
   handleConnection(client: Socket) {
     if (this.players == undefined) {
       this.clientsNo = 0;
@@ -99,7 +139,7 @@ export class PongGateway {
     console.log('Spects array : ' + this.coordsArray[data.room].spects);
     this.coordsArray[data.room].spects.push(data.user.nickname);
     this.coordsArray[data.room].spectsId.push(client.id);
-    console.log('Spects array : ' + this.coordsArray[data.room].spects);
+    console.log('Spects array : ' + this.coordsArray[data.room].spectsId);
     this.server.to(data.room.toString()).emit('new-coords', this.coordsArray[data.room]);
   }
 
@@ -110,9 +150,12 @@ export class PongGateway {
     if (this.players == undefined) {
       this.players = 0;
       this.coordsArray = [];
+      this.roomSockets = [];
+      this.roomSockets.push(null);
     }
     this.players++;
     this.rooms = Math.round(this.players / 2);
+    console.log('Rooms : ' + this.rooms);
     var coords = (this.players % 2 == 0 ? this.coordsArray[this.rooms] : data.coords);
     client.emit("role", {
       totalRooms: this.rooms,
@@ -123,10 +166,16 @@ export class PongGateway {
     if (this.players % 2 == 0) {
       coords.player2 = user;
       coords.socketId2 = client.id;
+      this.roomSockets[this.rooms].player2 = client;
     }
     else {
       coords.player1 = user;
       coords.socketId1 = client.id;
+      this.roomSockets.push({
+        player1: client,
+        player2: null,
+        spects: []
+      })
     }
     coords.full = (this.players % 2 == 0 ? true : false);
     this.server.to(this.rooms.toString()).emit('new-coords', coords);
@@ -177,6 +226,12 @@ export class PongGateway {
     this.server.to(room).emit('new-coords', this.coordsArray[parseInt(room, 10)]);
   }
 
+  @SubscribeMessage('set-move')
+  setMove(@MessageBody() room: string): void  {
+    this.coordsArray[parseInt(room, 10)].moving = true;
+    this.server.to(room).emit('new-coords', this.coordsArray[parseInt(room, 10)]);
+  }
+
   @SubscribeMessage('move')
   move(@MessageBody() room: string, @ConnectedSocket() client: Socket): void  {
     if (this.coordsArray == undefined){
@@ -185,7 +240,7 @@ export class PongGateway {
     var coords = this.coordsArray[parseInt(room, 10)];
     if (coords.end == true)
       return ;
-    coords.moving = true;
+    //this.coordsArray[parseInt(room, 10)].moving = true;
     coords.posX += coords.vxBall;
     coords.posY += coords.vyBall;
     if (
@@ -195,7 +250,7 @@ export class PongGateway {
     )
       coords.vxBall = -coords.vxBall;
     else if (coords.posX + coords.vxBall < 0) {
-      this.server.emit('stop-move', 'stop');
+      this.server.emit('stop-move', null);
       this.coordsArray[parseInt(room, 10)].moving = false;
       coords = initGame(coords, 2);
       console.log('score ' + coords.score1 + ' : ' + coords.score2);
@@ -209,7 +264,7 @@ export class PongGateway {
     )
       coords.vxBall = -coords.vxBall;
     else if (coords.posX + coords.vxBall > 700) {
-      this.server.emit('stop-move', 'stop');
+      this.server.emit('stop-move', null);
       this.coordsArray[parseInt(room, 10)].moving = false;
       coords = initGame(coords, 1);
       console.log('score ' + coords.score1 + ' : ' + coords.score2);
@@ -267,32 +322,26 @@ export class PongGateway {
     this.server.to(room).emit("new-coords", this.coordsArray[parseInt(room, 10)]);
   }
 
-/*   @SubscribeMessage('quit')
+  @SubscribeMessage('quit')
   quit(@MessageBody() data, @ConnectedSocket() client: Socket): void  {
     console.log('quit');
     console.log(client.id);
     var coords = this.coordsArray[parseInt(data.coords.room, 10)];
-    if (!coords.full)
-      this.server.to(coords.room).emit("reset", --this.rooms);
+    if (!coords.full) {
+      this.server.to(data.coords.room).emit('new-coords', resetAllGame());
+      this.server.to(data.coords.room).emit("role", {
+        totalRooms: --this.rooms,
+        role: -1,
+        room: '-1'});
+    }
     else {
       if (coords.score1 != 0 || coords.score2 != 0) {
         console.log('cool');
       }
     }
   }
- */
 
 
-  /*   @SubscribeMessage('disconnecting')
-  handleDisconnecting(client: Socket){
-    console.log('disconnecting');
-    var rooms = Object.keys(client.rooms);
-
-    rooms.forEach(function(room){
-      console.log(room);
-    });
-
-  }
   handleDisconnect(client: Socket){
     console.log('disconnect');
     console.log(client.rooms);
@@ -314,15 +363,16 @@ export class PongGateway {
     }
     if (role == -1)
       return ;
-    if (role == 0)
-      this.coordsArray[room].spectsId = this.coordsArray[room].spectsId.filter(val => val !== client.id);
+    if (role == 0) {
+      console.log(this.coordsArray[room].spectsId)
+      this.coordsArray[room].spectsId = arrayRemove(this.coordsArray[room].spectsId, client.id);
+      console.log(this.coordsArray[room].spectsId)
+      this.server.to(room.toString()).emit('new-coords', this.coordsArray[room]);
+    }
     if (!this.coordsArray[room].full) {
       delete this.coordsArray[room];
       //var clients = this.server.adapter.rooms
     }
     //this.server.emit('unjoin', client.id);
   }
- */
-
-
 }
