@@ -146,6 +146,10 @@ export default {
 			this.role = data.role;
 			this.totalRooms = data.totalRooms;
       this.coords.room = data.room;
+      if (this.role > -1)
+        document.getElementById("pong").style.opacity='1';
+      else
+        document.getElementById("pong").style.opacity='0';
   	});
 
     socket.on("reset", totalRooms => {
@@ -317,6 +321,7 @@ canvas {
   background-color: darkgray;
   background-image: url("../../public/background.jpg");
   background-size:cover;
+  opacity: 0;
 }
 .canvas-wrapper {
   padding-top: 35px;
