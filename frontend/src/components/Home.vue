@@ -136,6 +136,10 @@ export default {
     }
     });
     
+    socket.on("rooms", totalRooms => {
+			this.totalRooms = totalRooms;
+		});
+
     socket.on("role", data => {
       console.log('Role : ' + data.role);
       console.log('Room : ' + data.room);
