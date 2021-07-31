@@ -21,6 +21,7 @@
         <h1 v-if="this.role == 1">You are a player 1 in the room {{this.coords.room}} </h1>
         <h1 v-if="this.role == 2">You are a player 2 in the room {{this.coords.room}} </h1>
         <h1>Score : {{this.coords.score1}} - {{this.coords.score2}} </h1>
+
         <button v-if="this.role != 0 && !this.coords.end" v-on:click="move()">Play</button>
         <button v-if="this.role != 0 && this.coords.end" v-on:click="replay()">Replay</button>
         <button v-on:click="test()">Test</button>
@@ -31,6 +32,9 @@
 
         <button v-if="this.role > 0" v-on:click="normalBg()">Normal background</button>
         <button v-if="this.role > 0" v-on:click="greenBg()">Green background</button>
+
+        <button v-on:click="quit()">Quit</button>
+
         <h2 v-if="this.coords.spects.length">They are looking the game :</h2>
         <h2 v-for="s in this.coords.spects" :key="s">- {{s}}, </h2>
       </div>
@@ -219,21 +223,6 @@ export default {
       .then()
   	});
 
-    socket.on("unjoin", id => {
-      console.log('unjoin');
-      if (id == this.coords.socketId1) {
-        console.log("UNJOIN 111");
-        socket.emit("quit", {
-          coords: this.coords,
-          player: 1});
-      }
-      else if (id == this.coords.socketId2)
-        console.log("UNJOIN 222");
-        socket.emit("quit", {
-          coords: this.coords,
-          player: 2});
-	  });
-
       socket.on("test", data => {
       socket.emit('test', data);
 	  });
@@ -290,6 +279,9 @@ export default {
     insane: function() {
       if (!this.coords.moving)
         socket.emit('insane', this.coords.room);
+    },
+    quit: function() {
+      socket.emit('quit', null);
     },
     test: function() {
       //socket.emit('test', 'test first');

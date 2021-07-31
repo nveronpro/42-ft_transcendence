@@ -376,22 +376,82 @@ export class PongGateway {
   }
 
   @SubscribeMessage('quit')
-  quit(@MessageBody() data, @ConnectedSocket() client: Socket): void  {
+  quit(@MessageBody() dat, @ConnectedSocket() client: Socket): void  {
     console.log('quit');
-    console.log(client.id);
-    var coords = this.coordsArray[parseInt(data.coords.room, 10)];
-    if (!coords.full) {
-      this.server.to(data.coords.room).emit('new-coords', resetAllGame());
-      this.server.to(data.coords.room).emit("role", {
-        totalRooms: --this.rooms,
-        role: -1,
-        room: '-1'});
-    }
-    else {
-      if (coords.score1 != 0 || coords.score2 != 0) {
-        console.log('cool');
+    var role = -1;
+    var room = 1;
+    for (room = 1; room <= this.rooms; room++) {
+      if (this.coordsArray[room].spectsId.includes(client.id)) {
+        role = 0;
+        break;
+      }
+      if (this.coordsArray[room].socketId1 == client.id) {
+        role = 1;
+        break;
+      }
+      if (this. coordsArray[room].socketId2 == client.id) {
+        role = 2;
+        break;
       }
     }
+    console.log('Disconnected room : ' + room);
+    console.log('Disconnected role : ' + role);
+    if (role == -1)
+      return ;
+    if (role == 0) {
+      client.emit('role', {
+        role: -1,
+        room: '-1',
+        totalRooms: this.rooms
+      });
+      client.emit('new-coords', resetAllGame());
+      var index = this.coordsArray[room].spectsId.indexOf(client.id);
+      this.roomsSockets[room].spects.splice(index, 1);
+      this.coordsArray[room].spects.splice(index, 1);
+      this.coordsArray[room].spectsId = arrayRemove(this.coordsArray[room].spectsId, client.id);
+      this.server.to(room.toString()).emit('new-coords', this.coordsArray[room]);
+      return ;
+    }
+    if (!this.coordsArray[room].full) {
+      this.rooms--;
+      this.players--;
+      this.server.emit('rooms', this.rooms);
+      var coords = resetAllGame();
+      this.server.to(room.toString()).emit('role', {
+        role: -1,
+        room: '-1',
+        totalRooms: this.rooms
+      });
+      this.server.to(room.toString()).emit('new-coords', coords);
+      this.roomsSockets[room].spects.forEach(sock => sock.leave(room.toString()));
+      this.roomsSockets[room].player1.leave(room.toString());
+      var data = shiftRooms(this.coordsArray, this.roomsSockets, room, this.server);
+      this.coordsArray = data.coordsArray;
+      this.roomsSockets = data.roomsSockets;
+      return ;
+    }
+    if (this.coordsArray[room].score1 != 0 || this.coordsArray[room].score2 != 0) {
+      var win = (client.id == this.roomsSockets[room].player1.id) ? 2 : 1;
+      var client = (client.id == this.roomsSockets[room].player1.id) ? this.roomsSockets[room].player2 : this.roomsSockets[room].player1;
+      endGame(this.coordsArray[room], win, client);
+    }
+    this.rooms--;
+    this.players -= 2;
+    this.server.emit('rooms', this.rooms);
+    var coords = resetAllGame();
+    this.server.to(room.toString()).emit('role', {
+      role: -1,
+      room: '-1',
+      totalRooms: this.rooms
+    });
+    this.server.to(room.toString()).emit('new-coords', coords);
+    this.roomsSockets[room].spects.forEach(sock => sock.leave(room.toString()));
+    this.roomsSockets[room].player2.leave(room.toString());
+    this.roomsSockets[room].player1.leave(room.toString());
+    var data = shiftRooms(this.coordsArray, this.roomsSockets, room, this.server);
+    this.coordsArray = data.coordsArray;
+    this.roomsSockets = data.roomsSockets;
+    return ;
   }
 
   handleDisconnect(client: Socket){
