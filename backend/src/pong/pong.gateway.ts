@@ -394,7 +394,6 @@ export class PongGateway {
     }
   }
 
-
   handleDisconnect(client: Socket){
     console.log('disconnect');
     console.log(client.rooms);

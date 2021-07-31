@@ -150,6 +150,13 @@ export default {
         document.getElementById("pong").style.opacity='1';
       else
         document.getElementById("pong").style.opacity='0';
+      if (this.role > 0) {
+        console.log('ingame')
+        axios.post('/users/status/ingame').then()}
+      else if (this.role == 0)
+        axios.post('/users/status/spectator').then()
+      else
+        axios.post('/users/status/online').then()
   	});
 
     socket.on("reset", totalRooms => {
