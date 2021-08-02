@@ -172,10 +172,13 @@ export class PongGateway {
 
   privateRooms;
 
+  privateSockets;
+
   handleConnection(client: Socket) {
     if (this.players == undefined) {
       this.rooms = 0;
       this.privateRooms = {};
+      this.privateSockets = {};
     }
     this.server.emit('rooms', this.rooms);
     console.log(this.rooms);
@@ -247,12 +250,14 @@ export class PongGateway {
   createPrivate(@MessageBody() data: User[], @ConnectedSocket() client: Socket): void  {
     console.log('create-private');
     var room = data[0].login + '-' + data[1].login;
+    this.privateSockets[client.id] = room;
     client.emit("role", {
       totalRooms: this.rooms,
       role: 1,
       room: room});
     this.privateRooms[room].coords = resetAllGame();
     client.join(room);
+    this.privateRooms[room].coords.client1 = client;
     this.privateRooms[room].coords.player1 = data[0];
     this.privateRooms[room].coords.socketId1 = client.id;
     this.privateRooms[room].coords.spectsId = [];
@@ -266,11 +271,13 @@ export class PongGateway {
   joinPrivate(@MessageBody() data: User[], @ConnectedSocket() client: Socket): void  {
     console.log('join-private');
     var room = data[0].login + '-' + data[1].login;
+    this.privateSockets[client.id] = room;
     client.emit("role", {
       totalRooms: this.rooms,
       role: 2,
       room: room});
     client.join(room);
+    this.privateRooms[room].coords.client2 = client;
     this.privateRooms[room].coords.full = true;
     this.privateRooms[room].coords.socketId2 = client.id;
     this.server.to(room).emit('new-coords', this.privateRooms[room].coords);
@@ -421,6 +428,19 @@ export class PongGateway {
     console.log('quit');
     var role = -1;
     var room = 1;
+
+    // if the player is in a private game
+    if (this.privateSockets[client.id].includes('-')) {
+      var r = this.privateSockets[client.id];
+      this.server.to(r).emit('role', {
+        role: -1,
+        room: '-1',
+        totalRooms: this.rooms
+      });
+      this.privateRooms[r].client1.leave(r);
+      this.privateRooms[r].client2.leave(r);
+      return ;
+    }
     for (room = 1; room <= this.rooms; room++) {
       if (this.coordsArray[room].spectsId.includes(client.id)) {
         role = 0;
@@ -500,6 +520,20 @@ export class PongGateway {
     console.log(client.rooms);
     var role = -1;
     var room = 1;
+
+    if (this.privateSockets[client.id].includes('-')) {
+      var r = this.privateSockets[client.id];
+      this.server.to(r).emit('role', {
+        role: -1,
+        room: '-1',
+        totalRooms: this.rooms
+      });
+      if (client.id == this.privateRooms[r].client1.id)
+        this.privateRooms[r].client2.leave(r);
+      if (client.id == this.privateRooms[r].client2.id)
+        this.privateRooms[r].client1.leave(r);
+      return ;
+    }
     for (room = 1; room <= this.rooms; room++) {
       if (this.coordsArray[room].spectsId.includes(client.id)) {
         role = 0;
