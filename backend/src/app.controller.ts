@@ -10,7 +10,7 @@ export class AppController {
   @Get()
   //@UseGuards(JwtAuthGuard)
   home(@Req() request: Request){
-    let data = request.cookies["auth-cookie"];
+    let data = request?.cookies["auth-cookie"];
     if (data) {
       console.log("Classique page");
     } else {

@@ -14,7 +14,8 @@
 						<div class="my-3 p-3 bg-body rounded shadow-sm">
 							<h6 class="border-bottom pb-2 mb-0">Resulat de la recherche</h6>
 							<router-link class="d-flex text-muted pt-3" v-for="(all_user, index) of filterImages" :key="index" :to="'/friend/' + all_user.user_id">
-								<svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em"></text></svg>
+								<svg v-if='all_user.user_current_status === "offline"' class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#ff0800"></rect><text x="50%" y="50%" fill="#ff0800" dy=".3em"></text></svg>
+								<svg v-else class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#00ff37"></rect><text x="50%" y="50%" fill="#00ff37" dy=".3em"></text></svg>
 								<p class="pb-3 mb-0 small lh-sm border-bottom">
 									<strong class="d-block text-gray-dark">{{all_user.user_login}}</strong>
 									Deux, trois information sur l'utilisateur
@@ -57,17 +58,17 @@
 				friends: null,
 			}
 		},
-		async created () {
+		created () {
 			axios
-			.get('/api/auth/me')
+			.get('/auth/me')
 			.then(response => (this.user = response.data))
 
 			axios
-			.get('/api/friends/')
+			.get('/friends/')
 			.then(response => (this.friends = response.data))
 
 			axios
-			.get('/api/users/all')
+			.get('/users/all')
 			.then(response => (this.all_users = response.data))
 		},
 		computed: {
@@ -84,13 +85,13 @@
 			send: function (id) {
 				let _id = id;
 				axios
-				.post('/api/friends/send/'+ _id)
+				.post('/friends/send/'+ _id)
 				.then()
 			},
 			remove: function (id) {
 				let _id = id;
 				axios
-				.delete('/api/friends/'+ _id)
+				.delete('/friends/'+ _id)
 				.then()
 			},
 		},

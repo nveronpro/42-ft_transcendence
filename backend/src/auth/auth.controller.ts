@@ -12,14 +12,12 @@ export class AuthController {
   @Get('/login')
   @Redirect('/', 302) // CHANGE THE CODE
   login(@Res() res: Response){
-    //console.log("test login");
     const url_login = this.authService.login();
-	  //this.logger.log("url:"+url_login);
     return {url: url_login};
   }
 
   @Get('/logout')
-  @Redirect('http://localhost:8080', 302) // CHANGE THE CODE
+  @Redirect('http://localhost:3000', 302) // CHANGE THE CODE
   logout(@Res() res: Response){
     res.clearCookie('auth-cookie', { httpOnly: true });
   }
@@ -33,7 +31,7 @@ export class AuthController {
   }
 
   @Get('/saveToken')
-  @Redirect('http://localhost:8080', 302) // CHANGE THE CODE
+  @Redirect('http://localhost:3000', 302) // CHANGE THE CODE
   saveToken(@Query('token') token, @Res() res: Response){
     res.cookie('auth-cookie', token, { httpOnly: true });
   }
@@ -46,7 +44,6 @@ export class AuthController {
 
   @Get('/cookie')
   cookie(@Req() request: Request){
-    console.log(request?.cookies["auth-cookie"]);
     if (request.cookies["auth-cookie"])
       return true;
     else
@@ -56,7 +53,6 @@ export class AuthController {
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   async profile(@User() user){
-    // console.log(user);
     return user;
   }
 }

@@ -42,4 +42,7 @@ export class User extends BaseEntity {
 
 	@Column({nullable: true})
 	avatar: string;
+
+	@Column({nullable: true})
+	socketId: string;
 }
