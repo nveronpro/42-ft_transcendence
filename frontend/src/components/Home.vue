@@ -12,7 +12,7 @@
         <button v-on:click="test()">Test</button>
       </div>
     </div>
-    <canvas id="pong" ref="pong"> </canvas>
+    
     <div v-if="this.role != -1">
       <div class="play-buttons">
         <h1 v-if="this.coords.full">There are 2 players in the room, game can start</h1>
@@ -39,6 +39,7 @@
         <h2 v-for="s in this.coords.spects" :key="s">- {{s}}, </h2>
       </div>
     </div>
+    <canvas id="pong" ref="pong"> </canvas>
   </div>
 </template>
 
