@@ -76,8 +76,8 @@
 				code: '',
 			}
 		},
-		mounted () {
-			axios.post('/users/status/online');
+		async mounted () {
+			await axios.post('/users/status/online');
 			
 			axios
 			.get('/auth/me')

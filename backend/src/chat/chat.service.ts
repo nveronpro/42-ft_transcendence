@@ -34,7 +34,7 @@ export class ChatService {
 
   async block(user: UserType, id: number) {
     try {
-      this.manager.query("INSERT INTO \"block\" ($1, $2);", [user.id, id]);
+      this.manager.query("INSERT INTO \"block\" VALUES ($1, $2);", [user.id, id]);
     }
     catch (error) {
 			this.logger.error("block: An error has occured. Please check the database (or something). See error for more informations.");
@@ -45,7 +45,7 @@ export class ChatService {
 
   async unblock(user: UserType, id: number) {
     try {
-      this.manager.query("DELETE FROM \"block\" WHERE blocker = $1 AND blocked = $2);", [user.id, id]);
+      this.manager.query('DELETE FROM "block" WHERE "blockerId" = $1 AND "blockedId" = $2;', [user.id, id]);
     }
     catch (error) {
 			this.logger.error("unblock: An error has occured. Please check the database (or something). See error for more informations.");
@@ -55,7 +55,7 @@ export class ChatService {
   }
 
   async blockedUsers(user: UserType) {
-    const blocked = await this.manager.query("SELECT \"blocked\" FROM \"block\" WHERE \"blocker\' = $1;", [user.id]);
+    const blocked = await this.manager.query('SELECT "user"."login", "user"."id" FROM "block" JOIN "user" ON "block"."blockedId" = "user"."id" WHERE "blockerId" = $1;', [user.id]);
     return (blocked);
   }
 
@@ -361,7 +361,7 @@ export class ChatService {
       }
       else if (command == "/profile")
       {
-        if (args[0].nickname !== undefined)
+        if (args[0].argument0 !== undefined)
         {
           target = await UserType.findOne({nickname: args[0].argument0});
           if (target === undefined)
@@ -389,7 +389,7 @@ export class ChatService {
         target.qrcode_data = null;
         target.socketId = null;
 
-        server.to(String(roomId)).emit("profile", target);
+        server.to(String(roomId)).emit("profile", {destination: roomId, target:target});
       }
 
       else if (userPerms.userRole === UserRole.USER)

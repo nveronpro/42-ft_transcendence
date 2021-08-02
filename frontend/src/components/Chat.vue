@@ -111,7 +111,7 @@
 					</div>
 					<div class="offcanvas-body">
 						<div v-for="message of messages" :key="message.id">
-							<div v-if="message.destination === chat.id">
+							<div v-if="message.destination === chat.id" :id="'Cm' + chat.id">
 								<div v-if="message.login !== this.user.login" class="d-flex flex-row mb-2">
 									<div class="p-2">{{message.login}}: {{message.text}}</div>
 								</div>
@@ -154,6 +154,7 @@
 				name: '',
 				messages: [],
 				chats: [],
+				is_block: false,
 			}
 		},
 		updated() {
@@ -233,6 +234,19 @@
 				document.getElementById("textarea" + dest).value = "";
 			},
 			receivedMessage(message) {
+				axios
+				.get('/chat/block/')
+				.then(response => {
+					for(var i = 0; i < response.data.length; i++) {
+						if (response.data[i].login == message.login) {
+							this.is_block = true;
+						}
+					}
+				})
+				if (this.is_block) {
+					this.is_block = false;
+					return ;
+				}
 				if (message.text != "" && message.text[0] != '/') {
 					this.messages.push(message);
 				}
@@ -292,6 +306,21 @@
 						destination: data.destination,
 					});
 				}
+			},
+			profile(data) {
+				let messages = document.getElementById("Cm" + data.destination);
+				var content = document.createElement("div");
+
+				content.innerHTML = '<div class="card mb-3">' + 
+										'<img class="card-img-top" src="data:image/png;base64,' + data.target.avatar + '" alt="Card image cap">' + 
+										'<div class="card-body">' + 
+											'<h5 class="card-title">' + data.target.nickname + '</h5>' +
+											'<p class="card-text">Login: ' + data.target.login + '</p>' +
+											'<p class="card-text">Stats: <br> Wins: ' + data.target.wins + '<br> Looses: ' + data.target.looses + ' </p>' +
+										'</div>' +
+									'</div>';
+				messages.appendChild(content);
+				console.log(data);
 			}
 		},
 		async created () {
@@ -325,7 +354,12 @@
 
 			this.socket.on('profile', (data) => {
 				console.log(`event: profile`);
-				// this.mute(data);
+				this.profile(data);
+			})
+
+			this.socket.on('error', (data) => {
+				console.log(`event: error`);
+				console.log(data);
 			})
 
 			const tmp_data = {login: this.user.login};

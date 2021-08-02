@@ -13,6 +13,7 @@ export class ChatController {
 	@UseGuards(JwtAuthGuard)
 	getAllPublicChats(@User() user: UserType)
 	{
+		//PAS DE CONSOLE LOG MERCI !
 		return this.chatService.getAllPublicChats(user);
 	}
 
@@ -27,7 +28,6 @@ export class ChatController {
 	@UseGuards(JwtAuthGuard)
 	blockUser(@User() user: UserType, @Param("id") id: number) {
 		this.chatService.block(user, id);
-
 	}
 
 	@Post("unblock/:id")
@@ -35,5 +35,4 @@ export class ChatController {
 	unblockUser(@User() user: UserType, @Param("id") id: number) {
 		this.chatService.unblock(user, id);
 	}
-
 }

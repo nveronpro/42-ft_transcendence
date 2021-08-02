@@ -15,14 +15,25 @@
 						<small class="text-muted">Current status: {{user[0].user_current_status}}</small>
 						<p class="card-text mb-5">Joueur pro de pong</p>
 					</div>
-					<div class="card-footer bg-transparent border-Secondary">
-						<button :id="user[0].user_id" v-if="already_friend == false" v-on:click="send(user[0].user_id)" type="button" class="btn btn-outline-success ml-auto mb-3">
-								<i class="fas fa-plus"></i>
-						</button>
-						<button :id="user[0].user_id" v-if="already_friend == true" v-on:click="remove(user[0].user_id)" type="button" class="btn btn-outline-danger ml-auto mb-3">
-							<i class="fas fa-minus"></i>
-						</button>
+					<div class="card-footer bg-transparent border-Secondary d-flex justify-content-between">
+						<div>
+							<button :id="user[0].user_id" v-if="already_friend == false" v-on:click="send(user[0].user_id)" type="button" class="btn btn-outline-success ml-auto mb-3">
+								Ajouter cet amis  <i class="fas fa-plus"></i>
+							</button>
+							<button :id="user[0].user_id" v-if="already_friend == true" v-on:click="remove(user[0].user_id)" type="button" class="btn btn-outline-danger ml-auto mb-3">
+								Enleve cet amis  <i class="fas fa-minus"></i>
+							</button>
+						</div>
+						<div>
+							<button :id="user[0].user_id" v-if="is_block == false" v-on:click="block(user[0].user_id)" type="button" class="btn btn-outline-warning ml-auto mb-3">
+								Bloquer
+							</button>
+							<button :id="user[0].user_id" v-if="is_block == true" v-on:click="unblock(user[0].user_id)" type="button" class="btn btn-outline-warning ml-auto mb-3">
+								Debloquer
+							</button>
+						</div>
 					</div>
+					
 				</div>
 			</div>
 			<div class="col-12">
@@ -82,6 +93,8 @@
 			return {
 				user: null,
 				friends: null,
+				blocked: null,
+				is_block: false,
 				match_histories: null,
 				already_friend: false,
 			}
@@ -92,6 +105,17 @@
 			.then(response => (this.user = response.data))
 
 			axios
+			.get('/chat/block/')
+			.then(response => {
+				for(var i = 0; i < response.data.length; i++) {
+					if (response.data[i].id == this.$route.params.id) {
+						this.is_block = true;
+						break;
+					}
+				}
+			})
+
+			axios
 			.get('/friends/already/' + this.$route.params.id)
 			.then(response => (this.already_friend = response.data))
 
@@ -100,6 +124,18 @@
 			.then(response => (this.match_histories = response.data))
 		},
 		methods: {
+			block: function (id) {
+				let _id = id;
+				axios
+				.post('/chat/block/'+ _id)
+				.then(this.is_block = true)
+			},
+			unblock: function (id) {
+				let _id = id;
+				axios
+				.post('/chat/unblock/'+ _id)
+				.then(this.is_block = false)
+			},
 			send: function (id) {
 				let _id = id;
 				axios
