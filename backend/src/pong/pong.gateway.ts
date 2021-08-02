@@ -247,30 +247,32 @@ export class PongGateway {
   }
 
   @SubscribeMessage('create-private')
-  createPrivate(@MessageBody() data: User[], @ConnectedSocket() client: Socket): void  {
+  createPrivate(@MessageBody() data, @ConnectedSocket() client: Socket): void  {
     console.log('create-private');
-    var room = data[0].login + '-' + data[1].login;
+    var room = data.login1 + '-' + data.login2;
     this.privateSockets[client.id] = room;
     client.emit("role", {
       totalRooms: this.rooms,
       role: 1,
       room: room});
+    this.privateRooms[room] = {};
     this.privateRooms[room].coords = resetAllGame();
     client.join(room);
     this.privateRooms[room].coords.client1 = client;
-    this.privateRooms[room].coords.player1 = data[0];
+    // NEED A QUERY TO GET USERS BY LOGIN
+    //this.privateRooms[room].coords.player1 = USER1
+    //this.privateRooms[room].coords.player2 = USER2;
     this.privateRooms[room].coords.socketId1 = client.id;
     this.privateRooms[room].coords.spectsId = [];
     this.privateRooms[room].coords.room = room;
-    this.privateRooms[room].coords.player2 = data[1];
     this.server.to(room).emit('new-coords', this.privateRooms[room].coords);
     this.server.emit('rooms', this.rooms);
   }
 
   @SubscribeMessage('join-private')
-  joinPrivate(@MessageBody() data: User[], @ConnectedSocket() client: Socket): void  {
+  joinPrivate(@MessageBody() data, @ConnectedSocket() client: Socket): void  {
     console.log('join-private');
-    var room = data[0].login + '-' + data[1].login;
+    var room = data.login1 + '-' + data.login2;
     this.privateSockets[client.id] = room;
     client.emit("role", {
       totalRooms: this.rooms,
@@ -521,7 +523,7 @@ export class PongGateway {
     var role = -1;
     var room = 1;
 
-    if (this.privateSockets[client.id].includes('-')) {
+    if (this.privateSockets[client.id] != undefined && this.privateSockets[client.id].includes('-')) {
       var r = this.privateSockets[client.id];
       this.server.to(r).emit('role', {
         role: -1,
