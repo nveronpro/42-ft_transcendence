@@ -249,8 +249,9 @@
 					const data = {
 						login1: this.user.login,
 						login2: split[1],
+						userId: this.user.id,
 					}
-					this.socket_pong.emit('create-game', data);
+					this.socket_pong.emit('create-private', data);
 
 				} else if (split[0] == "/accept") {
 					if (split[1] == undefined || split[1] == "") {
@@ -266,6 +267,7 @@
 					const data = {
 						login2: this.user.login,
 						login1: split[1],
+						userId: this.user.id,
 					}
 					this.socket_pong.emit('join-private', data);
 				} else {
@@ -380,6 +382,9 @@
 			this.socket = io('http://localhost:8080', { withCredentials: true });
 			this.socket_pong = io('http://localhost:8080/', { path: '/pong/', withCredentials: true });
 
+			this.socket_pong.on('new-coords', (message) => {
+				console.log(`NEW COORDS CHAT VUE`);
+			})
 			this.socket.on('message', (message) => {
 				console.log(`event: message`);
 				this.receivedMessage(message)

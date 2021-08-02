@@ -116,13 +116,18 @@ export default {
     this.provider.canvas.width = "700";
     this.provider.canvas.height = "500";
     
+    axios
+    .get('/auth/me')
+    .then(response => {
+      this.user = response.data;
+			socket.emit('init', response.data.id);
+      console.log(reponse.data);
+    })
+
+
     socket.on("rooms", totalRooms => {
 			this.totalRooms = totalRooms;
 		});
-
-    axios
-    .get('/auth/me')
-    .then(response => (this.user = response.data))
 
     window.addEventListener('keydown', (e) =>{
     if(e.keyCode === 38 && this.coords.bar1Y > 0 && this.role == 1){
