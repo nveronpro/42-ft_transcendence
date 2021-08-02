@@ -12,6 +12,7 @@ import { CoordsAndUser } from './interfaces/coords-and-user.interface';
 import { UsersController } from '../users/users.controller';
 import { CannotAttachTreeChildrenEntityError } from 'typeorm';
 import { RoomsSockets } from './interfaces/room-sockets.interface';
+import { User } from '../users/entities/user.entity';
 
 function getRandomInt(min: number, max: number) {
   min = Math.ceil(min);
@@ -169,9 +170,12 @@ export class PongGateway {
 
   roomsSockets: Array<RoomsSockets>;
 
+  privateRooms;
+
   handleConnection(client: Socket) {
     if (this.players == undefined) {
       this.rooms = 0;
+      this.privateRooms = {};
     }
     this.server.emit('rooms', this.rooms);
     console.log(this.rooms);
@@ -239,6 +243,40 @@ export class PongGateway {
     console.log('Role : ' + (this.players % 2 == 0 ? 2 : 1));
   }
 
+  @SubscribeMessage('create-private')
+  createPrivate(@MessageBody() data: User[], @ConnectedSocket() client: Socket): void  {
+    console.log('create-private');
+    var room = data[0].login + '-' + data[1].login;
+    client.emit("role", {
+      totalRooms: this.rooms,
+      role: 1,
+      room: room});
+    this.privateRooms[room].coords = resetAllGame();
+    client.join(room);
+    this.privateRooms[room].coords.player1 = data[0];
+    this.privateRooms[room].coords.socketId1 = client.id;
+    this.privateRooms[room].coords.spectsId = [];
+    this.privateRooms[room].coords.room = room;
+    this.privateRooms[room].coords.player2 = data[1];
+    this.server.to(room).emit('new-coords', this.privateRooms[room].coords);
+    this.server.emit('rooms', this.rooms);
+  }
+
+  @SubscribeMessage('join-private')
+  joinPrivate(@MessageBody() data: User[], @ConnectedSocket() client: Socket): void  {
+    console.log('join-private');
+    var room = data[0].login + '-' + data[1].login;
+    client.emit("role", {
+      totalRooms: this.rooms,
+      role: 2,
+      room: room});
+    client.join(room);
+    this.privateRooms[room].coords.full = true;
+    this.privateRooms[room].coords.socketId2 = client.id;
+    this.server.to(room).emit('new-coords', this.privateRooms[room].coords);
+    this.server.emit('rooms', this.rooms);
+  }
+
   @SubscribeMessage('normal-bg')
   normalBg(@MessageBody() room: string): void  {
     this.server.to(room).emit('normal-bg', '');
@@ -291,7 +329,7 @@ export class PongGateway {
   move(@MessageBody() room: string, @ConnectedSocket() client: Socket): void  {
     if (this.coordsArray == undefined)
       return ;
-    var coords = this.coordsArray[parseInt(room, 10)];
+    var coords = (room.includes('-')) ? this.privateRooms[room].coords : this.coordsArray[parseInt(room, 10)];
     if (coords.end == true)
       return ;
     //this.coordsArray[parseInt(room, 10)].moving = true;
@@ -337,7 +375,10 @@ export class PongGateway {
       }
     }
     this.server.to(room).emit('new-coords', coords);
-    this.coordsArray[parseInt(room, 10)] = coords;
+    if (room.includes('-'))
+      this.privateRooms[room].coords = coords;
+    else
+      this.coordsArray[parseInt(room, 10)] = coords;
   }
 
   @SubscribeMessage('replay')
