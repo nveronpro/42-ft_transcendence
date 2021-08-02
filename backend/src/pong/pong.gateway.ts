@@ -258,10 +258,9 @@ export class PongGateway {
     this.privateRooms[room] = {};
     this.privateRooms[room].coords = resetAllGame();
     client.join(room);
-    this.privateRooms[room].coords.client1 = client;
-    // NEED A QUERY TO GET USERS BY LOGIN
-    //this.privateRooms[room].coords.player1 = USER1
-    //this.privateRooms[room].coords.player2 = USER2;
+    this.privateRooms[room].client1 = client;
+    this.privateRooms[room].coords.player1 = User.findOne({login:data.login1});
+    this.privateRooms[room].coords.player2 = User.findOne({login:data.login2});
     this.privateRooms[room].coords.socketId1 = client.id;
     this.privateRooms[room].coords.spectsId = [];
     this.privateRooms[room].coords.room = room;
@@ -279,7 +278,7 @@ export class PongGateway {
       role: 2,
       room: room});
     client.join(room);
-    this.privateRooms[room].coords.client2 = client;
+    this.privateRooms[room].client2 = client;
     this.privateRooms[room].coords.full = true;
     this.privateRooms[room].coords.socketId2 = client.id;
     this.server.to(room).emit('new-coords', this.privateRooms[room].coords);
