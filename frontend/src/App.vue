@@ -22,12 +22,12 @@
 						<div class="collapse navbar-collapse" id="navbarCollapse">
 							<div class="navbar-nav">
 								<router-link class="nav-item nav-link" to="/home">Home</router-link>
+								<router-link class="nav-item nav-link" to="/game">Game</router-link>
 								<router-link class="nav-item nav-link" to="/Leaderboard">Leaderboard</router-link>
 								<router-link class="nav-item nav-link" to="/friends">Friends</router-link>
 								<router-link class="nav-item nav-link" to="/stats">Stats</router-link>
 								<router-link class="nav-item nav-link" to="/profile">Profile</router-link>
 								<router-link class="nav-item nav-link" to="/test">Test</router-link>
-
 							</div>
 							<div class="navbar-nav ml-auto">
 								<div v-if="user !== null">
@@ -103,6 +103,11 @@
 				axios
 				.post('/users/status/offline');
 			});
+			window.onload = (event) => {
+				if (window.location.href != "http://localhost:3000/#/stats") {
+					window.location.href = "http://localhost:3000/#/home"
+				}
+			};
 		},
 		methods: {
 			google_auth: function (){

@@ -9,6 +9,7 @@ import ChatComponent from '@/components/Chat.vue';
 import TestComponent from '@/components/Test.vue';
 import FriendProfileComponent from '@/components/FriendProfile.vue';
 import LeaderboardComponent from '@/components/Leaderboard.vue';
+import GameComponent from '@/components/Game.vue';
 import axios from "axios";
 import initAxios from './axios.config'
 
@@ -17,6 +18,7 @@ const router = createRouter({
   routes: [
     { path: '/', redirect: { name: 'home' } },
     { path: '/home', name: 'home', component: HomeComponent },
+    { path: '/game', name: 'game', component: GameComponent },
     { path: '/test', name: 'test', component: TestComponent },
     { path: '/friends', name: 'Friends', component: FriendsComponent },
     { path: '/stats', name: 'Stats', component: StatsComponent },

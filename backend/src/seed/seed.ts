@@ -11,8 +11,10 @@ import * as speakeasy from 'speakeasy';
 import * as qrcode from 'qrcode';
 import { ChatUsers } from '../chat/entities/chatUsers.entity';
 import { Chat } from '../chat/entities/chat.entity';
+import { Block } from '../friends/entities/block.entity';
 
 async function reset_db() {
+	await Block.delete({});
 	await ChatUsers.delete({});
 	await Chat.delete({});
 	await FriendRequest.delete({});

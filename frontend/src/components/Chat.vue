@@ -24,7 +24,7 @@
 				</div>
 			</div>
 			<div class="d-flex flex-row chat-tab">
-				<button type="button" class="btn btn-primary position-relative m-2 rounded-circle" data-bs-toggle="offcanvas" data-bs-target="#search" aria-expanded="false" aria-controls="search">
+				<button @click="reloadGroups" type="button" class="btn btn-primary position-relative m-2 rounded-circle" data-bs-toggle="offcanvas" data-bs-target="#search" aria-expanded="false" aria-controls="search">
 				<i class="fas fa-search"></i>
 				</button>
 				<div class="offcanvas offcanvas-start" tabindex="-1" id="search" aria-labelledby="searchLabel">
@@ -148,6 +148,7 @@
 				friends: null,
 				groups: null,
 				socket: null,
+				socket_pong: null,
 				user: null,
 				text: '',
 				password: '',
@@ -155,14 +156,8 @@
 				messages: [],
 				chats: [],
 				is_block: false,
+
 			}
-		},
-		updated() {
-			axios
-			.get('/chat/')
-			.then(response => {
-				this.groups = response.data;
-			})
 		},
 		computed: {
 			filterFriends() {
@@ -183,6 +178,18 @@
 			},
 		},
 		methods: {
+			reloadGroups() {
+				axios
+				.get('/chat/')
+				.then(response => {
+					this.groups = response.data;
+				})
+
+				axios
+				.get('/friends/')
+				.then(response => (this.friends = response.data))
+
+			},
 			joinGroup(group) {
 				let input = document.getElementById("input_" + group);
 				let button = document.getElementById("button_" + group);
@@ -224,13 +231,61 @@
 				this.password = '';
 			},
 			sendMessage(dest) {
-				const message = {
-					login: this.user.login,
-					text: this.text,
-					destination: dest,
+				let split = this.text.split(' ');
+				if (split[0] == "/duel")
+				{
+					if (split[1] == undefined || split[1] == "") {
+						this.messages.push({
+							login: this.user.login,
+							text: "/duel [user_login]",
+							destination: dest,
+						});
+						this.text = '';
+						document.getElementById("textarea" + dest).value = "";
+						return ;
+					}
+					const message = {
+						login: this.user.login,
+						text: this.user.login + " duel " + split[1] + " , `/accept " + this.user.login + "` for accept !",
+						destination: dest,
+					}
+					this.socket.emit('msgToServer', message);
+
+					const data = {
+						login1: this.user.login,
+						login2: split[1],
+						userId: this.user.id,
+					}
+					this.socket_pong.emit('create-private', data);
+					this.$router.push("/game");
+
+				} else if (split[0] == "/accept") {
+					if (split[1] == undefined || split[1] == "") {
+						this.messages.push({
+							login: "Server",
+							text: "/accept [user_login]",
+							destination: dest,
+						});
+						this.text = '';
+						document.getElementById("textarea" + dest).value = "";
+						return ;
+					}
+					const data = {
+						login2: this.user.login,
+						login1: split[1],
+						userId: this.user.id,
+					}
+					this.socket_pong.emit('join-private', data);
+					this.$router.push("/game");
+				} else {
+					const message = {
+						login: this.user.login,
+						text: this.text,
+						destination: dest,
+					}
+					this.socket.emit('msgToServer', message)
 				}
-				this.socket.emit('msgToServer', message)
-				this.text = ''
+				this.text = '';
 				document.getElementById("textarea" + dest).value = "";
 			},
 			receivedMessage(message) {
@@ -332,7 +387,11 @@
 			.then(response => (this.friends = response.data))
 
 			this.socket = io('http://localhost:8080', { withCredentials: true });
+			this.socket_pong = io('http://localhost:8080/', { path: '/pong/', withCredentials: true });
 
+			this.socket_pong.on('new-coords', (message) => {
+				console.log(`NEW COORDS CHAT VUE`);
+			})
 			this.socket.on('message', (message) => {
 				console.log(`event: message`);
 				this.receivedMessage(message)
