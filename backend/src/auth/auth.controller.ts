@@ -27,6 +27,7 @@ export class AuthController {
   @Redirect('/', 302) // TODO CHANGE THE CODE
   async callback(@Query('code') code, @Res() res: Response){
     const token = await this.authService.callback(code, res);
+
     return { url: "/auth/saveToken?token=" + token.access_token };
   }
 
