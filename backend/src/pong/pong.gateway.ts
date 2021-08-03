@@ -175,11 +175,14 @@ export class PongGateway {
   clientsSockets;
 
   handleConnection(client: Socket) {
-    if (this.players == undefined) {
-      this.rooms = 0;
-      this.privateRooms = {};
-      this.privateSockets = {};
+    if (this.clientsSockets == undefined)
       this.clientsSockets = {};
+    if (this.privateSockets == undefined)
+      this.privateSockets = {};
+    if (this.privateRooms == undefined)
+      this.privateRooms = {};
+    if (this.players == undefined) {
+      this.rooms = 0; 
     }
     this.server.emit('init', null);
     this.server.emit('rooms', this.rooms);
@@ -206,7 +209,10 @@ export class PongGateway {
 
   @SubscribeMessage('init')
   init(@MessageBody() user: number, @ConnectedSocket() client: Socket): void  {
+    console.log("init");
     this.clientsSockets[user] = client;
+    console.log(user);
+    console.log(this.clientsSockets[user].id);
   }
 
   @SubscribeMessage('play')
@@ -256,8 +262,15 @@ export class PongGateway {
   @SubscribeMessage('create-private')
   async createPrivate(@MessageBody() data) {
     console.log('create-private');
-    console.log("data.userId = " + data.userId);
+    if (this.privateRooms[room] != undefined)
+      return ;
+    var player1 = await User.findOne({login:data.login1});
+    var player2 = await User.findOne({login:data.login2});
+    if ((player1 && player1.current_status != 'online') || (player2 && player2.current_status != 'online'))
+      return ;
     var client = this.clientsSockets[data.userId];
+    console.log("data.userId = " + data.userId);
+    console.log("this.clientsSockets[data.userId].id = " + this.clientsSockets[data.userId].id);
     var room = data.login1 + '-' + data.login2;
     console.log('Room create : ' + room);
     this.privateSockets[client.id] = room;
@@ -390,7 +403,6 @@ export class PongGateway {
     if ((this.coordsArray == undefined && !room.includes('-')) || (room.includes('-') && this.privateRooms[room].coords == undefined))
       return ;
     var coords = (room.includes('-')) ? this.privateRooms[room].coords : this.coordsArray[parseInt(room, 10)];
-    console.log(coords.posX);
     if (coords.end == true)
       return ;
     //this.coordsArray[parseInt(room, 10)].moving = true;
@@ -505,8 +517,10 @@ export class PongGateway {
         room: '-1',
         totalRooms: this.rooms
       });
-      this.privateRooms[r].client1.leave(r);
-      this.privateRooms[r].client2.leave(r);
+      if (this.privateRooms[r] != undefined && this.privateRooms[r].client1 != undefined)
+        this.privateRooms[r].client1.leave(r);
+      if (this.privateRooms[r] != undefined && this.privateRooms[r].client2 != undefined)
+        this.privateRooms[r].client2.leave(r);
       this.privateRooms[r] = undefined;
       return ;
     }
@@ -597,9 +611,9 @@ export class PongGateway {
         room: '-1',
         totalRooms: this.rooms
       });
-      if (client.id == this.privateRooms[r].client1.id)
+      if (this.privateRooms[r] != undefined && this.privateRooms[r].client1 != undefined && client.id == this.privateRooms[r].client1.id && this.privateRooms[r].client2)
         this.privateRooms[r].client2.leave(r);
-      if (client.id == this.privateRooms[r].client2.id)
+      if (this.privateRooms[r] != undefined && this.privateRooms[r].client2 != undefined && client.id == this.privateRooms[r].client2.id)
         this.privateRooms[r].client1.leave(r);
         this.privateRooms[r] = undefined;
       return ;

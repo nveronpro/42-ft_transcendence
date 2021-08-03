@@ -104,7 +104,7 @@
 				.post('/users/status/offline');
 			});
 			window.onload = (event) => {
-				if (window.location.href != "http://localhost:3000/#/stats") {
+				if (window.location.href != "http://localhost:3000/#/home") {
 					window.location.href = "http://localhost:3000/#/home"
 				}
 			};

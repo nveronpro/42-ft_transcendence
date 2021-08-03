@@ -230,7 +230,7 @@
 				this.name = '';
 				this.password = '';
 			},
-			sendMessage(dest) {
+			async sendMessage(dest) {
 				let split = this.text.split(' ');
 				if (split[0] == "/duel")
 				{
@@ -238,6 +238,16 @@
 						this.messages.push({
 							login: this.user.login,
 							text: "/duel [user_login]",
+							destination: dest,
+						});
+						this.text = '';
+						document.getElementById("textarea" + dest).value = "";
+						return ;
+					}
+					if (this.user.current_status != "online") {
+						this.messages.push({
+							login: "Server",
+							text: "You are already in game",
 							destination: dest,
 						});
 						this.text = '';
@@ -257,13 +267,22 @@
 						userId: this.user.id,
 					}
 					this.$router.push("/game");
-					this.socket_pong.emit('create-private', data);
-
+					setTimeout(() => {  this.socket_pong.emit('create-private', data); }, 500);
 				} else if (split[0] == "/accept") {
 					if (split[1] == undefined || split[1] == "") {
 						this.messages.push({
 							login: "Server",
 							text: "/accept [user_login]",
+							destination: dest,
+						});
+						this.text = '';
+						document.getElementById("textarea" + dest).value = "";
+						return ;
+					}
+					if (this.user.current_status != "online") {
+						this.messages.push({
+							login: "Server",
+							text: "You are already in game",
 							destination: dest,
 						});
 						this.text = '';
@@ -276,7 +295,7 @@
 						userId: this.user.id,
 					}
 					this.$router.push("/game");
-					this.socket_pong.emit('join-private', data);
+					setTimeout(() => {  this.socket_pong.emit('join-private', data); }, 500);
 				} else {
 					const message = {
 						login: this.user.login,

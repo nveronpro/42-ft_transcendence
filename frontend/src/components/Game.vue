@@ -47,10 +47,9 @@
 /* eslint-disable */
 import axios from "axios";
 import io from 'socket.io-client'
-var socket = io('http://localhost:8080/', { 
-  path: '/pong/',
-  withCredentials: true });
-
+var socket = io('http://localhost:8080/', {
+    path: '/pong/',
+    withCredentials: true });
 function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -108,15 +107,12 @@ export default {
     socket.on("rooms", totalRooms => {
 			this.totalRooms = totalRooms;
         });
-    window.onload = (event) => {
-        this.$router.push("/home");
-    };
 
     axios
     .get('/auth/me')
     .then(response => {
         this.user = response.data;
-	    socket.emit('init', response.data.id);
+        socket.emit('init', response.data.id);
         console.log(response.data.id);
     })
   },
@@ -150,7 +146,7 @@ export default {
     
     socket.on("rooms", totalRooms => {
 			this.totalRooms = totalRooms;
-		});
+	});
 
     socket.on("role", data => {
       console.log('Role : ' + data.role);
