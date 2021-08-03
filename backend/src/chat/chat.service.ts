@@ -150,14 +150,39 @@ export class ChatService {
       let room: Chat;
 
       const target: UserType = await UserType.findOne({login: targetLogin});
-      // if (target.current_status == "offline")
-      // {
-      //   this.logger.debug("User is offline");
-      //   client.emit("error", {text: `the User ${target.nickname} is offline. unable to send message`});
-      //   return ;
-      // }
+      if (target.current_status == "offline")
+      {
+        this.logger.debug("User is offline");
+        client.emit("error", {text: `the User ${target.nickname} is offline. unable to send message`});
+        return ;
+      }
 
-      // TODO Check if user is blocked.
+      
+      const blocked = await this.manager.query('SELECT * FROM "block" WHERE "blockerId" = $1 AND "blockedId" = $2;', [target.id, user.id]);
+      if (blocked[0] !== undefined)
+      {
+        //user is blocked
+        client.emit("error", {text: `the User ${target.nickname} has blocked you. unable to send message`});
+        return ;
+      }
+
+      const has_blocked = await this.manager.query('SELECT * FROM "block" WHERE "blockerId" = $2 AND "blockedId" = $1;', [target.id, user.id]);
+      if (has_blocked[0] !== undefined)
+      {
+        //user is blocked
+        client.emit("error", {text: `You blocked the user ${target.nickname}. unable to send message`});
+        return ;
+      }
+
+      //is chat already active
+      const exists = await this.manager.query('SELECT * FROM "chat" WHERE private = true AND (name = $1 OR name = $2);',
+      ["Private Messages " + user.nickname + "\\" + target.nickname, "Private Messages " + target.nickname + "\\" + user.nickname]);
+      if (exists[0] !== undefined)
+      {
+        // chat is already active
+        client.emit("error", {text: `You and ${target.nickname} are already chating. unable to send message`});
+        return ;
+      }
 
       //creating room
       const roomToCreate: CreateChatDto = new CreateChatDto();
@@ -182,14 +207,8 @@ export class ChatService {
 
       //adding users to chatRoom in socket
 
-      this.logger.debug("BEFORE FIRST JOIN");
       client.join(String(room.id));
-      this.logger.debug("AFTER FIRST, BEFORE SECOND");
-      //this.logger.debug(inspect(server.sockets.sockets.get(client.id), null, 2));
-      this.logger.debug("socketId: " + target.socketId);
-      this.logger.debug("target socket: " + server.sockets.sockets.get(target.socketId));
       server.sockets.sockets.get(target.socketId).join(String(room.id));
-      this.logger.debug("AFTER SECOND");
 
       server.to(String(room.id)).emit("open", {id: room.id, name: room.name});
       server.to(String(room.id)).emit("message", {login: "Server", destination: room.id, text: `User ${user.nickname} wishes to chat with ${target.nickname}.`});
