@@ -87,15 +87,15 @@ export class AuthService {
 					
 				usrDto1.wins = 0;
         usrDto1.looses = 0;
-        usrDto1.two_factor_auth = true;
+        usrDto1.two_factor_auth = false;
 				usrDto1.current_status = "none";
 				usrDto1.avatar = avatars_64[Math.floor(Math.random() * avatars_64.length)];
 
         var secret = speakeasy.generateSecret({
           name: usrDto1.login
         });
-        user.secret = secret.ascii;
-        user.qrcode_data = await qrcode.toDataURL(secret.otpauth_url);
+        usrDto1.secret = secret.ascii;
+        usrDto1.qrcode_data = await qrcode.toDataURL(secret.otpauth_url);
         await User.create(usrDto1).save();
       }
       const payload = {
