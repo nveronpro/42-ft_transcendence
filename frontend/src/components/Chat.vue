@@ -144,6 +144,7 @@
 	export default {
 		data() {
 			return {
+				all_users: null,
 				keyword: "",
 				friends: null,
 				groups: null,
@@ -230,7 +231,7 @@
 				this.name = '';
 				this.password = '';
 			},
-			async sendMessage(dest) {
+			sendMessage(dest) {
 				let split = this.text.split(' ');
 				if (split[0] == "/duel")
 				{
@@ -248,6 +249,28 @@
 						this.messages.push({
 							login: "Server",
 							text: "You are already in game",
+							destination: dest,
+						});
+						this.text = '';
+						document.getElementById("textarea" + dest).value = "";
+						return ;
+					}
+					if (this.user.login == split[1]){
+						this.messages.push({
+							login: "Server",
+							text: "You can't duel yourself",
+							destination: dest,
+						});
+						this.text = '';
+						document.getElementById("textarea" + dest).value = "";
+						return ;
+					}
+					let users = JSON.parse(JSON.stringify( this.all_users ));
+					let user_find = users.find(x => x.user_login === split[1]);
+					if (user_find == undefined) {
+						this.messages.push({
+							login: "Server",
+							text: "User don't exist",
 							destination: dest,
 						});
 						this.text = '';
@@ -283,6 +306,18 @@
 						this.messages.push({
 							login: "Server",
 							text: "You are already in game",
+							destination: dest,
+						});
+						this.text = '';
+						document.getElementById("textarea" + dest).value = "";
+						return ;
+					}
+					let users = JSON.parse(JSON.stringify( this.all_users ));
+					let user_find = users.find(x => x.user_login === split[1]);
+					if (user_find == undefined) {
+						this.messages.push({
+							login: "Server",
+							text: "User don't exist",
 							destination: dest,
 						});
 						this.text = '';
@@ -400,6 +435,10 @@
 		async created () {
 			const res = await axios.get('/auth/me')
 			this.user = res.data;
+
+			axios
+			.get('/users/all')
+			.then(response => (this.all_users = response.data))
 
 			axios
 			.get('/friends/')
