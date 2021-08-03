@@ -184,6 +184,11 @@
 				.then(response => {
 					this.groups = response.data;
 				})
+
+				axios
+				.get('/friends/')
+				.then(response => (this.friends = response.data))
+
 			},
 			joinGroup(group) {
 				let input = document.getElementById("input_" + group);
@@ -252,6 +257,7 @@
 						userId: this.user.id,
 					}
 					this.socket_pong.emit('create-private', data);
+					this.$router.push("/game");
 
 				} else if (split[0] == "/accept") {
 					if (split[1] == undefined || split[1] == "") {
@@ -270,6 +276,7 @@
 						userId: this.user.id,
 					}
 					this.socket_pong.emit('join-private', data);
+					this.$router.push("/game");
 				} else {
 					const message = {
 						login: this.user.login,

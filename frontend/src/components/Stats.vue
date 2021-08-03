@@ -6,7 +6,7 @@
 					<div class="p-3 border bg-light h-100">
 						<div class="card mb-3">
 							<div class="row">
-								<div class="col-md-12 col-lg-6">
+								<div class="col-11 col-md-11 col-lg-6">
 									<div id="avatar">
 									</div>
 								</div>
