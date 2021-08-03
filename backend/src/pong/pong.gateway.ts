@@ -256,6 +256,7 @@ export class PongGateway {
   @SubscribeMessage('create-private')
   async createPrivate(@MessageBody() data) {
     console.log('create-private');
+    console.log("data.userId = " + data.userId);
     var client = this.clientsSockets[data.userId];
     var room = data.login1 + '-' + data.login2;
     console.log('Room create : ' + room);

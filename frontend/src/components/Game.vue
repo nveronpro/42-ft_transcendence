@@ -112,6 +112,13 @@ export default {
         this.$router.push("/home");
     };
 
+    axios
+    .get('/auth/me')
+    .then(response => {
+        this.user = response.data;
+	    socket.emit('init', response.data.id);
+        console.log(response.data.id);
+    })
   },
 
   mounted() {
@@ -119,15 +126,6 @@ export default {
     this.provider.canvas = this.$refs["pong"];
     this.provider.canvas.width = "700";
     this.provider.canvas.height = "500";
-    
-    axios
-    .get('/auth/me')
-    .then(response => {
-      this.user = response.data;
-			socket.emit('init', response.data.id);
-      console.log(reponse.data);
-    })
-
 
     socket.on("rooms", totalRooms => {
 			this.totalRooms = totalRooms;

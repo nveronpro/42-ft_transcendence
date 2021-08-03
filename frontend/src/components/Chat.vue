@@ -83,7 +83,7 @@
 														<strong class="d-block text-gray-dark">{{group.name}}</strong>
 														Groupe id:{{group.id}}
 													</p>
-													<button v-if='group.password !== null && group.password !== ""' :id='"button_" + group.id' type="button" class="btn btn-primary align-self-start" @click="joinGroup(group.id)">
+													<button v-if='group.password !== null && group.password !== "" && group.password !== undefined' :id='"button_" + group.id' type="button" class="btn btn-primary align-self-start" @click="joinGroup(group.id)">
 														Password
 													</button>
 													<button v-else type="button" :id='"button_" + group.id' class="btn btn-primary align-self-start" @click="joinGroup(group.id)">
@@ -256,8 +256,8 @@
 						login2: split[1],
 						userId: this.user.id,
 					}
-					this.socket_pong.emit('create-private', data);
 					this.$router.push("/game");
+					this.socket_pong.emit('create-private', data);
 
 				} else if (split[0] == "/accept") {
 					if (split[1] == undefined || split[1] == "") {
@@ -275,8 +275,8 @@
 						login1: split[1],
 						userId: this.user.id,
 					}
-					this.socket_pong.emit('join-private', data);
 					this.$router.push("/game");
+					this.socket_pong.emit('join-private', data);
 				} else {
 					const message = {
 						login: this.user.login,

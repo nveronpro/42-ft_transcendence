@@ -634,5 +634,5 @@ export async function seed() {
 
 
 
-    await reset_db();
+    //await reset_db();
 }
