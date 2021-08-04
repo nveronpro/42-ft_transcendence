@@ -3,37 +3,33 @@
     <div v-if="this.role == -1" class="play-buttons">
       <h1 v-if="user">Welcome in the pong game, {{user.nickname}} </h1>
       <h1>There are actually {{this.totalRooms}} rooms</h1>
-      <h1>Role : {{this.role}}</h1>
       <div class="play-buttons">
         <h1 v-if="this.totalRooms > 0">Click on a room to join it as spectator :</h1>
-        <button v-for="i in this.totalRooms" :key="i" v-on:click="joinSpect(i)">Room {{i}}</button>
+        <button class="btn btn-secondary" v-for="i in this.totalRooms" :key="i" v-on:click="joinSpect(i)">Room {{i}}</button>
         <h1>Or click on 'Play' to join a game :</h1>
-        <button v-on:click="play()">Play</button>
-        <button v-on:click="test()">Test</button>
+        <button class="btn btn-secondary" v-on:click="play()">Play</button>
       </div>
     </div>
     
     <div v-if="this.role != -1">
       <div class="play-buttons">
-        <h1 v-if="this.coords.full">There are 2 players in the room, game can start</h1>
-        <h1 v-else>Waiting for a 2nd player...</h1>
+        
         <h1 v-if="this.role == 0">You are a spectator in the room {{this.coords.room}} </h1>
         <h1 v-if="this.role == 1">You are a player 1 in the room {{this.coords.room}} </h1>
         <h1 v-if="this.role == 2">You are a player 2 in the room {{this.coords.room}} </h1>
-        <h1>Score : {{this.coords.score1}} - {{this.coords.score2}} </h1>
 
-        <button v-if="this.role != 0 && !this.coords.end" v-on:click="move()">Play</button>
-        <button v-if="this.role != 0 && this.coords.end" v-on:click="replay()">Replay</button>
-        <button v-on:click="test()">Test</button>
+        <h3 v-if="this.coords.full">There are 2 players in the room, game can start</h3>
+        <h3 v-else>Waiting for a 2nd player...</h3>
 
-        <button v-if="this.role > 0 && this.coords.vxBall != 2 && this.coords.vxBall != -2" v-on:click="normal()">Normal mode</button>
-        <button v-if="this.role > 0 && this.coords.vxBall != 3 && this.coords.vxBall != -3" v-on:click="hard()">Hard mode</button>
-        <button v-if="this.role > 0 && this.coords.vxBall != 4 && this.coords.vxBall != -4" v-on:click="insane()">Insane mode</button>
+        <h1>{{this.coords.score1}} - {{this.coords.score2}} </h1>
 
-        <button v-if="this.role > 0" v-on:click="normalBg()">Normal background</button>
-        <button v-if="this.role > 0" v-on:click="greenBg()">Green background</button>
-
-        <button v-on:click="quit()">Quit</button>
+                <button class="m-1 btn btn-success" v-if="this.role != 0 && !this.coords.end" v-on:click="move()">Play</button>
+                <button class="m-1 btn btn-danger" v-on:click="quit()">Quit</button>
+                <button class="m-1 btn btn-secondary" v-if="this.role > 0 && this.coords.vxBall != 3 && this.coords.vxBall != -3" v-on:click="normal()">Normal mode</button>
+                <button class="m-1 btn btn-secondary" v-if="this.role > 0 && this.coords.vxBall != 4 && this.coords.vxBall != -4" v-on:click="hard()">Hard mode</button>
+                <button class="m-1 btn btn-secondary" v-if="this.role > 0 && this.coords.vxBall != 5 && this.coords.vxBall != -5" v-on:click="insane()">Insane mode</button>
+                <button class="m-1 btn btn-secondary" v-if="this.role > 0" v-on:click="normalBg()">Normal background</button>
+                <button class="m-1 btn btn-secondary" v-if="this.role > 0" v-on:click="greenBg()">Green background</button>
 
         <h2 v-if="this.coords.spects.length">They are looking the game :</h2>
         <h2 v-for="s in this.coords.spects" :key="s">- {{s}}, </h2>
@@ -103,7 +99,6 @@ export default {
   },
 
   created() {
-    console.log(socket);
     socket.on("rooms", totalRooms => {
 			this.totalRooms = totalRooms;
         });
@@ -113,7 +108,6 @@ export default {
     .then(response => {
         this.user = response.data;
         socket.emit('init', response.data.id);
-        console.log(response.data.id);
     })
   },
 
@@ -149,8 +143,6 @@ export default {
 	});
 
     socket.on("role", data => {
-      console.log('Role : ' + data.role);
-      console.log('Room : ' + data.room);
 			this.role = data.role;
 			this.totalRooms = data.totalRooms;
       this.coords.room = data.room;
@@ -159,7 +151,6 @@ export default {
       else
         document.getElementById("pong").style.opacity='0';
       if (this.role > 0) {
-        console.log('ingame')
         axios.post('/users/status/ingame').then()}
       else if (this.role == 0)
         axios.post('/users/status/spectator').then()
@@ -199,22 +190,18 @@ export default {
 	});
 
     socket.on("normal-bg", data => {
-      console.log("normal-bg")
-      HTMLElement =document.getElementById("pong");
       document.getElementById("pong").style.removeProperty('background-color');
       document.getElementById("pong").style.backgroundImage='url("../../public/background.jpg")';
       document.getElementById("pong").style.backgroundSize='cover';
 	  });
 
     socket.on("green-bg", data => {
-      console.log("green-bg")
       document.getElementById("pong").style.removeProperty('background-image');
       document.getElementById("pong").style.removeProperty('background-size');
       document.getElementById("pong").style.backgroundColor='darkgray';
 	  });
 
     socket.on("end-game", matchHist => {
-      console.log('end of the game');
       axios
       .post('/match-histories/', {
         winner: matchHist.winner,
@@ -284,12 +271,7 @@ export default {
     quit: function() {
       socket.emit('quit', null);
     },
-    test: function() {
-      //socket.emit('test', 'test first');
-      console.log(this.coords);
-    },
     move: function() {
-      console.log('move');
       if (this.coords.moving == false && this.role > 0 && this.coords.full && !this.coords.end) {
         this.coords.moving = true;
         socket.emit('set-move', this.coords.room);
@@ -298,17 +280,12 @@ export default {
         return;
       }
     },
-    replay: function() {
-      socket.emit('replay', this.coords.room);
-    },
     moveBall: function() {
-      console.log('moveBall moving ' + this.coords.moving)
       if (this.role < 1 || !this.coords.moving)
         return;
       socket.emit('move', this.coords.room);
       if (!this.coords.moving)
         return ;
-      this.raf = window.requestAnimationFrame(this.moveBall);
     },
   },
 };
