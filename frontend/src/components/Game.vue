@@ -103,7 +103,6 @@ export default {
   },
 
   created() {
-    console.log(socket);
     socket.on("rooms", totalRooms => {
 			this.totalRooms = totalRooms;
         });
@@ -113,7 +112,6 @@ export default {
     .then(response => {
         this.user = response.data;
         socket.emit('init', response.data.id);
-        console.log(response.data.id);
     })
   },
 
@@ -149,8 +147,6 @@ export default {
 	});
 
     socket.on("role", data => {
-      console.log('Role : ' + data.role);
-      console.log('Room : ' + data.room);
 			this.role = data.role;
 			this.totalRooms = data.totalRooms;
       this.coords.room = data.room;
@@ -159,7 +155,6 @@ export default {
       else
         document.getElementById("pong").style.opacity='0';
       if (this.role > 0) {
-        console.log('ingame')
         axios.post('/users/status/ingame').then()}
       else if (this.role == 0)
         axios.post('/users/status/spectator').then()
@@ -199,22 +194,18 @@ export default {
 	});
 
     socket.on("normal-bg", data => {
-      console.log("normal-bg")
-      HTMLElement =document.getElementById("pong");
       document.getElementById("pong").style.removeProperty('background-color');
       document.getElementById("pong").style.backgroundImage='url("../../public/background.jpg")';
       document.getElementById("pong").style.backgroundSize='cover';
 	  });
 
     socket.on("green-bg", data => {
-      console.log("green-bg")
       document.getElementById("pong").style.removeProperty('background-image');
       document.getElementById("pong").style.removeProperty('background-size');
       document.getElementById("pong").style.backgroundColor='darkgray';
 	  });
 
     socket.on("end-game", matchHist => {
-      console.log('end of the game');
       axios
       .post('/match-histories/', {
         winner: matchHist.winner,
@@ -284,12 +275,7 @@ export default {
     quit: function() {
       socket.emit('quit', null);
     },
-    test: function() {
-      //socket.emit('test', 'test first');
-      console.log(this.coords);
-    },
     move: function() {
-      console.log('move');
       if (this.coords.moving == false && this.role > 0 && this.coords.full && !this.coords.end) {
         this.coords.moving = true;
         socket.emit('set-move', this.coords.room);
@@ -302,13 +288,11 @@ export default {
       socket.emit('replay', this.coords.room);
     },
     moveBall: function() {
-      console.log('moveBall moving ' + this.coords.moving)
       if (this.role < 1 || !this.coords.moving)
         return;
       socket.emit('move', this.coords.room);
       if (!this.coords.moving)
         return ;
-      this.raf = window.requestAnimationFrame(this.moveBall);
     },
   },
 };
