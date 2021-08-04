@@ -264,8 +264,8 @@ export class PongGateway {
     console.log('create-private');
     if (this.privateRooms[room] != undefined)
       return ;
-    var player1 = await User.findOne({login:data.login1});
-    var player2 = await User.findOne({login:data.login2});
+    var player1 = await User.findOne({nickname:data.login1});
+    var player2 = await User.findOne({nickname:data.login2});
     if ((player1 && player1.current_status != 'online') || (player2 && player2.current_status != 'online'))
       return ;
     var client = this.clientsSockets[data.userId];
@@ -282,8 +282,8 @@ export class PongGateway {
     this.privateRooms[room].coords = resetAllGame();
     client.join(room);
     this.privateRooms[room].client1 = this.clientsSockets[data.userId];
-    this.privateRooms[room].coords.player1 = await User.findOne({login:data.login1});
-    this.privateRooms[room].coords.player2 = await User.findOne({login:data.login2});
+    this.privateRooms[room].coords.player1 = await User.findOne({nickname:data.login1});
+    this.privateRooms[room].coords.player2 = await User.findOne({nickname:data.login2});
     this.privateRooms[room].coords.socketId1 = client.id;
     this.privateRooms[room].coords.spectsId = [];
     this.privateRooms[room].coords.room = room;

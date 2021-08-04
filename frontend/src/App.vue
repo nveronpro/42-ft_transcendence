@@ -27,7 +27,6 @@
 								<router-link class="nav-item nav-link" to="/friends">Friends</router-link>
 								<router-link class="nav-item nav-link" to="/stats">Stats</router-link>
 								<router-link class="nav-item nav-link" to="/profile">Profile</router-link>
-								<router-link class="nav-item nav-link" to="/test">Test</router-link>
 							</div>
 							<div class="navbar-nav ml-auto">
 								<div v-if="user !== null">

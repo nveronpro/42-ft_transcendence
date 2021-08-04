@@ -202,7 +202,7 @@ export class ChatGateway {
   async executeCommand(client: Socket, ...args: any[] ) {
     let login = args[0].login;
     let roomId = args[0].destination;
-
+    
     const user: UserType = await this.chatService.getUserLogin(login);
 
     

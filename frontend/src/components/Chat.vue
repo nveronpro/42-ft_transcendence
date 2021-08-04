@@ -60,7 +60,7 @@
 												<svg v-if='friend.current_status === "offline"' class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#ff0800"></rect><text x="50%" y="50%" fill="#ff0800" dy=".3em"></text></svg>
 												<svg v-else class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#00ff37"></rect><text x="50%" y="50%" fill="#00ff37" dy=".3em"></text></svg>
 												<p class="pb-3 mb-0 small lh-sm border-bottom">
-													<strong class="d-block text-gray-dark">{{friend.login}}</strong>
+													<strong class="d-block text-gray-dark">{{friend.nickname}}</strong>
 													Envoyer un message à {{ friend.login }} alias {{ friend.nickname }}
 												</p>
 											</a>
@@ -101,7 +101,7 @@
 				</div>
 			</div>
 			<div v-for="chat of chats" :key="chat.id" class="d-flex flex-row chat-tab" :id=" 'Cb' + chat.id">
-				<button type="button" class="btn btn-primary position-relative m-2 rounded-circle" data-bs-toggle="offcanvas" :data-bs-target="'#' + 'C' + chat.id" aria-expanded="false" :aria-controls="'C' + chat.id">
+				<button @click="reloadUser" type="button" class="btn btn-primary position-relative m-2 rounded-circle" data-bs-toggle="offcanvas" :data-bs-target="'#' + 'C' + chat.id" aria-expanded="false" :aria-controls="'C' + chat.id">
 				{{chat.name[0]}}
 				</button>
 				<div class="offcanvas offcanvas-start" tabindex="-1" :id="'C' + chat.id" :aria-labelledby="'C' + chat.id + 'Label'">
@@ -112,7 +112,7 @@
 					<div class="offcanvas-body">
 						<div v-for="message of messages" :key="message.id">
 							<div v-if="message.destination === chat.id" :id="'Cm' + chat.id">
-								<div v-if="message.login !== this.user.login" class="d-flex flex-row mb-2">
+								<div v-if="message.login !== this.user.nickname" class="d-flex flex-row mb-2">
 									<div class="p-2">{{message.login}}: {{message.text}}</div>
 								</div>
 								<div v-else class="d-flex flex-row-reverse">
@@ -165,7 +165,7 @@
 				const { friends, keyword } = this;
 				let u = JSON.parse(JSON.stringify( this.friends ));
 				if (keyword !== ""){
-					return u.filter(({ login }) => login.toLowerCase().includes(keyword.toLowerCase()));
+					return u.filter(({ nickname }) => nickname.toLowerCase().includes(keyword.toLowerCase()));
 				}
 				return null;
 			},
@@ -191,6 +191,13 @@
 				.then(response => (this.friends = response.data))
 
 			},
+			reloadUser() {
+				axios
+				.get('/auth/me')
+				.then(response => {
+					this.user = response.data;
+				})
+			},
 			joinGroup(group) {
 				let input = document.getElementById("input_" + group);
 				let button = document.getElementById("button_" + group);
@@ -204,8 +211,7 @@
 				{
 					input.style.display = "block";
 					button.innerHTML = "Join"
-				}
-				else {
+				} else {
 					this.socket.emit('joinChat', data);
 					this.password = '';
 					if (input.style.display == "block")
@@ -266,7 +272,7 @@
 						return ;
 					}
 					let users = JSON.parse(JSON.stringify( this.all_users ));
-					let user_find = users.find(x => x.user_login === split[1]);
+					let user_find = users.find(x => x.user_nickname === split[1]);
 					if (user_find == undefined) {
 						this.messages.push({
 							login: "Server",
@@ -279,13 +285,13 @@
 					}
 					const message = {
 						login: this.user.login,
-						text: this.user.login + " duel " + split[1] + " , `/accept " + this.user.login + "` for accept !",
+						text: this.user.login + " duel " + split[1] + " , `/accept " + this.user.nickname + "` for accept !",
 						destination: dest,
 					}
 					this.socket.emit('msgToServer', message);
 
 					const data = {
-						login1: this.user.login,
+						login1: this.user.nickname,
 						login2: split[1],
 						userId: this.user.id,
 					}
@@ -313,7 +319,7 @@
 						return ;
 					}
 					let users = JSON.parse(JSON.stringify( this.all_users ));
-					let user_find = users.find(x => x.user_login === split[1]);
+					let user_find = users.find(x => x.user_nickname === split[1]);
 					if (user_find == undefined) {
 						this.messages.push({
 							login: "Server",
@@ -325,7 +331,7 @@
 						return ;
 					}
 					const data = {
-						login2: this.user.login,
+						login2: this.user.nickname,
 						login1: split[1],
 						userId: this.user.id,
 					}
@@ -359,13 +365,13 @@
 				if (message.text != "" && message.text[0] != '/') {
 					this.messages.push(message);
 				}
-				if (message.text[0] === '/' && message.login == this.user.login) {
+				if (message.text[0] === '/' && message.login == this.user.nickname) {
 					
 					let split = message.text.split(' ');
 					if (split[0] == "/help"){
 						this.messages.push({
 							login: "Server",
-							text: "/profile [user_login/user_nickname]",
+							text: "/profile [user_nickname]",
 							destination: message.destination,
 						});
 					} else {

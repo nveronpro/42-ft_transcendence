@@ -176,7 +176,7 @@ export class ChatService {
 
       //is chat already active
       const exists = await this.manager.query('SELECT * FROM "chat" WHERE private = true AND (name = $1 OR name = $2);',
-      ["Private Messages " + user.nickname + "\\" + target.nickname, "Private Messages " + target.nickname + "\\" + user.nickname]);
+      ["Private Messages " + user.login + "\\" + target.login, "Private Messages " + target.login + "\\" + user.login]);
       if (exists[0] !== undefined)
       {
         // chat is already active
@@ -186,7 +186,7 @@ export class ChatService {
 
       //creating room
       const roomToCreate: CreateChatDto = new CreateChatDto();
-      roomToCreate.name = "Private Messages " + user.nickname + "\\" + target.nickname;
+      roomToCreate.name = "Private Messages " + user.login + "\\" + target.login;
       roomToCreate.password = null;
       roomToCreate.private = true;
 
@@ -287,7 +287,7 @@ export class ChatService {
           client.emit("error", {text: `You cannot send message to this channel`});
           return ;
         }
-      server.to(String(roomId)).emit("message", {login: user.login, destination: roomId, text: message});
+      server.to(String(roomId)).emit("message", {login: user.nickname, destination: roomId, text: message});
 
     }
     catch (error) {
@@ -378,6 +378,15 @@ export class ChatService {
       const allCommands: string[] = ["/profile", "/mute", "/unmute", "/kick", "/ban", "/unban", "/password", "/promote", "/demote", "/close"];
       const command: String = args[0].command;
       const roomId: String = args[0].destination;
+
+      const room: Chat = await Chat.findOne({id: args[0].destination});
+
+      if (room === undefined)
+      {
+        this.logger.error(`sendServerCommand: User#${user.login} tried to send a command to room#${roomId} but it doesn't exist !`);
+        client.emit("error", {text: "You can not do this !"});
+        return ;
+      }
       
       let userPerms: ChatUsers = (await this.manager.query('SELECT * FROM "chat_users" WHERE "chatId" = $1 AND "userId" = $2;', [roomId, user.id]))[0];
 
@@ -463,20 +472,24 @@ export class ChatService {
         this.manager.query("UPDATE \"chat_users\" SET \"userRole\" = $1 WHERE \"userId\" = $2 AND \"chatId\" = $3;", [UserRole.MUTED, target.id, roomId]);
         server.sockets.sockets.get(String(target.socketId)).emit("mute", {destination: roomId, actif: true});
 
-        if(args[0].argument1 !== undefined && typeof(args[0].argument1) == "number" && args[0].argument1 > 0)
+
+        if(args[0].argument1 !== undefined && args[0].argument1 > 0)
         {
           setTimeout(() => {
-            const still_muted = this.manager.query('SELECT * FROM "chat_users" WHERE "userId" = $1 AND "chatId" = $2;', [target.id, roomId]);
-            if (still_muted[0] === undefined || still_muted[0].userRole !== UserRole.MUTED)
-            {
-              //user not muted anymore
-              return;
-            }
-            else
-            {
-              this.manager.query("UPDATE \"chat_users\" SET \"userRole\" = $1 WHERE \"userId\" = $2 AND \"chatId\" = $3;", [UserRole.USER, target.id, roomId]);
-              server.sockets.sockets.get(String(target.socketId)).emit("mute", {destination: roomId, actif: false});
-            }
+            const still_muted = this.manager.query('SELECT * FROM "chat_users" WHERE "userId" = $1 AND "chatId" = $2;', [target.id, roomId]).then((data) => {
+              if (data[0] === undefined || data[0].userRole !== UserRole.MUTED)
+              {
+                this.logger.verbose("user is unmuted or absent");
+                //user not muted anymore
+                return;
+              }
+              else
+              {
+                this.manager.query("UPDATE \"chat_users\" SET \"userRole\" = $1 WHERE \"userId\" = $2 AND \"chatId\" = $3;", [UserRole.USER, target.id, roomId]);
+                server.sockets.sockets.get(String(target.socketId)).emit("mute", {destination: roomId, actif: false});
+              }
+            });
+
           }, args[0].argument1 * 1000);
         }
       }
@@ -562,20 +575,22 @@ export class ChatService {
         server.sockets.sockets.get(String(target.socketId)).emit("close", {destination: roomId, text: "you have been kicked out of the room."});
         server.to(String(roomId)).emit("message", {destination: roomId, text:`User ${target.nickname} has left the chat(ban)`});
 
-        if(args[0].argument1 !== undefined && typeof(args[0].argument1) == "number" && args[0].argument1 > 0)
+        if(args[0].argument1 !== undefined && args[0].argument1 > 0)
         {
           setTimeout(() => {
-            const still_muted = this.manager.query('SELECT * FROM "chat_users" WHERE "userId" = $1 AND "chatId" = $2;', [target.id, roomId]);
-            if (still_muted[0] === undefined || still_muted[0].userRole !== UserRole.BANNED)
-            {
-              //user not Banned anymore
-              return;
-            }
-            else
-            {
-              this.manager.query("DELETE FROM \"chat_users\" WHERE \"userId\" = $1 AND \"chatId\" = $2;", [target.id, roomId]);
-              server.sockets.sockets.get(String(target.socketId)).emit("mute", {destination: roomId, actif: false});
-            }
+            const still_muted = this.manager.query('SELECT * FROM "chat_users" WHERE "userId" = $1 AND "chatId" = $2;', [target.id, roomId]).then((data) => {
+              if (data[0] === undefined || data[0].userRole !== UserRole.BANNED)
+              {
+                this.logger.verbose("user is unmuted or absent");
+                //user not muted anymore
+                return;
+              }
+              else
+              {
+                this.manager.query("DELETE FROM \"chat_users\" WHERE \"userId\" = $1 AND \"chatId\" = $2;", [target.id, roomId]);
+              }
+            });
+
           }, args[0].argument1 * 1000);
         }
       }
