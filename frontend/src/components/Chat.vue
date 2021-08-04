@@ -353,7 +353,7 @@
 				.get('/chat/block/')
 				.then(response => {
 					for(var i = 0; i < response.data.length; i++) {
-						if (response.data[i].login == message.login) {
+						if (response.data[i].nickname == message.login) {
 							this.is_block = true;
 						}
 					}

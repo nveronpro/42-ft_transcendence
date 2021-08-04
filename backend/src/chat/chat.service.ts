@@ -55,7 +55,7 @@ export class ChatService {
   }
 
   async blockedUsers(user: UserType) {
-    const blocked = await this.manager.query('SELECT "user"."login", "user"."id" FROM "block" JOIN "user" ON "block"."blockedId" = "user"."id" WHERE "blockerId" = $1;', [user.id]);
+    const blocked = await this.manager.query('SELECT "user"."nickname", "user"."id" FROM "block" JOIN "user" ON "block"."blockedId" = "user"."id" WHERE "blockerId" = $1;', [user.id]);
     return (blocked);
   }
 
