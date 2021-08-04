@@ -23,12 +23,11 @@
         <h1>Score : {{this.coords.score1}} - {{this.coords.score2}} </h1>
 
         <button v-if="this.role != 0 && !this.coords.end" v-on:click="move()">Play</button>
-        <button v-if="this.role != 0 && this.coords.end" v-on:click="replay()">Replay</button>
         <button v-on:click="test()">Test</button>
 
-        <button v-if="this.role > 0 && this.coords.vxBall != 2 && this.coords.vxBall != -2" v-on:click="normal()">Normal mode</button>
-        <button v-if="this.role > 0 && this.coords.vxBall != 3 && this.coords.vxBall != -3" v-on:click="hard()">Hard mode</button>
-        <button v-if="this.role > 0 && this.coords.vxBall != 4 && this.coords.vxBall != -4" v-on:click="insane()">Insane mode</button>
+        <button v-if="this.role > 0 && this.coords.vxBall != 3 && this.coords.vxBall != -3" v-on:click="normal()">Normal mode</button>
+        <button v-if="this.role > 0 && this.coords.vxBall != 4 && this.coords.vxBall != -4" v-on:click="hard()">Hard mode</button>
+        <button v-if="this.role > 0 && this.coords.vxBall != 5 && this.coords.vxBall != -5" v-on:click="insane()">Insane mode</button>
 
         <button v-if="this.role > 0" v-on:click="normalBg()">Normal background</button>
         <button v-if="this.role > 0" v-on:click="greenBg()">Green background</button>
@@ -283,9 +282,6 @@ export default {
       } else {
         return;
       }
-    },
-    replay: function() {
-      socket.emit('replay', this.coords.room);
     },
     moveBall: function() {
       if (this.role < 1 || !this.coords.moving)

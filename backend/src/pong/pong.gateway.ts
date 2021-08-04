@@ -57,8 +57,8 @@ function resetAllGame(): Coords {
     bar1Y: 220,
     bar2X: 685,
     bar2Y: 220,
-    vxBall: -2,
-    vyBall: 5,
+    vxBall: -3,
+    vyBall: 7,
     score1: 0,
     score2: 0,
     full: false,
@@ -316,13 +316,13 @@ export class PongGateway {
   @SubscribeMessage('bar1-bottom')
   bar1Bottom(@MessageBody() room: string): void  {
     if (!room.includes('-')) {
-      if (!(this.coordsArray[parseInt(room, 10)].bar1Y > 0))
+      if (!(this.coordsArray[parseInt(room, 10)].bar1Y < this.coordsArray[parseInt(room, 10)].height-100))
         return ;
       this.coordsArray[parseInt(room, 10)].bar1Y += 20;
       this.server.to(room).emit('new-coords', this.coordsArray[parseInt(room, 10)]);
     }
     else {
-      if (!(this.privateRooms[room].coords.bar1Y > 0))
+      if (!(this.privateRooms[room].coords.bar1Y < this.privateRooms[room].coords.height-100))
         return ;
       this.privateRooms[room].coords.bar1Y += 20;
       this.server.to(room).emit('new-coords', this.privateRooms[room].coords);
@@ -348,13 +348,13 @@ export class PongGateway {
   @SubscribeMessage('bar2-bottom')
   bar2Bottom(@MessageBody() room: string): void  {
     if (!room.includes('-')) {
-      if (!(this.coordsArray[parseInt(room, 10)].bar2Y > 0))
+      if (!(this.coordsArray[parseInt(room, 10)].bar2Y < this.coordsArray[parseInt(room, 10)].height-100))
         return ;
       this.coordsArray[parseInt(room, 10)].bar2Y += 20;
       this.server.to(room).emit('new-coords', this.coordsArray[parseInt(room, 10)]);
     }
     else {
-      if (!(this.privateRooms[room].coords.bar2Y > 0))
+      if (!(this.privateRooms[room].coords.bar2Y < this.privateRooms[room].coords.height-100))
         return ;
       this.privateRooms[room].coords.bar2Y += 20;
       this.server.to(room).emit('new-coords', this.privateRooms[room].coords);
@@ -381,7 +381,7 @@ export class PongGateway {
     while (true) {
       if (coords.moving == false || coords.end == true)
         return ;
-      await sleep(10);
+      await sleep(20);
       //this.coordsArray[parseInt(room, 10)].moving = true;
       coords.posX += coords.vxBall;
       coords.posY += coords.vyBall;
@@ -392,8 +392,6 @@ export class PongGateway {
       )
         coords.vxBall = -coords.vxBall;
       else if (coords.posX + coords.vxBall < 0) {
-        //this.server.to(room).emit('stop-move', null);
-        //this.coordsArray[parseInt(room, 10)].moving = false;
         coords = initGame(coords, 2);
         if (coords.score2 > 2)
           coords = endGame(coords, 2, client);
@@ -405,8 +403,6 @@ export class PongGateway {
       )
         coords.vxBall = -coords.vxBall;
       else if (coords.posX + coords.vxBall > 700) {
-        //this.server.to(room).emit('stop-move', null);
-        //this.coordsArray[parseInt(room, 10)].moving = false;
         coords = initGame(coords, 1);
         if (coords.score1 > 2)
           coords = endGame(coords, 1, client);
@@ -430,28 +426,8 @@ export class PongGateway {
     }
   }
 
-  @SubscribeMessage('replay')
-  replay(@MessageBody() room: string): void  {
-    this.coordsArray[parseInt(room, 10)].end = false;
-    this.coordsArray[parseInt(room, 10)].score1 = 0;
-    this.coordsArray[parseInt(room, 10)].score2 = 0;
-    this.server.to(room).emit("new-coords", this.coordsArray[parseInt(room, 10)]);
-  }
-
   @SubscribeMessage('normal')
   normal(@MessageBody() room: string, @ConnectedSocket() client: Socket): void  {
-    var coords = (room.includes('-')) ? this.privateRooms[room].coords : this.coordsArray[parseInt(room, 10)];
-    coords.vxBall = -2;
-    coords.vyBall = 5;
-    this.server.to(room).emit("new-coords", coords);
-    if (room.includes('-'))
-      this.privateRooms[room].coords = coords;
-    else
-      this.coordsArray[parseInt(room, 10)] = coords;
-  }
-
-  @SubscribeMessage('hard')
-  hard(@MessageBody() room: string, @ConnectedSocket() client: Socket): void  {
     var coords = (room.includes('-')) ? this.privateRooms[room].coords : this.coordsArray[parseInt(room, 10)];
     coords.vxBall = -3;
     coords.vyBall = 7;
@@ -462,11 +438,23 @@ export class PongGateway {
       this.coordsArray[parseInt(room, 10)] = coords;
   }
 
-  @SubscribeMessage('insane')
-  insane(@MessageBody() room: string, @ConnectedSocket() client: Socket): void  {
+  @SubscribeMessage('hard')
+  hard(@MessageBody() room: string, @ConnectedSocket() client: Socket): void  {
     var coords = (room.includes('-')) ? this.privateRooms[room].coords : this.coordsArray[parseInt(room, 10)];
     coords.vxBall = -4;
     coords.vyBall = 9;
+    this.server.to(room).emit("new-coords", coords);
+    if (room.includes('-'))
+      this.privateRooms[room].coords = coords;
+    else
+      this.coordsArray[parseInt(room, 10)] = coords;
+  }
+
+  @SubscribeMessage('insane')
+  insane(@MessageBody() room: string, @ConnectedSocket() client: Socket): void  {
+    var coords = (room.includes('-')) ? this.privateRooms[room].coords : this.coordsArray[parseInt(room, 10)];
+    coords.vxBall = -5;
+    coords.vyBall = 11;
     this.server.to(room).emit("new-coords", coords);
     if (room.includes('-'))
       this.privateRooms[room].coords = coords;
