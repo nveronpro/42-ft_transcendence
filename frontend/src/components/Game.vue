@@ -80,8 +80,8 @@ export default {
         bar1Y: 220,
         bar2X: 685,
         bar2Y: 220,
-        vxBall: -2,
-        vyBall: 5,
+        vxBall: -3,
+        vyBall: 7,
         score1: 0,
         score2: 0,
         full: false,
@@ -101,7 +101,7 @@ export default {
   created() {
     socket.on("rooms", totalRooms => {
 			this.totalRooms = totalRooms;
-        });
+    });
 
     axios
     .get('/auth/me')
@@ -171,6 +171,7 @@ export default {
 	  });
 
     socket.on("new-coords", coords => {
+      console.log(coords)
       let ctx = this.provider.context;
       let height = this.provider.canvas.height;
       let width = this.provider.canvas.width;
