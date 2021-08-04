@@ -9,7 +9,6 @@
         <button v-for="i in this.totalRooms" :key="i" v-on:click="joinSpect(i)">Room {{i}}</button>
         <h1>Or click on 'Play' to join a game :</h1>
         <button v-on:click="play()">Play</button>
-        <button v-on:click="test()">Test</button>
       </div>
     </div>
     
@@ -23,7 +22,6 @@
         <h1>Score : {{this.coords.score1}} - {{this.coords.score2}} </h1>
 
         <button v-if="this.role != 0 && !this.coords.end" v-on:click="move()">Play</button>
-        <button v-on:click="test()">Test</button>
 
         <button v-if="this.role > 0 && this.coords.vxBall != 3 && this.coords.vxBall != -3" v-on:click="normal()">Normal mode</button>
         <button v-if="this.role > 0 && this.coords.vxBall != 4 && this.coords.vxBall != -4" v-on:click="hard()">Hard mode</button>
@@ -83,8 +81,8 @@ export default {
         bar1Y: 220,
         bar2X: 685,
         bar2Y: 220,
-        vxBall: -2,
-        vyBall: 5,
+        vxBall: -3,
+        vyBall: 7,
         score1: 0,
         score2: 0,
         full: false,
@@ -104,7 +102,7 @@ export default {
   created() {
     socket.on("rooms", totalRooms => {
 			this.totalRooms = totalRooms;
-        });
+    });
 
     axios
     .get('/auth/me')
@@ -174,6 +172,7 @@ export default {
 	  });
 
     socket.on("new-coords", coords => {
+      console.log(coords)
       let ctx = this.provider.context;
       let height = this.provider.canvas.height;
       let width = this.provider.canvas.width;

@@ -95,8 +95,10 @@ function shiftRooms(coordsArray, roomsSockets, room, server) {
       sock.join((i).toString());});
     roomsSockets[i].player1.leave((i+1).toString());
     roomsSockets[i].player1.join((i).toString());
-    roomsSockets[i].player2.leave((i+1).toString());
-    roomsSockets[i].player2.join((i).toString());
+    if (roomsSockets[i].player2 != null) {
+      roomsSockets[i].player2.leave((i+1).toString());
+      roomsSockets[i].player2.join((i).toString());
+    }
     server.to(i.toString()).emit('new-coords', coordsArray[i]);
   }
 
