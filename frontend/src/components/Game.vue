@@ -192,7 +192,6 @@ export default {
         axios.post('/users/status/spectator').then()
       else
         axios.post('/users/status/online').then()
-    console.log('room = '+ this.coords.room)
   	});
 
     socket.on("reset", totalRooms => {
@@ -307,6 +306,8 @@ export default {
         socket.emit('insane', this.coords.room);
     },
     quit: function() {
+      if (this.coords.moving)
+        return ;
       socket.emit('quit', null);
     },
     move: function() {

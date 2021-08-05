@@ -304,7 +304,6 @@ export class PongGateway {
 
   @SubscribeMessage('bar1-top')
   bar1Top(@MessageBody() data): void  {
-    console.log('bol = '+ data.bol)
     if (!data.room.includes('-'))
       this.coordsArray[parseInt(data.room, 10)].bar1Top = data.bol;
     else
@@ -356,10 +355,6 @@ export class PongGateway {
       if (coords.moving == false || coords.end == true)
         return ;
       await sleep(20);
-      console.log(coords.bar1Top);
-      console.log(coords.bar1Bottom);
-      console.log(coords.bar2Top);
-      console.log(coords.bar2Bottom);
       if (coords.bar1Top == true && coords.bar1Y > 0)
         coords.bar1Y -= 15;
       if (coords.bar1Bottom == true && coords.bar1Y < coords.height-100)
