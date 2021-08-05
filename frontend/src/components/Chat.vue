@@ -162,7 +162,7 @@
 		},
 		computed: {
 			filterFriends() {
-				const { friends, keyword } = this;
+				const { keyword } = this;
 				let u = JSON.parse(JSON.stringify( this.friends ));
 				if (keyword !== ""){
 					return u.filter(({ nickname }) => nickname.toLowerCase().includes(keyword.toLowerCase()));
@@ -170,7 +170,7 @@
 				return null;
 			},
 			filterGroups() {
-				const { groups, keyword } = this;
+				const { keyword } = this;
 				let u = JSON.parse(JSON.stringify( this.groups ));
 				if (keyword !== ""){
 					return u.filter(({ name }) => name.toLowerCase().includes(keyword.toLowerCase()));
@@ -243,7 +243,7 @@
 				{
 					if (split[1] == undefined || split[1] == "") {
 						this.messages.push({
-							login: this.user.login,
+							login: "Server",
 							text: "/duel [user_login]",
 							destination: dest,
 						});
@@ -435,7 +435,6 @@
 										'</div>' +
 									'</div>';
 				messages.appendChild(content);
-				console.log(data);
 			}
 		},
 		async created () {
@@ -453,35 +452,26 @@
 			this.socket = io('http://localhost:8080', { withCredentials: true });
 			this.socket_pong = io('http://localhost:8080/', { path: '/pong/', withCredentials: true });
 
-			this.socket_pong.on('new-coords', (message) => {
-				console.log(`NEW COORDS CHAT VUE`);
-			})
 			this.socket.on('message', (message) => {
-				console.log(`event: message`);
 				this.receivedMessage(message)
 			})
 			this.socket.on('open', (chat) => {
-				console.log(`event: open`);
 				this.openChat(chat);
 			})
 
 			this.socket.on('close', (chat) => {
-				console.log(`event: close`);
 				this.closeChat(chat);
 			})
 
 			this.socket.on('mute', (data) => {
-				console.log(`event: mute`);
 				this.mute(data);
 			})
 
 			this.socket.on('profile', (data) => {
-				console.log(`event: profile`);
 				this.profile(data);
 			})
 
 			this.socket.on('error', (data) => {
-				console.log(`event: error`);
 				console.log(data);
 			})
 

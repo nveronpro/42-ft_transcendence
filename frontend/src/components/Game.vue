@@ -31,8 +31,8 @@
                 <button class="m-1 btn btn-secondary" v-if="this.role > 0" v-on:click="normalBg()">Normal background</button>
                 <button class="m-1 btn btn-secondary" v-if="this.role > 0" v-on:click="greenBg()">Green background</button>
 
-        <h2 v-if="this.coords.spects.length">They are looking the game :</h2>
-        <h2 v-for="s in this.coords.spects" :key="s">- {{s}}, </h2>
+        <!--<h4 v-if="this.coords.spects.length">They are looking the game :</h4>
+        <p v-for="s in this.coords.spects" :key="s">- {{s}}, </p>-->
       </div>
     </div>
     <canvas id="pong" ref="pong"> </canvas>
@@ -80,8 +80,8 @@ export default {
         bar1Y: 220,
         bar2X: 685,
         bar2Y: 220,
-        vxBall: -2,
-        vyBall: 5,
+        vxBall: -3,
+        vyBall: 7,
         score1: 0,
         score2: 0,
         full: false,
@@ -101,7 +101,7 @@ export default {
   created() {
     socket.on("rooms", totalRooms => {
 			this.totalRooms = totalRooms;
-        });
+    });
 
     axios
     .get('/auth/me')
@@ -123,7 +123,7 @@ export default {
 
     window.addEventListener('keydown', (e) =>{
     if(e.keyCode === 38 && this.coords.bar1Y > 0 && this.role == 1){
-      console.log('haut');
+      //console.log('haut');
       socket.emit('bar1-top', this.coords.room);
     }else if (e.keyCode === 40 && this.coords.bar1Y < this.provider.canvas.height-100 && this.role == 1){
       socket.emit('bar1-bottom', this.coords.room);
@@ -159,7 +159,7 @@ export default {
   	});
 
     socket.on("reset", totalRooms => {
-      console.log('reset');
+      //console.log('reset');
       socket.leave(this.coords.room);
 			this.role = -1;
 			this.totalRooms = totalRooms;
@@ -171,6 +171,7 @@ export default {
 	  });
 
     socket.on("new-coords", coords => {
+      //console.log(coords)
       let ctx = this.provider.context;
       let height = this.provider.canvas.height;
       let width = this.provider.canvas.width;

@@ -28,6 +28,7 @@ const router = createRouter({
     { path: '/leaderboard', name: 'Leaderboard', component: LeaderboardComponent },
   ]
 })
+
 initAxios();
 
 const app = createApp(App);

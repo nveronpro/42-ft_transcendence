@@ -5,10 +5,10 @@
         <h1 class="display-4 fw-bold lh-1" style="font-size:3.5vw;">FT_TRANSCENDENCE</h1>
         <p class="lead">Ft_transcendence is an 42 project. It's a simple pong website, you can play pong and send chat with your friends !</p>
         <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4 mb-lg-3">
-          <a class="btn btn-primary btn-lg px-4 me-md-2 fw-bold" href="https://github.com/Arrvac/ft_transcendence">Github</a>
-          <a class="btn btn-outline-secondary btn-lg px-4" href="https://profile.intra.42.fr/users/oroberts">Oroberts</a>
-          <a class="btn btn-outline-secondary btn-lg px-4" href="https://profile.intra.42.fr/users/mavileo">Mavileo</a>
-          <a class="btn btn-outline-secondary btn-lg px-4" href="https://profile.intra.42.fr/users/nveron">Nveron</a>
+          <a class="btn btn-primary btn-lg px-4 me-md-2 fw-bold" href="https://github.com/Arrvac/ft_transcendence" target="_blank">Github</a>
+          <a class="btn btn-outline-secondary btn-lg px-4" href="https://profile.intra.42.fr/users/oroberts" target="_blank">Oroberts</a>
+          <a class="btn btn-outline-secondary btn-lg px-4" href="https://profile.intra.42.fr/users/mavileo" target="_blank">Mavileo</a>
+          <a class="btn btn-outline-secondary btn-lg px-4" href="https://profile.intra.42.fr/users/nveron" target="_blank">Nveron</a>
         </div>
       </div>
       <div class="col-lg-4 offset-lg-1 p-0 overflow-hidden shadow-lg">
