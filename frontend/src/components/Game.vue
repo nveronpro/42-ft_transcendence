@@ -85,7 +85,11 @@ export default {
         score1: 0,
         score2: 0,
         full: false,
-        end: false
+        end: false,
+        bar1Top: false,
+        bar1Bottom: false,
+        bar2Top: false,
+        bar2Bottom: false,
       },
       role: -1,
       totalRooms: 0
@@ -122,22 +126,54 @@ export default {
 		});
 
     window.addEventListener('keydown', (e) =>{
-    if(e.keyCode === 38 && this.coords.bar1Y > 0 && this.role == 1){
-      //console.log('haut');
-      socket.emit('bar1-top', this.coords.room);
-    }else if (e.keyCode === 40 && this.coords.bar1Y < this.provider.canvas.height-100 && this.role == 1){
-      socket.emit('bar1-bottom', this.coords.room);
-    }
-    });
-
-    window.addEventListener('keydown', (e) =>{
-    if(e.keyCode === 38 && this.coords.bar2Y > 0 && this.role == 2){
-      socket.emit('bar2-top', this.coords.room);
-    }else if (e.keyCode === 40 && this.coords.bar2Y < this.provider.canvas.height-100 && this.role == 2){
-      socket.emit('bar2-bottom', this.coords.room);
+    if(e.keyCode === 38 && this.role == 1){
+      socket.emit('bar1-top', {
+        room: this.coords.room,
+        bol: true});
+    }else if (e.keyCode === 40 && this.role == 1){
+      socket.emit('bar1-bottom', {
+        room: this.coords.room,
+        bol: true});
     }
     });
     
+    window.addEventListener('keyup', (e) =>{
+    if(e.keyCode === 38 && this.role == 1){
+      socket.emit('bar1-top', {
+        room: this.coords.room,
+        bol: false});
+    }else if (e.keyCode === 40 && this.role == 1){
+      socket.emit('bar1-bottom', {
+        room: this.coords.room,
+        bol: false});
+    }
+    });
+    
+    window.addEventListener('keydown', (e) =>{
+    if(e.keyCode === 38 && this.role == 2){
+      socket.emit('bar2-top', {
+        room: this.coords.room,
+        bol: true});
+    }else if (e.keyCode === 40 && this.role == 2){
+      socket.emit('bar2-bottom', {
+        room: this.coords.room,
+        bol: true});
+    }
+    });
+    
+    window.addEventListener('keyup', (e) =>{
+    if(e.keyCode === 38 && this.role == 2){
+      socket.emit('bar2-top', {
+        room: this.coords.room,
+        bol: false});
+    }else if (e.keyCode === 40 && this.role == 2){
+      socket.emit('bar2-bottom', {
+        room: this.coords.room,
+        bol: false});
+    }
+    });
+    
+
     socket.on("rooms", totalRooms => {
 			this.totalRooms = totalRooms;
 	});
@@ -156,6 +192,7 @@ export default {
         axios.post('/users/status/spectator').then()
       else
         axios.post('/users/status/online').then()
+    console.log('room = '+ this.coords.room)
   	});
 
     socket.on("reset", totalRooms => {

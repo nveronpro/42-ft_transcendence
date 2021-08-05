@@ -62,9 +62,12 @@ function resetAllGame(): Coords {
     score1: 0,
     score2: 0,
     full: false,
-    end: false
-
-  }
+    end: false,
+    bar1Top: false,
+    bar1Bottom: false,
+    bar2Top: false,
+    bar2Bottom: false,
+}
   return coords;
 }
 
@@ -300,67 +303,36 @@ export class PongGateway {
   }
 
   @SubscribeMessage('bar1-top')
-  bar1Top(@MessageBody() room: string): void  {
-    if (!room.includes('-')) {
-      if (!(this.coordsArray[parseInt(room, 10)].bar1Y > 0))
-        return ;
-      this.coordsArray[parseInt(room, 10)].bar1Y -= 20;
-      this.server.to(room).emit('new-coords', this.coordsArray[parseInt(room, 10)]);
-    }
-    else {
-      if (!(this.privateRooms[room].coords.bar1Y > 0))
-        return ;
-      this.privateRooms[room].coords.bar1Y -= 20;
-      this.server.to(room).emit('new-coords', this.privateRooms[room].coords);
-    }
+  bar1Top(@MessageBody() data): void  {
+    console.log('bol = '+ data.bol)
+    if (!data.room.includes('-'))
+      this.coordsArray[parseInt(data.room, 10)].bar1Top = data.bol;
+    else
+      this.privateRooms[data.room].coords.bar1Top = data.bol;
   }
 
   @SubscribeMessage('bar1-bottom')
-  bar1Bottom(@MessageBody() room: string): void  {
-    if (!room.includes('-')) {
-      if (!(this.coordsArray[parseInt(room, 10)].bar1Y < this.coordsArray[parseInt(room, 10)].height-100))
-        return ;
-      this.coordsArray[parseInt(room, 10)].bar1Y += 20;
-      this.server.to(room).emit('new-coords', this.coordsArray[parseInt(room, 10)]);
-    }
-    else {
-      if (!(this.privateRooms[room].coords.bar1Y < this.privateRooms[room].coords.height-100))
-        return ;
-      this.privateRooms[room].coords.bar1Y += 20;
-      this.server.to(room).emit('new-coords', this.privateRooms[room].coords);
-    }
+  bar1Bottom(@MessageBody() data): void  {
+    if (!data.room.includes('-'))
+      this.coordsArray[parseInt(data.room, 10)].bar1Bottom = data.bol;
+    else
+      this.privateRooms[data.room].coords.bar1Bottom = data.bol;
   }
 
   @SubscribeMessage('bar2-top')
-  bar2Top(@MessageBody() room: string): void  {
-    if (!room.includes('-')) {
-      if (!(this.coordsArray[parseInt(room, 10)].bar2Y > 0))
-        return ;
-      this.coordsArray[parseInt(room, 10)].bar2Y -= 20;
-      this.server.to(room).emit('new-coords', this.coordsArray[parseInt(room, 10)]);
-    }
-    else {
-      if (!(this.privateRooms[room].coords.bar2Y > 0))
-        return ;
-      this.privateRooms[room].coords.bar2Y -= 20;
-      this.server.to(room).emit('new-coords', this.privateRooms[room].coords);
-    }
+  bar2Top(@MessageBody() data): void  {
+    if (!data.room.includes('-'))
+      this.coordsArray[parseInt(data.room, 10)].bar2Top = data.bol;
+    else
+      this.privateRooms[data.room].coords.bar2Top = data.bol;
   }
 
   @SubscribeMessage('bar2-bottom')
-  bar2Bottom(@MessageBody() room: string): void  {
-    if (!room.includes('-')) {
-      if (!(this.coordsArray[parseInt(room, 10)].bar2Y < this.coordsArray[parseInt(room, 10)].height-100))
-        return ;
-      this.coordsArray[parseInt(room, 10)].bar2Y += 20;
-      this.server.to(room).emit('new-coords', this.coordsArray[parseInt(room, 10)]);
-    }
-    else {
-      if (!(this.privateRooms[room].coords.bar2Y < this.privateRooms[room].coords.height-100))
-        return ;
-      this.privateRooms[room].coords.bar2Y += 20;
-      this.server.to(room).emit('new-coords', this.privateRooms[room].coords);
-    }
+  bar2Bottom(@MessageBody() data): void  {
+    if (!data.room.includes('-'))
+      this.coordsArray[parseInt(data.room, 10)].bar2Bottom = data.bol;
+    else
+      this.privateRooms[data.room].coords.bar2Bottom = data.bol;
   }
 
   @SubscribeMessage('set-move')
@@ -384,16 +356,30 @@ export class PongGateway {
       if (coords.moving == false || coords.end == true)
         return ;
       await sleep(20);
-      //this.coordsArray[parseInt(room, 10)].moving = true;
+      console.log(coords.bar1Top);
+      console.log(coords.bar1Bottom);
+      console.log(coords.bar2Top);
+      console.log(coords.bar2Bottom);
+      if (coords.bar1Top == true && coords.bar1Y > 0)
+        coords.bar1Y -= 15;
+      if (coords.bar1Bottom == true && coords.bar1Y < coords.height-100)
+        coords.bar1Y += 15;
+      if (coords.bar2Top == true && coords.bar2Y > 0)
+        coords.bar2Y -= 15;
+      if (coords.bar2Bottom == true && coords.bar2Y < coords.height-100)
+        coords.bar2Y += 15;
       coords.posX += coords.vxBall;
       coords.posY += coords.vyBall;
       if (
         coords.posY <= coords.bar1Y + 100 &&
         coords.posY >= coords.bar1Y &&
         coords.posX <= 15 && coords.posX >= 0
-      )
-        coords.vxBall = -coords.vxBall;
-      else if (coords.posX + coords.vxBall < 0) {
+        ) {
+          coords.vxBall = -coords.vxBall;
+          coords.posX += coords.vxBall;
+          coords.posY += coords.vyBall;
+        }
+        else if (coords.posX + coords.vxBall < 0) {
         coords = initGame(coords, 2);
         if (coords.score2 > 2)
           coords = endGame(coords, 2, client);
@@ -402,8 +388,11 @@ export class PongGateway {
         coords.posY <= coords.bar2Y + 100 &&
         coords.posY >= coords.bar2Y &&
         coords.posX >= 685 && coords.posX <= 700
-      )
+      ) {
         coords.vxBall = -coords.vxBall;
+        coords.posX += coords.vxBall;
+        coords.posY += coords.vyBall;
+      }
       else if (coords.posX + coords.vxBall > 700) {
         coords = initGame(coords, 1);
         if (coords.score1 > 2)

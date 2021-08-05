@@ -76,15 +76,20 @@
 			}
 		},
 		async mounted () {
-			await axios.post('/users/status/online');
+			try {
+				await axios.post('/users/status/online');
+				axios
+				.get('/auth/me')
+				.then(response => ( this.user = response.data ))
+				axios
+				.get('/users/all/')
+				.then(response => (this.users = response.data))
+				this.google_auth_verify = false;
+			}
+			catch {
+				console.log();
+			}
 			
-			axios
-			.get('/auth/me')
-			.then(response => ( this.user = response.data ))
-			axios
-			.get('/users/all/')
-			.then(response => (this.users = response.data))
-			this.google_auth_verify = false;
 		},
 		updated () {
 			axios
@@ -93,8 +98,13 @@
 				var img = document.createElement("img");
 				img.src = response.data.qrcode_data;
 				let doc = document.getElementById("qrcode");
+				try {
 				if (!doc.querySelector("img"))
 					doc.appendChild(img);
+				}
+				catch {
+					console.log();
+				}
 			})
 		},
 		created() {

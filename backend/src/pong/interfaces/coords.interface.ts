@@ -24,4 +24,9 @@ export interface Coords {
     score2: number;
     full: boolean;
     end: boolean;
+    bar1Top: boolean;
+    bar1Bottom: boolean;
+    bar2Top: boolean;
+    bar2Bottom: boolean;
+
 }
