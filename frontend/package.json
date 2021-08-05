@@ -6,7 +6,7 @@
         "serve": "vue-cli-service serve",
         "build": "vue-cli-service build --mode prod",
         "lint": "vue-cli-service lint",
-        "production": "vue-cli-service serve --mode production"
+        "production": "vue-cli-service serve --mode production --skip-plugins @vue/cli-plugin-eslint --port 3000"
     },
     "dependencies": {
         "@nestjs/cli": "^8.0.2",

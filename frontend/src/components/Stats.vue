@@ -94,7 +94,7 @@
 				match_histories: null,
 			}
 		},
-		mounted () {
+		beforeCreate () {
 			axios
 			.get('/auth/me')
 			.then(response => (this.user = response.data))

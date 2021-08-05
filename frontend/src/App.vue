@@ -102,7 +102,7 @@
 				axios
 				.post('/users/status/offline');
 			});
-			window.onload = (event) => {
+			window.onload = () => {
 				if (window.location.href != "http://localhost:3000/#/home") {
 					window.location.href = "http://localhost:3000/#/home"
 				}
