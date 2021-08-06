@@ -67,7 +67,8 @@ function resetAllGame(): Coords {
     bar1Bottom: false,
     bar2Top: false,
     bar2Bottom: false,
-}
+    needShift: false,
+  }
   return coords;
 }
 
@@ -203,6 +204,7 @@ export class PongGateway {
 
   @SubscribeMessage('init')
   init(@MessageBody() user: number, @ConnectedSocket() client: Socket): void  {
+    this.server.emit('rooms', this.rooms);
     this.clientsSockets[user] = client;
   }
 
@@ -404,11 +406,11 @@ export class PongGateway {
           coords.vxBall = -coords.vxBall;
         }
       }
-      this.server.to(room).emit('new-coords', coords);
-      if (room.includes('-'))
-        this.privateRooms[room].coords = coords;
+      this.server.to(coords.room).emit('new-coords', coords);
+      if (coords.room.includes('-'))
+        this.privateRooms[coords.room].coords = coords;
       else
-        this.coordsArray[parseInt(room, 10)] = coords;
+        this.coordsArray[parseInt(coords.room, 10)] = coords;
     }
   }
 

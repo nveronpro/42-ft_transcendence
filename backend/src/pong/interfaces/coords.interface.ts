@@ -28,5 +28,6 @@ export interface Coords {
     bar1Bottom: boolean;
     bar2Top: boolean;
     bar2Bottom: boolean;
+    needShift: boolean,
 
 }
