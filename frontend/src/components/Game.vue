@@ -90,7 +90,6 @@ export default {
         bar1Bottom: false,
         bar2Top: false,
         bar2Bottom: false,
-        needShift: false,
       },
       role: -1,
       totalRooms: 0
@@ -105,7 +104,6 @@ export default {
 
   created() {
     socket.on("rooms", totalRooms => {
-      console.log('total rooms ' + totalRooms)
 			this.totalRooms = totalRooms;
     });
 
@@ -124,7 +122,6 @@ export default {
     this.provider.canvas.height = "500";
 
     socket.on("rooms", totalRooms => {
-      console.log('total rooms2 ' + totalRooms)
 			this.totalRooms = totalRooms;
 		});
 
@@ -179,7 +176,6 @@ export default {
 
     socket.on("rooms", totalRooms => {
 			this.totalRooms = totalRooms;
-      console.log('total rooms3 ' + totalRooms)
 	});
 
     socket.on("role", data => {

@@ -67,7 +67,6 @@ function resetAllGame(): Coords {
     bar1Bottom: false,
     bar2Top: false,
     bar2Bottom: false,
-    needShift: false,
   }
   return coords;
 }
